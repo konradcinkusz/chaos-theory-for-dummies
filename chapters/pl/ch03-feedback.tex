@@ -11,7 +11,10 @@
 %% Gdzie dokładnie punkt stały traci stabilność, diagram pajęczynowy na
 %% paraboli, cykl o okresie cztery i nieregularne zachowanie dalej należą do
 %% rozdziału 5; diagram bifurkacyjny do rozdziału 8; r = 4 nie pada wcale.
-%% Nachylenie jest MIERZONE, nigdy nie podane wzorem.
+%% Nachylenie pochodzi z rozdziału 2 i jest mierzone szturchaniem funkcją
+%% slope z chaoslab; ten rozdział je STOSUJE do krzywej i nigdy nie podaje
+%% wzoru. Wzrost wykładniczy i logarytm też są z rozdziału 2, więc
+%% podrozdział o podwajaniu jest krótki i do niego odsyła.
 %%
 %% Bliźniak: chapters/en/ch03-feedback.tex. Podrozdział za podrozdziałem,
 %% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
@@ -41,8 +44,8 @@ pierwszą niespodziankę: populacja, której kończy się miejsce, nie zawsze
 \outcome{zamienić zdanie \enquote{wzrost zwalnia, gdy brakuje miejsca} w
   regułę i ją uruchomić}
 \outcome{sprawdzić, czy skutki dwóch pchnięć danej reguły się sumują}
-\outcome{znaleźć punkty stałe reguły krzywoliniowej i zmierzyć obliczeniowo
-  nachylenie w każdym z nich}
+\outcome{znaleźć punkty stałe reguły krzywoliniowej i ocenić każdy z nich po
+  zmierzonym nachyleniu}
 \outcome{przewidzieć na podstawie tego nachylenia, co zrobi populacja w
   pobliżu swojego poziomu ustalonego}
 \end{outcomes}
@@ -52,28 +55,27 @@ pierwszą niespodziankę: populacja, której kończy się miejsce, nie zawsze
 \index{podwajanie}\index{bakterie}
 
 \noindent
-Podwajanie to najprostszy wzrost, jaki istnieje: na każdym kroku każda
-sztuka tego, co masz, zamienia się w dwie. Rozdział~\ref{ch:iteration} nazwał
-taki wzrost, proporcjonalny do tego, co już jest, wykładniczym.
+Rozdział~\ref{ch:iteration} nazwał wykładniczym wzrost, który na każdym
+kroku mnoży przez tę samą liczbę, i policzył logarytmem, ile kroków trwa
+podwojenie. Bakteria to właśnie taki wzrost, z mnożnikiem dwa co dwadzieścia
+minut.
 
 \begin{think}
-Wróćmy do bakterii, która podwaja się co dwadzieścia minut. Mniej więcej po
-jakim czasie kolonia będzie ważyć więcej niż Ziemia: po stu latach, po roku,
-po miesiącu czy po dwóch dniach?
+Mniej więcej po jakim czasie jej kolonia będzie ważyć więcej niż Ziemia: po
+stu latach, po roku, po miesiącu czy po dwóch dniach?
 \end{think}
 \reveal{Po niecałych dwóch dniach: po \val{ch03.earth.doublings}
 podwojeniach, czyli po \val{ch03.earth.hours} godziny. Jedna komórka waży
 około jednej bilionowej grama.}
-Większość ludzi zgaduje rok albo dłużej. Listing liczy na liczbach
-całkowitych, więc po drodze nic się nie zaokrągla:
+Większość ludzi zgaduje rok albo dłużej. Logarytm z
+rozdziału~\ref{ch:iteration} podałby tę liczbę; listing zamiast tego liczy
+na liczbach całkowitych, a wiersz \code{cells = 2 * cells} to cała reguła
+wzrostu.
 
 \pyregion{code/ch03/doubling.py}{grow}{Liczenie podwojeń, aż kolonia przeważy Ziemię}{lst:ch03-grow}
 
 \noindent
-Wiersz \code{cells = 2 * cells} to cała reguła wzrostu. Reszta programu
-wypisuje stan kolonii co osiem godzin:
-
-\pyregion{code/ch03/doubling.py}{table}{Kolonia co osiem godzin}{lst:ch03-table}
+Reszta programu wypisuje stan kolonii co osiem godzin:
 
 \transcript{ch03-doubling}
 
@@ -83,13 +85,10 @@ W skrócie, którym Python zapisuje bardzo duże i bardzo małe liczby,
 prawo (Python stawia kropkę tam, gdzie po polsku piszemy przecinek), a
 \code{1.0e-12} to przecinek przesunięty o dwanaście miejsc w lewo. Po jednej
 dobie kolonia ważyłaby około \val{ch03.day.tonnes} ton; niecałą dobę później
-więcej niż planeta.
-
-Podwajanie myli oko, bo każdy krok dodaje więcej niż wszystkie wcześniejsze
-razem. Połóż jedno ziarnko ryżu na pierwszym polu szachownicy, dwa na drugim,
-cztery na trzecim i tak dalej: pierwsze cztery pola mieszczą
-$1 + 2 + 4 + 8 = 15$ ziarenek, a piąte samo $16$, i na końcu ostatnie pole
-mieści więcej niż pozostałe sześćdziesiąt trzy razem.
+więcej niż planeta. Podwajanie myli oko, bo każdy krok dodaje więcej niż
+wszystkie wcześniejsze razem: połóż jedno ziarnko ryżu na pierwszym polu
+szachownicy, dwa na drugim i cztery na trzecim, a ostatnie pole zmieści
+więcej niż pozostałe sześćdziesiąt trzy razem.
 
 Nic nie rośnie tak długo. W kolbie z bulionem bakterie zatrzymują się na
 kilku miliardach komórek w każdym mililitrze, gdy kończy się pożywienie i
@@ -148,10 +147,10 @@ część miejsca, która jest jeszcze wolna.
 
 Gdy miejsca jest pod dostatkiem, przyjmij, że każde zwierzę zostawia $r$
 młodych, które dożyją rozrodu, więc następne pokolenie jest $r$ razy
-liczniejsze od obecnego: $x \to r x$. Dla $r = 2$ to reguła podwajania.
+liczniejsze od obecnego: $x \mapsto r x$. Dla $r = 2$ to reguła podwajania.
 Teraz niech zatłoczenie ją spowolni: pomnóż przez część miejsca, która jest
 jeszcze wolna:
-\[ x \;\to\; r\,x\,(1 - x). \]
+\[ x \;\mapsto\; r\,x\,(1 - x). \]
 Słowami: następne pokolenie to tyle, ile obecne wydałoby na świat, mając
 miejsca pod dostatkiem, pomniejszone w proporcji do miejsca, które zostało.
 Dopóki $x$ jest maleńkie, $1 - x$ jest bliskie $1$ i reguła jest prawie
@@ -278,12 +277,13 @@ Gdzie ustali się populacja przy $r = \num{1.5}$?
 $1 - \tfrac{2}{3} = \tfrac{1}{3}$.}
 Punkt stały to tylko połowa odpowiedzi; druga połowa to pytanie, czy
 populacja w jego pobliżu jest do niego przyciągana, czy od niego odpychana.
-Dla reguły prostoliniowej $x \to a x + b$ rozstrzygał to mnożnik $a$:
-szturchnięcie od punktu stałego jest na każdym kroku mnożone przez $a$, więc
-maleje, gdy $a$ leży między $-1$ a $1$, a w przeciwnym razie rośnie. Krzywa
-nie ma jednego mnożnika; jej stromość zmienia się od miejsca do miejsca. Ale
-przybliż ją, a w pobliżu dowolnego punktu wygląda jak prosta \dash{} a prosta
-ma mnożnik. To jej stromość, czyli \emph{nachylenie}.
+Rozdział~\ref{ch:iteration} odpowiedział na nie dla prostej: szturchnięcie od
+punktu stałego jest na każdym kroku mnożone przez \emph{nachylenie} reguły, a
+punkt stały trzyma, gdy nachylenie co do wielkości jest mniejsze od jedności.
+Stwierdził też, że nachylenie krzywej zmienia się od miejsca do miejsca. To
+nie psuje sprawdzianu, bo dość małe szturchnięcie czuje tylko ten kawałek
+krzywej, na którym jest: przybliż ją, a w pobliżu dowolnego punktu wygląda
+jak prosta.
 
 \plotfig{ch03-zoom}{Reguła zatłoczenia przy $r = \num{1.5}$, przybliżona
 wokół punktu stałego w jednej trzeciej. Z bliska krzywej nie da się odróżnić
@@ -291,13 +291,10 @@ od prostej, a stromość tej prostej rozstrzyga, co stanie się z małym
 szturchnięciem.}{przybliżanie, aż krzywa wygląda na prostą}
 
 \noindent
-Zmierz więc nachylenie: szturchnij populację o jedną milionową w górę i o
-jedną milionową w dół i zobacz, jak daleko od siebie wylądują następne
-pokolenia.
+Zmierz więc nachylenie w każdym punkcie stałym, szturchając, funkcją
+\api{slope} z \pkg{chaoslab}, tak jak w rozdziale~\ref{ch:iteration}:
 
-\pyregion{code/ch03/settle.py}{slope}{O ile jedno pokolenie mnoży maleńkie szturchnięcie}{lst:ch03-slope}
-
-\pyregion{code/ch03/settle.py}{table}{Nachylenie w obu punktach stałych, dla dwóch wartości tempa wzrostu}{lst:ch03-slopes}
+\pyregion{code/ch03/settle.py}{measure}{Nachylenie reguły zatłoczenia w obu punktach stałych, dla dwóch wartości tempa wzrostu}{lst:ch03-slope}
 
 \transcript{ch03-settle}
 
@@ -312,9 +309,9 @@ pustym miejscu się mnoży, czyli rośnie, i ten punkt stały jest
 szturchnięcie znika prawie całkowicie w jednym pokoleniu, i dlatego kolumna
 zatłoczenia tak szybko wskoczyła na \num{0.5}.
 
-Na tej idei opiera się reszta książki: \textbf{na krzywej nachylenie w danym
-punkcie jest mnożnikiem maleńkiego szturchnięcia w tym miejscu}, a znajduje
-się je, szturchając i patrząc.
+Na tej idei opiera się reszta książki: \textbf{w punkcie stałym krzywej
+nachylenie robi to, co dla prostej robił mnożnik}, i rozstrzyga, czy małe
+szturchnięcie wygaśnie, czy urośnie.
 
 \begin{rigourbox}
 Przyjęte tu na wiarę: że nachylenie rozstrzyga dla krzywej to, co mnożnik
@@ -325,18 +322,21 @@ rachunek różniczkowy nazywa \emph{pochodną}, i tutaj jest dokładny co do
 każdej wydrukowanej cyfry.
 \end{rigourbox}
 
-\begin{lab}{l03_01_slope}{Zmierz nachylenie i oceń punkt stały}
-Napisz \code{slope}, które mierzy nachylenie dowolnej reguły, jaką mu
-podasz; \code{fixed\_points}, które podaje oba punkty stałe reguły
-zatłoczenia; oraz \code{is\_stable}, które na podstawie nachylenia mówi, czy
-punkt stały trzyma. Testy obejmują przycisk cosinusa na kalkulatorze,
-naciskany raz za razem.
-\end{lab}
-
 \begin{projectbox}
-Wspólna biblioteka książki, \pkg{chaoslab}, ma ten pomiar dla dowolnej
-reguły jako \api{slope}, a późniejsze rozdziały z niego korzystają.
+\pkg{chaoslab} ma regułę zatłoczenia jako \api{logistic}: podaj jej $r$, a
+zwróci regułę gotową dla \api{slope} i \api{orbit}. Ta nazwa pochodzi z
+rozdziału~\ref{ch:logistic}, w którym zaczynają się dziwniejsze zwyczaje tej
+reguły.
 \end{projectbox}
+
+\begin{lab}{l03_01_verdict}{Odczytaj los punktu stałego z nachylenia}
+Napisz \code{fixed\_points}, które podaje oba punkty stałe reguły
+zatłoczenia; \code{level\_slope}, które mierzy nachylenie w poziomie
+ustalonym; oraz \code{verdict}, które z tego nachylenia odczytuje, czy
+populacja szturchnięta z poziomu podpełza z powrotem, wraca wahając się, czy
+zostaje odepchnięta. Testy uruchamiają regułę na dwa tysiące pokoleń i
+sprawdzają twój werdykt z tym, co się dzieje.
+\end{lab}
 
 \section{Przestrzelenie}
 \label{sec:ch03-overshoot}
@@ -368,19 +368,20 @@ nie muszą wygasać.
 \noindent
 Nachylenie mówi dlaczego. W poziomie ustalonym przy $r = \num{2.8}$ wynosi
 ono \val{ch03.slope.over}. Co do wielkości jest mniejsze od jedności, więc
-szturchnięcie maleje i poziom jest stabilny. Ale jest ujemne: populacja
-trochę powyżej poziomu zostaje posłana trochę poniżej niego, potem znów
-trochę powyżej. Ujemne nachylenie to przestrzelenie wbudowane w regułę, a
-ustalanie się przez coraz mniejsze wahania nazywa się \emph{oscylacją
-tłumioną}.
+szturchnięcie maleje i poziom jest stabilny. Ale jest ujemne, a
+rozdział~\ref{ch:iteration} pokazał na prostej, co robi ujemny mnożnik:
+populacja trochę powyżej poziomu zostaje posłana trochę poniżej niego, potem
+znów trochę powyżej. Ustalanie się przez coraz mniejsze wahania nazywa się
+\emph{oscylacją tłumioną}.
 
 Przestrzelenie bierze się z opóźnienia. Reguła wylicza zmianę na całe
 pokolenie z tego, jak zatłoczone jest miejsce teraz, i patrzy znowu dopiero
 pokolenie później. Przy \val{ch03.over.before}, poniżej swojego poziomu,
 populacja widzi mnóstwo miejsca i wydaje na świat liczne następne pokolenie;
 zanim te młode się pojawią, miejsca już nie ma, a populacja jest ponad
-poziomem. Znasz to z obcego prysznica: przekręcasz kurek w stronę gorącej
-wody, nic się nie dzieje, więc przekręcasz dalej \dash{} a potem cię parzy.
+poziomem. Hotelowy prysznic z rozdziału~\ref{ch:iteration} przestrzeliwał
+z tego samego powodu: woda, którą czujesz, wypłynęła z kurka kilka sekund
+temu, więc przekręcasz kurek dalej, niż trzeba \dash{} a potem cię parzy.
 
 Żeby sprawdzić to wyjaśnienie, usuń opóźnienie. Zachowaj to samo prawo
 zmiany, ale niech populacja sprawdza swoje zatłoczenie dziesięć razy na
@@ -457,14 +458,14 @@ zaskakiwać.
 
 \begin{summarybox}
 \begin{itemize}
-\item \textbf{Wzrost wykładniczy}, proporcjonalny do tego, co już jest, na
-  każdym kroku dodaje więcej niż wszystkie wcześniejsze kroki, i nic
-  rzeczywistego nie rośnie tak długo.
+\item \textbf{Wzrost wykładniczy}, poznany w rozdziale~\ref{ch:iteration},
+  przy każdym podwojeniu dodaje więcej niż wszystkie wcześniejsze podwojenia,
+  i nic rzeczywistego nie rośnie tak długo.
 \item \textbf{Sprzężenie zwrotne} to wielkość, która zmienia własne tempo
   zmian. \textbf{Dodatnie sprzężenie zwrotne} pcha dalej (wycie głośnika, run
   na bank), aż natrafi na granicę; \textbf{ujemne sprzężenie zwrotne} stawia
   opór (termostat, zatłoczenie).
-\item Zatłoczenie wpisane w podwajanie daje $x \to r x (1 - x)$, gdzie $x$ to
+\item Zatłoczenie wpisane w podwajanie daje $x \mapsto r x (1 - x)$, gdzie $x$ to
   zajęta część miejsca: \textbf{krzywą S}, rosnącą najszybciej w połowie
   poziomu ustalonego.
 \item Dla reguły prostoliniowej skutki pchnięć się sumują
@@ -472,8 +473,8 @@ zaskakiwać.
   pchnięcie może pomóc albo zaszkodzić, zależnie od tego, gdzie jest układ.
 \item Reguła ustala się tam, gdzie każde zwierzę jest dokładnie zastępowane,
   w \textbf{punkcie stałym} $1 - 1/r$. \textbf{Nachylenie} w nim, zmierzone
-  szturchaniem, mnoży małe szturchnięcie; wielkość mniejsza od jedności
-  oznacza stabilność.
+  szturchaniem jak w rozdziale~\ref{ch:iteration}, mnoży małe szturchnięcie;
+  wielkość mniejsza od jedności oznacza stabilność.
 \item Ujemne nachylenie oznacza \textbf{przestrzelenie} i \textbf{oscylację
   tłumioną}. Przyczyną jest opóźnienie: to samo prawo w małych ratach nie
   przestrzeliwuje.
