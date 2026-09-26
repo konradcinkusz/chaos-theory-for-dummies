@@ -17,3 +17,179 @@ Każde błędne odczytanie, które książka stara się poprawić, w kolejności
 \trapentry{12}{Model, który jest błędny, jest bezużyteczny.}%
   {Każdy model jest błędny, bo coś pomija. Użyteczne pytanie brzmi: czy jest wystarczająco dobry do tego pytania, w tym zakresie.}%
   {\ref{sec:ch01-wrong}}
+
+\trapchapter{Rozdział~\ref{ch:iteration}}{Reguła następnego kroku}
+\trapentry{21}{Wzrost wykładniczy to szybki wzrost.}%
+  {To wzrost proporcjonalny do tego, co już jest, a mnożnik może być bliski jedności: przy 1 procencie rocznie suma podwaja się po mniej więcej \val{ch02.dbl.one.log} latach. Wzrost wykładniczy gwarantuje nie szybkość, tylko to, że w końcu prześcignie każdy wzrost, który dodaje stałą kwotę.}%
+  {\ref{sec:ch02-until}}
+\trapentry{22}{Punkt stały to miejsce, w którym układ w końcu się znajdzie.}%
+  {To miejsce, w którym układ pozostaje, jeśli jest w nim dokładnie. Tylko stabilny punkt stały, w którym każdy krok zmniejsza odległość ($\abs{a} < 1$ dla $x \mapsto a\,x + b$), przyciąga pobliskie stany; niestabilny, jak saldo kredytu, przy którym rata pokrywa odsetki, je odpycha.}%
+  {\ref{sec:ch02-stability}}
+
+\trapchapter{Rozdział~\ref{ch:feedback}}{Sprzężenie zwrotne: dlaczego nic nie rośnie wiecznie}
+\trapentry{31}{Skutek dwóch pchnięć to suma ich skutków.}%
+  {Tylko dla reguły prostoliniowej. Na krzywej, a taką robi z reguły sprzężenie zwrotne, skutek pchnięcia zależy od tego, gdzie układ już się znajduje: dwa pchnięcia mogą razem zrobić znacznie więcej, znacznie mniej albo coś przeciwnego niż ich suma.}%
+  {\ref{sec:ch03-superposition}}
+\trapentry{32}{Granica wzrostu oznacza, że wzrost łagodnie się zatrzymuje.}%
+  {Przy łagodnym tempie wzrostu tak. Przy silnym, albo gdy między przyczyną a skutkiem jest opóźnienie, populacja przestrzeliwuje swój poziom i oscyluje, a po dalszym podkręceniu wahania wcale nie muszą wygasać.}%
+  {\ref{sec:ch03-overshoot}}
+
+\trapchapter{Rozdział~\ref{ch:motion}}{Ruch: reguły zmiany i mapa wszystkich stanów}
+\trapentry{41}{Mniejszy krok sprawia, że symulacja jest poprawna.}%
+  {Sprawia, że jest poprawna dłużej. Błąd metody krokowej powstaje przy każdym kroku i się piętrzy: Euler z krokami dziesięć razy mniejszymi zyskuje na sprężynie tyle samo energii, tylko dziesięć razy później.}%
+  {\ref{sec:ch04-euler}}
+\trapentry{42}{Wahadło to prosty układ, więc jego ruch musi być prosty.}%
+  {Jedno wahadło ma dwie liczby stanu, a gładka reguła na płaszczyźnie może się tylko zatrzymać, krążyć albo uciec. Zawieś na nim drugie, a stan ma cztery liczby i ruch może być chaotyczny.}%
+  {\ref{sec:ch04-settle}}
+\trapentry{43}{Wahnięcie wahadła trwa tyle samo, niezależnie od wychylenia.}%
+  {Tylko przy małych wychyleniach. Wahadło o długości metra puszczone z 90 stopni wychyla się o około 18 procent dłużej niż puszczone z 10, a blisko położenia do góry nogami czas wahnięcia rośnie bez ograniczeń.}%
+  {\ref{sec:ch04-phase}}
+
+\trapchapter{Rozdział~\ref{ch:logistic}}{Jedna linijka algebry, każde możliwe zachowanie}
+\trapentry{51}{Prosta reguła daje proste zachowanie.}%
+  {Jedna linijka arytmetyki, $x_{n+1} = r\,x_n\,(1 - x_n)$, daje stan ustalony, cykle i orbity, które nigdy się nie powtarzają, gdy kręci się jedynym pokrętłem $r$. To, jak skomplikowane wydaje się zachowanie, mało mówi o tym, jak skomplikowana jest reguła.}%
+  {\ref{sec:ch05-knob}}
+\trapentry{52}{Skoro nie powtórzyło się po tysiącu kroków, to zaraz się powtórzy.}%
+  {Przy $r = \num{3.9}$ żaden cykl nie przyciąga orbity: w stu tysiącach kroków odwzorowania logistycznego nie wraca ani jedna wartość, a dłuższy przebieg daje tylko więcej wartości, których wcześniej nie było.}%
+  {\ref{sec:ch05-period}}
+\trapentry{53}{Nieregularny wynik wymaga przypadkowej albo skomplikowanej przyczyny.}%
+  {Prosta reguła deterministyczna bez żadnej losowości może dawać wynik równie nieregularny jak przypadek. Sam wynik nie mówi, co go wytworzyło; to była przestroga, którą May w 1976 roku skierował do ekologów.}%
+  {\ref{sec:ch05-may}}
+
+\trapchapter{Rozdział~\ref{ch:butterfly}}{Efekt motyla, zmierzony}
+\trapentry{61}{Jeśli uruchomię model chaotyczny jeszcze raz, dostanę coś innego.}%
+  {Nie z tego samego punktu startowego: reguła chaotyczna daje z tego samego punktu tę samą przyszłość, co do ostatniej cyfry. Przyszłość zmienia zmieniony punkt startowy, choćby najmniej.}%
+  {\ref{sec:ch06-lorenz}}
+\trapentry{62}{Motyl wywołuje tornado.}%
+  {Pytanie Lorenza dotyczyło przewidywania, nie siły: drobne zaburzenie zmienia to, jaka pogoda nastąpi, a skoro każde inne zaburzenie robi to samo, żadne z nich z osobna nie jest przyczyną.}%
+  {\ref{sec:ch06-lorenz}}
+\trapentry{63}{Chaos oznacza losowość.}%
+  {Układ chaotyczny w każdym kroku dokładnie trzyma się swojej reguły. To, co wygląda na losowość, to reguła odczytująca cyfry punktu startowego, których nikt nie zna.}%
+  {\ref{sec:ch06-determinism}}
+
+\trapchapter{Rozdział~\ref{ch:lyapunov}}{Liczba na chaos: wykładnik Lapunowa}
+\trapentry{71}{Żeby poznać typowe rozciągnięcie na krok, uśrednij rozciągnięcia.}%
+  {Wzrost się składa, więc typowy czynnik to ten, który użyty w każdym kroku daje ten sam iloczyn. Uśredniaj logarytmy rozciągnięć, nie same rozciągnięcia: krok $\times 4$ i krok $\times \tfrac14$ zostawiają odstęp tam, gdzie był.}%
+  {\ref{sec:ch07-stretch}}
+\trapentry{72}{Dziesięć razy lepsze dane dają dziesięć razy dłuższe prognozy.}%
+  {Horyzont to mniej więcej $\ln(T/\delta)/\lambda$, więc dziesięciokrotnie lepszy stan początkowy daje stałe $\ln 10/\lambda$ dodatkowych kroków. Dla odwzorowania logistycznego przy $r = 4$ tysiąckrotna poprawa daje mniej więcej dziesięć kroków, bez względu na wcześniejszy błąd.}%
+  {\ref{sec:ch07-horizon}}
+\trapentry{73}{Większy komputer w końcu uczyni każdy układ przewidywalnym.}%
+  {Szybszy komputer nie mierzy stanu początkowego ani trochę lepiej, a horyzont zależy od błędu stanu początkowego tylko przez jego logarytm. Podwojenie horyzontu wymaga dwa razy więcej poprawnych cyfr; tysiąc kroków odwzorowania logistycznego przy $r = 4$ wymagałoby stanu początkowego z dokładnością do mniej więcej trzystu miejsc po przecinku.}%
+  {\ref{sec:ch07-horizon}}
+
+\trapchapter{Rozdział~\ref{ch:bifurcations}}{Droga do chaosu i liczba, której nikt się nie spodziewał}
+\trapentry{81}{Przejście od porządku do chaosu to nagłe przełączenie.}%
+  {Na drodze odwzorowania logistycznego porządek rozpada się w nieskończonej kaskadzie podwojeń okresu, z których każde przychodzi szybciej niż poprzednie; chaos zaczyna się tam, gdzie kaskada się kończy, przy $r \approx \num{3.5699}$.}%
+  {\ref{sec:ch08-picture}}
+\trapentry{82}{Inne równanie daje inną drogę do chaosu.}%
+  {Każda reguła z jednym gładkim garbem idzie tą samą drogą: jej podwojenia leżą przy innych wartościach pokrętła, ale odstępy między nimi maleją w tym samym stosunku, stałej Feigenbauma $\delta \approx \num{4.6692}$.}%
+  {\ref{sec:ch08-universal}}
+\trapentry{83}{Gdy układ raz osiągnie chaos, jest chaotyczny wszędzie dalej.}%
+  {Za kaskadą odwzorowanie logistyczne wraca do porządku nieskończenie wiele razy, w oknach o każdym okresie; najszersze, okresu trzy, otwiera się przy $r = 1 + \sqrt{8}$.}%
+  {\ref{sec:ch08-windows}}
+
+\trapchapter{Rozdział~\ref{ch:lorenz}}{Trzy równania na pogodę: atraktor Lorenza}
+\trapentry{91}{Chaos potrzebuje wielu zmiennych.}%
+  {Model Lorenza ma trzy liczby i dwa mnożenia, i jest chaotyczny. Trzy to najmniej, ile potrzebuje przepływ, bo droga na płaszczyźnie nie może przeciąć samej siebie; to też wystarcza.}%
+  {\ref{sec:ch09-flow}}
+\trapentry{92}{Układ chaotyczny może pójść gdziekolwiek.}%
+  {Nieprzewidywalny to nie to samo co nieograniczony. Każdy przebieg Lorenza, z niemal każdego startu, zostaje ściągnięty na ten sam ograniczony zbiór w kształcie motyla, atraktor, i nigdy go nie opuszcza.}%
+  {\ref{sec:ch09-attractor}}
+\trapentry{93}{Jeśli droga jest nieprzewidywalna, nic w niej nie da się przewidzieć.}%
+  {Droga jest nieprzewidywalna dalej niż na mniej więcej dwadzieścia jednostek czasu, ale statystyki atraktora \dash{} część czasu na każdym skrzydle, średnia wysokość, a nawet wykładnik Lapunowa \dash{} wychodzą takie same z każdego startu.}%
+  {\ref{sec:ch09-statistics}}
+
+\trapchapter{Rozdział~\ref{ch:strange}}{Rozciągnij i złóż: dziwne atraktory}
+\trapentry{101}{Jeśli układ nigdy nie opuszcza małego obszaru, nie może być bardzo wrażliwy na stan początkowy.}%
+  {Obszar ogranicza to, jak \emph{duży} może być błąd, a nie to, jak szybko rośnie. Maleńki błąd podwaja się raz za razem, aż dorówna rozmiarom obszaru, a od tej chwili dwa przebiegi są tak niezależne jak dwa punkty wrzucone do niego na chybił trafił.}%
+  {\ref{sec:ch10-knead}}
+\trapentry{102}{Skoro pole wciąż maleje, ruch musi zamierać.}%
+  {Odwzorowanie Hénona mnoży każde pole przez \num{0.3} w każdym kroku, bo mocno ściska w jednym kierunku, a rozciąga w innym. Plama punktów staje się coraz dłuższą i cieńszą wstęgą, której punkty poruszają się bez końca.}%
+  {\ref{sec:ch10-area}}
+\trapentry{103}{Wystarczy dość mocno powiększyć dowolną krzywą, a stanie się linią prostą.}%
+  {To prawda dla krzywych gładkich. Każda linia atraktora dziwnego rozpada się w powiększeniu na wiązkę linii, a każda z nich znowu: warstwy w warstwach w każdej skali.}%
+  {\ref{sec:ch10-zoom}}
+
+\trapchapter{Rozdział~\ref{ch:fractals}}{Fraktale: mierzenie czegoś, co nie ma długości}
+\trapentry{111}{Wybrzeże ma długość, tylko trudno ją zmierzyć.}%
+  {Długość to wartość, na której ustalają się pomiary, gdy linijka się skraca, a pomiary wybrzeża się nie ustalają: pomiary krzywej Kocha rosną $\tfrac{4}{3}$ razy przy każdym trzykrotnym skróceniu linijki. Długość wybrzeża to fakt o wybrzeżu i o linijce naraz.}%
+  {\ref{sec:ch11-koch}}
+\trapentry{112}{Wymiar musi być liczbą całkowitą.}%
+  {Liczony z kopii albo z pudełek wymiar jest pomiarem i nie musi być całkowity: dla krzywej Kocha wynosi $\ln 4 / \ln 3$, między jeden a dwa, a dla zbioru Cantora $\ln 2 / \ln 3$, między zero a jeden. Liczby całkowite należą do kształtów gładkich.}%
+  {\ref{sec:ch11-dimension}}
+\trapentry{113}{Fraktale to ozdoba: ładne obrazki, żadnego pożytku.}%
+  {Fraktalne rozgałęzienia w płucach, naczyniach krwionośnych i rzekach wykonują pracę: mieszczą dużą powierzchnię albo długi brzeg w ograniczonej przestrzeni. Prawdziwe obiekty są fraktalami tylko w pewnym zakresie rozmiarów, a podany wymiar powinien mówić w jakim.}%
+  {\ref{sec:ch11-world}}
+
+\trapchapter{Rozdział~\ref{ch:mechanics}}{Wahadła i planety}
+\trapentry{131}{Wahadło to prosta maszyna, więc jego ruch musi być prosty.}%
+  {Prawda dla jednego wahadła, którego stan to dwie liczby. Zawieś na nim drugie, a stan to cztery liczby, i puszczone z wysoka wahadło nie układa się w żaden powtarzający się wzór.}%
+  {\ref{sec:ch13-double}}
+\trapentry{132}{Układ, który zachowuje energię, bez tarcia i bez niczego losowego, nie może być chaotyczny.}%
+  {Ustalenie energii czterech liczb stanu wciąż zostawia trzy kierunki ruchu, a to wystarcza do chaosu. Dwa wahadła podwójne różniące się o milionową część radiana rozchodzą się w ciągu sekund, choć energia każdego jest stała z dokładnością do około jednej części na $10^{8}$.}%
+  {\ref{sec:ch13-apart}}
+\trapentry{133}{Układ Słoneczny to doskonały zegar.}%
+  {W skali tysięcy lat jest zegarem znakomitym. Laskar stwierdził, że planety wewnętrzne są chaotyczne, z czasem Lapunowa około pięciu milionów lat, więc nie da się przewidzieć, gdzie na orbicie będzie Ziemia za sto milionów lat.}%
+  {\ref{sec:ch13-solar}}
+\trapentry{134}{Chaotyczny Układ Słoneczny to układ niestabilny: planety się rozlecą.}%
+  {Nieprzewidywalny to nie niestabilny. Obliczenia sięgające miliardów lat w niemal każdym przebiegu pokazują planety na orbitach o mniej więcej tych samych rozmiarach i kształtach; nie da się przewidzieć tylko, gdzie na tych orbitach będą.}%
+  {\ref{sec:ch13-solar}}
+
+\trapchapter{Rozdział~\ref{ch:weather}}{Pogoda, klimat i prognoza zespołowa}
+\trapentry{141}{Prognoza to jedna liczba.}%
+  {Prognoza to liczba i informacja, na ile jej ufać. Ta sama średnia zespołu zasługuje na zaufanie w dniu, w którym członkowie się zgadzają, i na wzruszenie ramion w dniu, w którym się rozchodzą, a rozrzut zespołu nadąża za wielkością błędu, choć nikt nie widzi prawdy.}%
+  {\ref{sec:ch14-ensemble}}
+\trapentry{142}{Prognoza 30 procent szansy na deszcz, po której spadł deszcz, była błędna.}%
+  {Jeden dzień nie obali prawdopodobieństwa. Prognoza 30 procent jest trafna, jeśli pada w mniej więcej 30 procentach dni, w które ją wydano; to sprawdzenie, wiarygodność, wymaga wielu prognoz, a dobry zespół je przechodzi.}%
+  {\ref{sec:ch14-rain}}
+\trapentry{143}{Skoro nie da się przewidzieć pogody, nie da się też przewidzieć klimatu.}%
+  {Pogoda to trajektoria, a klimat to statystyka atraktora. Dwa przebiegi, które nie zgadzają się co do żadnego dnia, zgadzają się co do średniej, wahania i tego, jak często pada; zmiana wymuszenia przesuwa te statystyki i właśnie o to pyta projekcja klimatyczna.}%
+  {\ref{sec:ch14-climate}}
+
+\trapchapter{Rozdział~\ref{ch:life}}{Życie, rynki i szum: jak odróżnić chaos od przypadku}
+\trapentry{151}{Ciąg, który wygląda na losowy, musi pochodzić z losowości.}%
+  {Odwzorowanie logistyczne przy $r = 4$ wygląda na równie losowe jak przetasowanie jego własnych wartości, a nie ma w nim ani grama przypadku. Losowy wygląd to fakt o wyglądzie; o przyczynie mówi dopiero test porządku.}%
+  {\ref{sec:ch15-twins}}
+\trapentry{152}{Nieregularne dane dowodzą chaosu.}%
+  {Nieregularne są i chaos, i szum. Twierdzenie o chaosie wymaga dowodów na regułę: struktury w odwzorowaniu powrotu, prognozy dobrej na początku i pogarszającej się równomiernie oraz zapisu dość długiego i czystego, by jedno i drugie coś znaczyło.}%
+  {\ref{sec:ch15-life}}
+\trapentry{153}{Chaos na rynkach oznacza, że da się je przewidzieć.}%
+  {Chaos da się prognozować tylko na kilka kroków naprzód i wcale poza horyzontem, więc chaotyczne ceny obiecywałyby krótki horyzont z twardą granicą, a nie szklaną kulę; a dowody na chaos o niewielu wymiarach w cenach są słabe i sporne.}%
+  {\ref{sec:ch15-evidence}}
+\trapentry{154}{Dobra prognoza o krok naprzód dowodzi chaosu.}%
+  {Szereg z pamięcią, jak dobowa temperatura, daje się prognozować na dzień naprzód bez żadnego chaosu. Podpisem chaosu jest prognoza dobra o krok naprzód, pogarszająca się w stałym tempie i wygrywająca z surogatami, które zachowują powolne wzrosty i spadki szeregu.}%
+  {\ref{sec:ch15-evidence}}
+
+\trapchapter{Rozdział~\ref{ch:computers}}{Chaos wewnątrz komputera}
+\trapentry{161}{Program deterministyczny zawsze daje ten sam wynik.}%
+  {Na tej samej maszynie, z tym samym kompilatorem i bibliotekami, tak. Zmień którąkolwiek z tych rzeczy albo kolejność sumowania, a zmienią się zaokrąglenia; chaotyczne obliczenie przenosi różnicę na ostatniej cyfrze na pierwszą w mniej więcej pięćdziesiąt kroków.}%
+  {\ref{sec:ch16-formulas}}
+\trapentry{162}{Więcej miejsc po przecinku czyni symulację dokładną.}%
+  {Każda dodatkowa cyfra kupuje stałą liczbę poprawnych kroków, nigdy wszystkie: przy $r = 4$ odwzorowanie logistyczne zużywa jedną cyfrę dwójkową na krok, a dokładne ułamki podwajają liczbę cyfr w każdym kroku.}%
+  {\ref{sec:ch16-exact}}
+\trapentry{163}{Chaotyczne odwzorowanie to dobry generator liczb losowych.}%
+  {Chaos daje nieprzewidywalność i nic więcej z tego, czego potrzebuje generator: wartości odwzorowania logistycznego gromadzą się przy $0$ i $1$, każda wyznacza następną, a w komputerze wpada ono w krótką pętlę. Dobre generatory projektuje się za pomocą teorii liczb tak, by miały jedną ogromną pętlę.}%
+  {\ref{sec:ch16-random}}
+
+\trapchapter{Rozdział~\ref{ch:taming}}{Okiełznać chaos: sterowanie i synchronizacja}
+\trapentry{171}{Chaosem nie da się sterować.}%
+  {Chaos zabrania przewidywania na daleką metę, a sterownik musi przewidzieć tylko jeden krok: czeka, aż orbita przejdzie blisko niestabilnej orbity, a potem znosi każde nadchodzące chybienie pchnięciem parametru. Odwzorowanie logistyczne przy $r = \num{3.9}$ daje się utrzymać w niestabilnym punkcie stałym pchnięciami mniejszymi niż jeden procent.}%
+  {\ref{sec:ch17-nudge}}
+\trapentry{172}{Sterować układem to go przemóc.}%
+  {Sterownik nie dostarcza żadnego ruchu: utrzymuje jedno z własnych niestabilnych zachowań układu, znosząc małe chybienia, a gdy orbita zostanie złapana, pchnięcia maleją prawie do zera. Siła, czyli duża i trwała zmiana parametru, nie daje nawet tego samego stanu.}%
+  {\ref{sec:ch17-small}}
+\trapentry{173}{Dwa układy chaotyczne nigdy nie mogą się zgadzać.}%
+  {Zostawione same sobie nigdy nie pozostaną razem. Sprzężone tak, że jeden słucha drugiego, mogą zgadzać się dokładnie: kopia układu Lorenza, która dostaje $x$ oryginału, zgrywa się z nim. Ta zgodność dotyczy teraźniejszości, a nie przewidywania przyszłości.}%
+  {\ref{sec:ch17-sync}}
+
+\trapchapter{Rozdział~\ref{ch:why}}{Po co ci chaos: przewodnik terenowy po przewidywaniu}
+\trapentry{181}{Nieprzewidywalne znaczy niepoznawalne.}%
+  {Za horyzontem trajektoria przepada, a prawie wszystko inne jest znane: dokąd układ może dojść, jak często odwiedza każdy obszar i jakie są szanse. Prognoza podana jako szanse to poprawna odpowiedź, nie wykręt.}%
+  {\ref{sec:ch18-beyond}}
+\trapentry{182}{Małe przyczyny zawsze mają znaczenie.}%
+  {W układzie stabilnym wygasają. W chaotycznym mała przyczyna zmienia szczegóły za horyzontem i nic w statystykach, a żadnej pojedynczej małej przyczyny nie da się po fakcie obwinić o duży skutek.}%
+  {\ref{sec:ch18-noise}}
+\trapentry{183}{Chaos znaczy: wszystko wolno.}%
+  {Chaos to dokładna reguła zamknięta w ograniczonym atraktorze, ze stałymi statystykami i horyzontem, który da się policzyć. Nazwanie czegoś chaotycznym to twierdzenie do sprawdzenia, a nie powód, żeby przestać prognozować.}%
+  {\ref{sec:ch18-everyone}}

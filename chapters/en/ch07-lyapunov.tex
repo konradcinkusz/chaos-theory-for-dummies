@@ -24,17 +24,18 @@
 \index{Lyapunov exponent}\index{prediction horizon}
 
 \noindent
-Chapter~\ref{ch:butterfly} ended with a rule of thumb: at $r = 4$ the gap
-between two runs of the logistic map roughly doubles at every step. It is a
-good rule of thumb and a poor measurement: \enquote{roughly} hides a great
-deal, and the question behind it is one you will ask of every system in this
-book. How fast do small errors grow, and how far ahead does that let you see?
+Chapter~\ref{ch:butterfly} counted two things about the logistic map at
+$r = 4$: the gap between two nearby runs roughly doubles at every step, and
+each correct decimal digit of the start buys only a few more steps of
+forecast. Both were found by counting, for one map. The question behind them
+is one you will ask of every system in this book: how fast do small errors
+grow, and how far ahead does that let you see?
 
-This chapter turns the rule of thumb into one number, the Lyapunov exponent,
-and the number into a horizon: how many steps a prediction is good for. Hold
-on to this question while you read: if you measured the start of a chaotic
-system a thousand times more precisely, how much further ahead could you
-predict it?
+This chapter turns the counting into one number, the Lyapunov exponent, which
+can be measured for any system, and the number into a horizon: how many steps
+a prediction is good for. Hold on to this question while you read: if you
+measured the start of a chaotic system a thousand times more precisely, how
+much further ahead could you predict it?
 
 \begin{outcomes}
 \outcome{find how much one step of a rule stretches a small error, and check
@@ -54,11 +55,12 @@ predict it?
 \index{stretch}
 
 \noindent
-Start two runs of the logistic map at $r = 4$, one at $x = \num{0.3}$ and the
-other $\num{1e-10}$ higher. Chapter~\ref{ch:butterfly} watched the gap
-between them grow. This time, watch what each single step does to it: divide
-the gap after the step by the gap before. Call that ratio the step's
-\emph{stretch}. If the gap roughly doubles, the stretch is roughly $2$.
+Chapter~\ref{ch:butterfly} noticed that the gap between two runs grows
+raggedly: some steps nearly quadruple it, a few shrink it, and only on
+average does it double. Start with that raggedness. Run the logistic map at
+$r = 4$ from $x = \num{0.3}$ and from $\num{1e-10}$ higher, and watch what
+each single step does to the gap: divide the gap after the step by the gap
+before. Call that ratio the step's \emph{stretch}.
 
 \pyregion{code/ch07/stretch.py}{rule}{The logistic map and its stretch}{lst:ch07-rule}
 
@@ -294,24 +296,32 @@ the exponent with the error and the tolerance gives the horizon.}{stretch,
 exponent, horizon}
 
 \begin{think}
-At $r = 4$, with a tolerance of $T = \num{0.1}$ and an error in the start of
-a millionth, the formula gives about \val{ch07.hz.million} steps. You buy an
-instrument a thousand times better, so the error is a billionth. How many
-steps now: a thousand times as many, twice as many, or something else?
+Suppose a forecasting model has a Lyapunov time of two days, and its
+forecasts are good for six. A new network of instruments cuts the error in
+its start tenfold. For how long are the forecasts good now: about sixty days,
+about twelve, or less than that?
 \end{think}
-\reveal{About \val{ch07.hz.billion}: ten more. A thousand times better buys
-$\ln 1000/\ln 2$ extra steps, about \val{ch07.ln.thousand} divided by
-\val{ch07.ln.two}, which is \val{ch07.extra.thousand}, whatever the error
-was before.}
+\reveal{About $\num{10.6}$ days. Cutting the error tenfold adds $\ln 10$ to
+$\ln(T/\delta)$, so it adds $\ln 10$ Lyapunov times: $2 \times
+\val{ch07.ln.ten}$, about $\num{4.6}$ days.}
+
+\begin{trapbox}
+\textbf{\enquote{Ten times better data gives ten times longer forecasts.}}
+It gives a fixed number of extra steps, $\ln 10/\lambda$, whatever the error
+was before. At $r = 4$ that is \val{ch07.per.ten}, the figure
+Chapter~\ref{ch:butterfly} counted for each decimal digit, now derived, and
+true of every chaotic system with its own $\lambda$. The horizon grows with
+the logarithm of your precision, not with the precision: the twentieth
+correct digit buys no more than the first.
+\end{trapbox}
 
 \pyregion{code/ch07/horizon.py}{formula}{The horizon formula}{lst:ch07-formula}
 
 \noindent
-The program sets that line beside a count. The function \code{counts},
-further down the file, makes the measurement of Chapter~\ref{ch:butterfly}
-from a thousand starts: two runs $\delta$ apart, followed until they differ
-by more than $T$. In the output, \code{1e-03} is Python's way of writing
-$10^{-3}$, a thousandth.
+The program sets that line beside the count Chapter~\ref{ch:butterfly}
+made: its function \code{counts} follows two runs $\delta$ apart from a
+thousand starts until they differ by more than $T$. In the output,
+\code{1e-03} is Python's way of writing $10^{-3}$, a thousandth.
 
 \pyregion{code/ch07/horizon.py}{table}{Formula against count, for four errors in the start}{lst:ch07-count}
 
@@ -324,21 +334,14 @@ slowly once it stops being small. The last two columns are a warning:
 individual starts differ, some by a lot, because the horizon, like the
 exponent, is an average. But look down the rows. Each thousandfold
 improvement adds the same ten steps; measured, the rows are
-\val{ch07.hz.gained} steps apart on average.
+\val{ch07.hz.gained} steps apart on average, against a formula's $\ln 1000/\ln 2$, which is
+\val{ch07.ln.thousand} divided by \val{ch07.ln.two}: \val{ch07.extra.thousand}.
 
 \plotfig{ch07-horizon-line}{The horizon against the error in the start, on a
 logarithmic scale with better measurements to the right. The count (dots,
 and a band holding most of the starts) follows the formula's straight line:
 every factor of ten in precision buys the same number of extra
 steps.}{horizon against the error in the start}
-
-\begin{trapbox}
-\textbf{\enquote{Ten times better data gives ten times longer forecasts.}}
-It gives a fixed number of extra steps, $\ln 10/\lambda$, which at $r = 4$ is
-\val{ch07.per.ten}. The horizon grows with the logarithm of your precision,
-not with the precision: every extra correct decimal place buys the same few
-steps, the twentieth no more than the first.
-\end{trapbox}
 
 \begin{think}
 A computer stores a number to about sixteen significant figures. Suppose you

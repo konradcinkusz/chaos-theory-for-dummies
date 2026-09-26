@@ -1,41 +1,511 @@
 %% ch09 --- Trzy równania na pogodę: atraktor Lorenza
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
-%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
-%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
-%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
-%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
-%% już generowany.
+%% Napisany we wrześniu 2026. Każda liczba, której czytelnik nie policzy w
+%% pamięci, pochodzi z code/measure/ch09.py, który importuje TE SAME funkcje,
+%% które drukują listingi (code/ch09/). Reguły Lorenza używają tylko + - * /,
+%% więc każda trajektoria na tych stronach jest taka sama na każdej maszynie;
+%% wykładnik jest zapisany z dwoma miejscami po przecinku, których ostatni
+%% bit logarytmu nie ruszy.
+%%
+%% CZEGO TEN ROZDZIAŁ NIE MOŻE POWIEDZIEĆ. Słowo "dziwny" i geometria
+%% atraktora należą do rozdziału 10, mierzenie takich kształtów do 11,
+%% pogoda kontra klimat i prognozy zespołowe do 14, zaufanie do statystyk
+%% policzonych komputerem do 16, synchronizacja do 17, a historia z 1961 i
+%% motyl z 1972 do rozdziału 6.
+%%
+%% Bliźniak: chapters/en/ch09-lorenz.tex. Podrozdział za podrozdziałem, makro
+%% za makrem, liczba za liczbą; tools/parity.py je porównuje.
 
 \chapter{Trzy równania na pogodę: atraktor Lorenza}
 \label{ch:lorenz}
+\index{układ Lorenza}\index{Lorenz, Edward}
 
-\chapterstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\noindent
+Postaw szeroki garnek z wodą na małym ogniu. Ciepła woda przy dnie chce się
+unieść, a chłodna przy powierzchni opaść, i powyżej pewnej temperatury woda
+zaczyna się toczyć: w górę z jednej strony, w dół z drugiej, jak powolne
+koło. Powietrze robi to samo nad nasłonecznionym polem, a w większej skali to
+toczenie się jest jednym z silników pogody.
 
-Argument: chaos is not a quirk of stepping rules; it lives in continuous
-time too, and Lorenz found it in 1963 in three equations cut down from a
-model of convection (sigma = 10, rho = 28, beta = 8/3), in his paper
-Deterministic Nonperiodic Flow. Integrated with Chapter 4's RK4, the state
-wanders round two lobes, switching unpredictably between them, and never
-repeats \dash{} three numbers is exactly what Chapter 4's theorem said chaos
-in a flow needs. Two starts a hair apart diverge, and the rate is a Lyapunov
-exponent of about 0.9 per time unit, measured here. And yet the trajectory
-never leaves a bounded butterfly-shaped set: the attractor. That is the
-chapter's hinge and the book's second big idea: the INDIVIDUAL future is
-unpredictable, but WHERE the system lives and HOW OFTEN it visits each
-region is perfectly predictable. Statistics of the attractor \dash{} the
-fraction of time on each lobe, the average height \dash{} are stable
-numbers, the same from almost any start. Payoff: the reader can integrate
-the Lorenz system, measure its divergence, and compute a statistic of the
-attractor that does not depend on the start. Traps to elicit: a chaotic
-system can go anywhere; if the path is unpredictable nothing about it is
-predictable; chaos needs many variables. Listings: RK4 on the Lorenz system;
-divergence of two runs; lobe statistics from different starts. Labs:
-implement the Lorenz derivative; measure a lobe fraction. Figures: the
-attractor in projection; two runs diverging; a histogram that does not care
-about the start.
+Opisz ten wir trzema liczbami i trzema krótkimi regułami, dokładnymi, bez
+żadnej przypadkowości. Czy będzie się kręcił równo, jak koło? Czy też trzy
+liczby mogą być tak nieregularne jak niebo? Część~II znalazła chaos w
+regułach, które robią jeden krok na raz. Ten rozdział znajduje go w czymś,
+co płynie \dash{} a potem znajduje wewnątrz chaosu coś, czego nikt się nie
+spodziewał: kształt.
 
-\medskip
-\textbf{Budżet słów:} 3500.
-}
+\begin{outcomes}
+\outcome{przeczytać trzy reguły zmiany Lorenza wyraz po wyrazie i powiedzieć,
+  co każdy wyraz robi z wirem}
+\outcome{prowadzić reguły metodą RK4 i odczytać wynik z dwóch widoków: jedna
+  liczba względem drugiej oraz jedna liczba względem czasu}
+\outcome{zmierzyć, jak szybko rozchodzą się dwa prawie identyczne przebiegi,
+  i zamienić to tempo na horyzont przewidywania}
+\outcome{powiedzieć, czym jest atraktor i dlaczego układ chaotyczny nie może
+  pójść, gdzie zechce}
+\outcome{policzyć statystykę przebiegu i sprawdzić, że nie zależy od tego,
+  skąd przebieg wystartował}
+\end{outcomes}
+
+\section{Trzy liczby na garnek wody}
+\label{sec:ch09-rules}
+\index{konwekcja}
+
+\noindent
+W 1963 roku Edward Lorenz, meteorolog z Massachusetts Institute of
+Technology, opublikował pracę zatytułowaną \enquote{Deterministic Nonperiodic
+Flow}, czyli \enquote{Deterministyczny nieokresowy przepływ}. Ten tytuł to
+cały rozdział w pigułce. \emph{Deterministyczny}: w regułach nie ma
+przypadku. \emph{Nieokresowy}: ruch nigdy się nie powtarza.
+\emph{Przepływ}: czas płynie gładko, więc reguła podaje prędkość, z jaką
+zmienia się stan, a nie jego następną wartość, jak w
+rozdziale~\ref{ch:motion}. Model Lorenza to drastycznie okrojony opis płynu
+podgrzewanego od dołu i zachowuje trzy liczby:
+
+\begin{itemize}
+\item $x$: jak szybko kręci się wir i w którą stronę (dodatnie w jedną,
+  ujemne w drugą);
+\item $y$: o ile cieplejsza jest strona, którą woda się wznosi, od strony,
+  którą opada;
+\item $z$: o ile temperatura, od dołu do góry, została odgięta od
+  równomiernego spadku przez mieszanie, które robi wir.
+\end{itemize}
+
+\noindent
+Zapisuj $\mathrm{d}x/\mathrm{d}t$ i czytaj \enquote{tempo $x$}: to, jak
+szybko $x$ zmienia się w tej chwili; to nazwa prędkości, a nie ułamek do
+skracania. Reguły Lorenza to
+\[
+\frac{\mathrm{d}x}{\mathrm{d}t} = \sigma\,(y - x), \qquad
+\frac{\mathrm{d}y}{\mathrm{d}t} = x\,(\rho - z) - y, \qquad
+\frac{\mathrm{d}z}{\mathrm{d}t} = x\,y - \beta\,z,
+\]
+z trzema stałymi liczbami nazwanymi greckimi literami: $\sigma$ (sigma) to
+$10$, $\rho$ (ro) to $28$, a $\beta$ (beta) to $\tfrac{8}{3}$. Słowami:
+
+\begin{itemize}
+\item \textbf{Wir goni różnicę temperatur.} Gdy $y$ jest większe od $x$, wir
+  przyspiesza, a gdy mniejsze, zwalnia; $\sigma$ mówi, jak żwawo.
+\item \textbf{Wir buduje różnicę, a różnica ucieka.} Po wymnożeniu druga
+  reguła to $\rho x - xz - y$. Kręcący się wir wynosi ciepłą wodę w górę z
+  jednej strony i sprowadza chłodną w dół z drugiej, budując $y$ w tempie
+  $\rho x$, gdzie $\rho$ mówi, jak mocno grzejemy garnek ($\rho = 1$ to
+  najsłabsze grzanie, przy którym wir w ogóle rusza). Wyraz $-y$ to różnica
+  uciekająca na boki; wyraz $-xz$ to mieszanie, które się odgryza.
+\item \textbf{Wir miesza warstwę, a warstwa się uspokaja.} Wir wynoszący
+  ciepłą wodę w górę ($x$ i $y$ tego samego znaku) wygina profil temperatury w
+  tempie $xy$; pozostawiony sam sobie profil wraca w tempie $\beta z$, gdzie
+  $\beta$ wynika z kształtu wirów.
+\end{itemize}
+
+\noindent
+Tylko dwa wyrazy, $xz$ i $xy$, mnożą przez siebie dwie z trzech liczb; każdy
+inny wyraz to stała liczba razy jedna z nich. Te dwa iloczyny to cała
+nieliniowość modelu w sensie z rozdziału~\ref{ch:feedback} i okaże się, że
+wystarczą.
+
+\mermaidfig{ch09-feedback}{Trzy liczby popychają się nawzajem w kółko. Wir
+buduje różnicę temperatur, różnica napędza wir, a razem mieszają warstwę,
+która osłabia różnicę.}{trzy liczby w pętli}
+
+\begin{think}
+Załóżmy, że woda stoi zupełnie nieruchomo: $x = 0$, $y = 0$ i $z = 0$. Co
+mówią trzy reguły?
+\end{think}
+\reveal{Każde tempo jest zerem: $10 \times (0 - 0) = 0$, potem $0 - 0 = 0$,
+potem $0 - 0 = 0$. Nic się nie zmienia.}
+To garnek, który po cichu przekazuje ciepło w górę, bez żadnego wiru. Stan, w
+którym każde tempo jest zerem, to \emph{punkt stały} przepływu, w języku
+rozdziału~\ref{ch:iteration}: zacznij w nim, a w nim zostaniesz. Nie jest
+jedyny.
+
+\begin{think}
+Sprawdź $x = y = \sqrt{72}$, czyli około \val{ch09.fixed.xy}, oraz $z = 27$.
+Czy wszystkie trzy tempa są zerem? Potrzebujesz tylko
+$\tfrac{8}{3} \times 27 = 72$.
+\end{think}
+\reveal{Tak. Pierwsze tempo to $10 \times 0 = 0$. Drugie to
+$x \times (28 - 27) - y = x - y = 0$. Trzecie to $x \times x - 72 = 72 -
+72 = 0$.}
+To \emph{ustalony wir}: kręci się ze stałą prędkością przy stałej różnicy
+temperatur. Z minusami, $x = y = -\sqrt{72}$ i $z = 27$, to ten sam wir
+kręcący się w drugą stronę. Dla każdego grzania $\rho$ większego od $1$ oba
+ustalone wiry leżą w $x = y = \pm\sqrt{\beta(\rho - 1)}$ i $z = \rho - 1$,
+gdzie $\pm$ znaczy \enquote{plus albo minus}.
+
+\begin{lab}{l09_01_rates}{Reguły Lorenza własną ręką}
+Napisz \code{rates}, która dostaje stan $(x, y, z)$ i zwraca trzy tempa,
+oraz \code{fixed\_points}, która zwraca każdy stan, w którym wszystkie trzy
+są zerem. Test porównuje twoje tempa z biblioteką książki i sprawdza, że
+naprawdę są zerem w każdym punkcie, który zwrócisz.
+\end{lab}
+
+\section{Za przepływem}
+\label{sec:ch09-flow}
+\index{układ Lorenza!motyl}\index{RK4}
+
+\noindent
+Oto te same reguły w wersji z biblioteki książki. Ostatnie trzy wiersze to
+trzy reguły; \api{lorenz} zwraca funkcję, która dostaje stan i oddaje jego
+trzy tempa, czyli dokładnie to, o co prosiło twoje laboratorium.
+
+\pyregion{code/src/chaoslab/systems.py}{lorenz}{Reguły Lorenza z 1963 roku w chaoslab}{lst:ch09-field}
+
+\noindent
+Żeby za nimi podążać, użyj metody RK4 z rozdziału~\ref{ch:motion}:
+\api{integrate} robi kroki długości \code{DT}, czyli jednej setnej jednostki
+czasu, i zapamiętuje każdy stan. Jednostka czasu jest własną jednostką
+modelu, a nie sekundą ani godziną.
+
+\pyregion{code/ch09/lorenz_run.py}{run}{Czterdzieści jednostek czasu przepływu Lorenza, od stanu (1, 1, 1)}{lst:ch09-run}
+
+\begin{think}
+Wahadło z tarciem wchodzi spiralą w swój punkt spoczynku. Garnek Lorenza ma
+trzy punkty stałe. Czy przebieg rozpoczęty w $(1, 1, 1)$, blisko
+nieruchomej wody, osiądzie w jednym z nich?
+\end{think}
+\reveal{Nie. Zostaje odepchnięty od nieruchomej wody, krąży wokół jednego
+ustalonego wiru coraz szerszymi pętlami, zostaje przerzucony, by krążyć
+wokół drugiego, i nigdy się nie uspokaja.}
+Przy tym grzaniu żaden ustalony wir nie potrafi zatrzymać stanu; potrafią
+tylko wtedy, gdy $\rho$ jest mniejsze od $\tfrac{470}{19}$, czyli około
+\val{ch09.rho.hopf} \dash{} tę liczbę daje z reguł algebra, której ta
+książka nie przeprowadza. Zmniejsz grzanie do $20$, a ten sam start
+rzeczywiście się uspokoi: ostatni wiersz wydruku to ustalony wir w
+$x = y = -\val{ch09.steady.x}$, $z = 19$.
+
+\transcript{ch09-butterfly}
+
+\noindent
+Wiersz oznaczony \code{loops} wypisuje jedną literę na pętlę: \code{L} dla
+pętli po stronie, gdzie $x$ jest ujemne, \code{R} dla drugiej. Przebieg
+robi \val{ch09.loops.left} pętli po lewej, zanim zrobi pierwszą po prawej,
+a potem litery idą seriami od jednej do pięciu, bez żadnego wzoru. Nie ma go
+czego szukać: to jest \emph{nieokresowość} z tytułu Lorenza.
+
+\plotfig{ch09-butterfly}{Przebieg od $(1, 1, 1)$. Z lewej: $x$ względem $z$
+od chwili 5 do chwili 60 \dash{} pętle wokół dwóch ustalonych wirów
+(krzyżyki) rysują dwa skrzydła. Z prawej: $x$ względem czasu przez
+pierwsze czterdzieści jednostek czasu; linie przerywane to ustalone
+wiry.}{motyl z dwóch stron}
+
+\noindent
+Lewa połowa rysunku~\ref{fig:ch09-butterfly} zasłużyła na nazwę
+\emph{motyla Lorenza}. Każde skrzydło to wir kręcący się w jedną stronę;
+przejście między nimi to wir zmieniający kierunek.
+
+\begin{think}
+Służby pogodowe liczą dziś modele niosące wiele milionów liczb. Model
+Lorenza niesie trzy. Czy trzy wystarczą na prawdziwy chaos, czy tylko na
+jego szkic?
+\end{think}
+\reveal{Trzy wystarczą, i trzy to najmniej, ile potrzebuje przepływ.}
+Rozdział~\ref{ch:motion} podał tę dolną granicę; oto powód. Na płaszczyźnie
+droga nigdy nie może przeciąć samej siebie, bo dwie drogi przez jeden punkt
+miałyby tę samą przyszłość; przepływ z dwiema liczbami może więc tylko
+osiąść, zwijać się spiralą albo krążyć po stałej pętli. Z trzecią liczbą
+droga może przechodzić nad sobą i pod sobą, i to wystarcza.
+
+\begin{trapbox}
+\textbf{\enquote{Chaos potrzebuje wielu zmiennych.}} Potrzebuje trzech liczb
+i dwóch mnożeń. Pogodę trudno przewidzieć nie tylko dlatego, że atmosfera
+jest wielka: garnek wody okrojony do trzech liczb jest już
+nieprzewidywalny. Czego chaos naprawdę potrzebuje, to temat
+rozdziału~\ref{ch:strange}.
+\end{trapbox}
+
+\begin{worldbox}
+\emph{Chaotyczne koło wodne} to garnek Lorenza zbudowany z drewna i wody:
+cieknące kubki wiszą na obwodzie koła, a woda wlewa się do kubków na górze.
+Willem Malkus i Louis Howard zbudowali takie koło w MIT, a jego równania, po
+przemianowaniu wielkości, są równaniami Lorenza: koło kręci się, zwalnia i
+zawraca w chwilach, których nikt nie potrafi zapowiedzieć. Równania pewnego
+rodzaju lasera też są równaniami Lorenza, co pokazał Hermann Haken w 1975
+roku.
+\end{worldbox}
+
+\section{Dwa starty o włos od siebie}
+\label{sec:ch09-apart}
+\index{wrażliwość na warunki początkowe}\index{wykładnik Lapunowa!przepływu}
+
+\noindent
+Rozdział~\ref{ch:butterfly} zmierzył wrażliwość na odwzorowaniu. Oto ten sam
+pomiar na przepływie. Przebieg najpierw idzie przez pięćdziesiąt jednostek
+czasu, żeby zostawić start za sobą; potem zostaje skopiowany, a kopia
+przesunięta o jedną stumilionową w $x$.
+
+\pyregion{code/ch09/two_runs.py}{split}{Dwa przebiegi o jedną stumilionową od siebie}{lst:ch09-split}
+
+\noindent
+Oba są prowadzone tą samą regułą, a program co dwie jednostki czasu wypisuje
+$x$ każdego z nich i odległość między nimi:
+
+\transcript{ch09-two-runs}
+
+\noindent
+Do chwili 14 oba przebiegi zgadzają się co do dwóch miejsc po przecinku; w
+chwili 24 są na różnych skrzydłach. Odległość rośnie mniej więcej
+dziesięciokrotnie co dwie, trzy jednostki czasu, choć nie gładko: puchnie i
+kurczy się, gdy para obiega pętlę. Pierwszy raz przekracza $1$ w chwili
+\val{ch09.apart.first}.
+
+Rozdział~\ref{ch:lyapunov} nazwał to tempo wykładnikiem Lapunowa, $\lambda$
+(lambda): to średnia logarytmu tego, jak bardzo rozciąga się mała szczelina.
+Dla przepływu średnia liczona jest na jednostkę czasu. Biblioteka mierzy go
+tak:
+
+\pyregion{code/src/chaoslab/measure.py}{flowexp}{Wykładnik Lapunowa przepływu}{lst:ch09-flowexp}
+
+\noindent
+Prowadź dwa przebiegi o włos od siebie. Po każdym kroku dodaj logarytm tego,
+o ile urosła szczelina między nimi, a potem ściągnij drugi przebieg z
+powrotem na pierwotną małą odległość, w tym samym kierunku, żeby szczelina
+nigdy nie urosła do rozmiarów motyla, gdzie przestałaby mierzyć rozciąganie.
+Suma podzielona przez upływ czasu to $\lambda$. Oto on z trzech startów:
+
+\pyregion{code/ch09/exponent.py}{exponent}{Wykładnik przepływu Lorenza z trzech startów}{lst:ch09-exponent}
+
+\transcript{ch09-exponent}
+
+\noindent
+Od \val{ch09.lambda.lo} do \val{ch09.lambda.hi} na jednostkę czasu, z
+trzech zupełnie różnych startów: przyjmijmy \val{ch09.lambda}. Średnio
+szczelina mnoży się przez $e$ do potęgi \val{ch09.lambda}, czyli około
+\val{ch09.stretch}, na każdą jednostkę czasu.
+
+\begin{think}
+Horyzont z rozdziału~\ref{ch:lyapunov}: błąd rośnie do tolerancji w czasie
+około $\ln(\text{tolerancja} / \text{błąd}) / \lambda$. Przy błędzie
+$10^{-8}$, tolerancji $1$ i $\lambda = \val{ch09.lambda}$: jak długo dwa
+przebiegi powinny pozostać bliżej niż $1$ od siebie? Potrzebujesz
+$\ln(10^{8})$, czyli około \val{ch09.ln.eight}.
+\end{think}
+\reveal{Około $\val{ch09.ln.eight} / \val{ch09.lambda}$, czyli mniej więcej
+\val{ch09.horizon} jednostek czasu. Para powyżej potrzebowała
+\val{ch09.apart.first}.}
+Jedna para to jedna próbka. Rozdziel przebieg w \val{ch09.apart.pairs}
+różnych miejscach wzdłuż motyla, a pierwsze przekroczenie $1$ wypada
+gdziekolwiek od chwili \val{ch09.apart.min} do chwili \val{ch09.apart.max},
+średnio w \val{ch09.apart.mean}. Wzór przewiduje średnią; rozrzut bierze się
+stąd, że rozciąganie nie jest takie samo na całych skrzydłach.
+
+\plotfig{ch09-apart}{Dwa przebiegi, które startują o jedną stumilionową od
+siebie. Z lewej: ich $x$ zgadzają się, a potem się rozchodzą. Z prawej: ich
+odległość w skali logarytmicznej wspina się wzdłuż przerywanej linii
+wykładnika, aż osiągnie rozmiar motyla.}{dwa rozchodzące się przebiegi}
+
+\noindent
+W regule nie ma nic niepewnego, a mimo to prognoza od startu znanego z
+dokładnością do ośmiu miejsc po przecinku wystarcza na mniej więcej
+dwadzieścia jednostek czasu. (Dwa przebiegi, które się rozeszły, można
+znowu zmusić do zgody, pozwalając jednemu czuć drugi: to opowieść
+rozdziału~\ref{ch:taming}.)
+
+\section{Nieprzewidywalny, ale nie gdziekolwiek}
+\label{sec:ch09-attractor}
+\index{atraktor}
+
+\noindent
+Jeśli przebiegu nie da się prognozować dalej niż na dwadzieścia jednostek
+czasu, co w ogóle można o nim powiedzieć?
+
+\begin{think}
+W chwili 24 dwa przebiegi powyżej nie mają ze sobą nic wspólnego: jeden ma
+$x$ w pobliżu $-12$, drugi w pobliżu $8$. Puść je jeszcze na tysiąc jednostek
+czasu. Czy któryś z nich może się znaleźć w $x = 100$ albo w $z = -50$?
+\end{think}
+\reveal{Nie. Przez \val{ch09.long.time} jednostek czasu $x$ nie oddala się od
+zera bardziej niż o \val{ch09.long.x} w żadną stronę, a $z$ pozostaje między
+\val{ch09.long.zlo} a \val{ch09.long.zhi}. I tak jest niezależnie od tego,
+skąd wystartujesz.}
+Sprawdź to \enquote{niezależnie od tego, skąd} na ośmiu startach w
+narożnikach pudła o boku osiemdziesiąt, daleko poza wszystkim, co widać na
+rysunkach powyżej:
+
+\pyregion{code/ch09/cloud.py}{cloud}{Osiem startów daleko poza motylem}{lst:ch09-cloud}
+
+\noindent
+Program prowadzi każdy przez pięćdziesiąt jednostek czasu, pomija pierwsze
+pięć i wypisuje pokój, w którym żył każdy przebieg:
+
+\transcript{ch09-cloud}
+
+\noindent
+Każdy przebieg zostaje ściągnięty ze swojego narożnika i potem mieszka w tym
+samym pokoju co długi przebieg. Zauważ też, że wiersze idą w identycznych
+parach: $(-40, -40, -40)$ i $(40, 40, -40)$ dają te same liczby. Następny
+podrozdział mówi dlaczego.
+
+\begin{trapbox}
+\textbf{\enquote{Układ chaotyczny może pójść gdziekolwiek.}}
+Nieprzewidywalny to nie to samo co nieograniczony. Nie powiesz, w którym
+miejscu motyla będzie przebieg Lorenza za sto jednostek czasu, ale powiesz,
+że będzie na motylu, i to jest prawdziwe przewidywanie: cienki zbiór stanów
+spośród wszystkich, jakie mogłyby przyjąć trzy liczby.
+\end{trapbox}
+
+\noindent
+Zbiór stanów, na który przebiegi zostają ściągnięte i którego potem nigdy
+nie opuszczają, to \emph{atraktor}. Wahadło z tarciem ma za atraktor jeden
+punkt; wahadło zegara, podtrzymywane w ruchu, ma pętlę. Atraktorem Lorenza
+jest motyl, ten sam z niemal każdego startu, a przebieg na nim nigdy się
+nie powtarza i nigdy go nie opuszcza. Jak droga może bez końca krążyć w
+ograniczonym obszarze, nie przecinając się i nie wracając po własnych
+śladach, to zagadka dotycząca samego kształtu \dash{} dlatego nazywa się go
+\emph{atraktorem dziwnym}. Rozdział~\ref{ch:strange} otwiera ten kształt, a
+rozdział~\ref{ch:fractals} mierzy kształty takie jak on.
+
+\begin{rigourbox}
+Dwie rzeczy są tu pokazane przez uruchomienie, a nie udowodnione. To, że
+żaden przebieg nie ucieknie, da się udowodnić na stronie algebry o
+wielkości, która maleje zawsze, gdy stan jest daleko. To, że motyl
+narysowany przez komputer naprawdę istnieje i naprawdę jest chaotyczny, a
+nie jest wytworem kroków i zaokrągleń, pozostawało otwarte przez ponad
+trzydzieści lat, aż Warwick Tucker rozstrzygnął to dowodem, w którym
+komputer liczył tak, że każdy błąd zaokrąglenia był wzięty pod uwagę.
+\end{rigourbox}
+
+\section{Co wciąż da się przewidzieć}
+\label{sec:ch09-statistics}
+\index{atraktor!statystyki}
+
+\noindent
+Motyl mówi, gdzie przebieg mieszka. Następne pytanie brzmi: jak spędza tam
+czas.
+
+\begin{think}
+Nie powiesz, na którym skrzydle będzie przebieg w chwili 50. Czy powiesz,
+jaką część długiego przebiegu spędza on na prawym skrzydle, gdzie $x$ jest
+dodatnie?
+\end{think}
+\reveal{Tak: połowę. Zmień jednocześnie znaki $x$ i $y$: pierwsze dwa tempa
+zmieniają znak razem z nimi, a trzecie, $xy - \beta z$, wcale się nie
+zmienia, bo $(-x)(-y) = xy$.}
+Reguły nie dbają więc o to, w którą stronę kręci się wir. Każdy przebieg na
+jednym skrzydle ma lustrzane odbicie na drugim \dash{} dlatego wiersze
+chmury szły parami \dash{} i długi przebieg dzieli swój czas między skrzydła
+po równo.
+
+\begin{trapbox}
+\textbf{\enquote{Jeśli droga jest nieprzewidywalna, nic w niej nie da się
+przewidzieć.}} Droga jest nieprzewidywalna dalej niż na mniej więcej
+dwadzieścia jednostek czasu. Kształt, na którym mieszka, już nie, podobnie
+jak to, ile czasu spędza w każdej jego części. To są \emph{statystyki
+atraktora} i z każdego startu wychodzą takie same.
+\end{trapbox}
+
+\begin{lab}{l09_02_wings}{Dwie liczby, o których start nie decyduje}
+Napisz \code{fraction\_right}, czyli udział stanów przebiegu z $x$ większym od
+zera, oraz \code{mean\_height}, czyli średnią jego $z$. Test prowadzi reguły
+Lorenza od $(1, 1, 1)$ i od dalekiego narożnika chmury i sprawdza, że twoje
+dwa podsumowania zgadzają się między przebiegami.
+\end{lab}
+
+\noindent
+Oto wersje z książki:
+
+\pyregion{code/ch09/averages.py}{stats}{Dwie statystyki przebiegu}{lst:ch09-stats}
+
+\noindent
+Listing prowadzi pięć startów, każdy przez 500 jednostek czasu, odrzuca
+pierwsze dziesięć, żeby start został zapomniany, i dla każdego przebiegu
+wypisuje, na którym skrzydle jest w chwili 50, jaką część czasu spędził na
+prawym skrzydle i jaka jest jego średnia wysokość:
+
+\transcript{ch09-averages}
+
+\noindent
+Środkowa kolumna to część nieprzewidywalna: lewe, lewe, prawe, lewe, prawe, i
+nic, co mógłbyś wiedzieć zawczasu, tego nie wybiera. Ostatnie dwie kolumny to
+część przewidywalna. Udział prawego skrzydła wynosi od \val{ch09.frac.lo} do
+\val{ch09.frac.hi} z każdego startu, tak jak zapowiadało lustro. Średnia
+wysokość wynosi od \val{ch09.height.lo} do \val{ch09.height.hi}, a tej liczby
+nie podpowiedziała żadna symetria: po prostu jest taka sama z każdego startu.
+
+Statystyka skończonego przebiegu trochę się chwieje. Potnij jeden przebieg
+długości \val{ch09.long.time} jednostek czasu na kawałki: w kawałkach po 100
+jednostek czasu udział prawego skrzydła odbiega zwykle od połowy o około
+\val{ch09.wobble.short}; w kawałkach po 2000 \dash{} o około
+\val{ch09.wobble.long}; w całym przebiegu wynosi \val{ch09.long.frac}. Im
+dłużej patrzysz, tym ostrzejsza statystyka \dash{} odwrotnie niż droga,
+której prognoza jest tym gorsza, im dalej sięgasz.
+
+\plotfig{ch09-histograms}{Ile czasu przebieg spędza przy każdej wartości
+$x$ i $z$, z trzech startów, po 500 jednostek czasu każdy. Trzy obrysy leżą
+jeden na drugim: histogram nie dba o to, skąd przebieg
+wystartował.}{histogramy obojętne na start}
+
+\noindent
+Cały histogram tego, gdzie przebieg spędza czas, wychodzi taki sam z trzech
+startów. To oś tego rozdziału i druga wielka myśl tej książki:
+\textbf{indywidualna przyszłość układu chaotycznego jest nieprzewidywalna,
+ale to, gdzie układ mieszka i jak często odwiedza każdą część, da się
+przewidzieć}. Nawet $\lambda$ jest liczbą tego rodzaju.
+
+Rozdział~\ref{ch:weather} buduje właśnie na tym rozróżnienie między pytaniem
+o pogodę na przyszły tydzień a pytaniem o klimat i pokazuje, jak synoptycy
+liczą wiele kopii naraz. Rozdział~\ref{ch:computers} pyta, dlaczego można
+ufać statystyce, choć własne zaokrąglenia komputera szybko czynią jego drogę
+inną niż prawdziwa.
+
+\begin{summarybox}
+\begin{itemize}
+\item Model Lorenza z 1963 roku, opisujący podgrzewany garnek, zachowuje trzy
+  liczby: prędkość wiru $x$, różnicę temperatur $y$ i wymieszanie $z$. Tylko
+  dwa wyrazy jego trzech \textbf{reguł zmiany}, $xy$ i $xz$, są
+  \textbf{nieliniowe}. Jego \textbf{punkty stałe} to nieruchomy garnek i dwa
+  \textbf{ustalone wiry}.
+\item Przy $\rho = 28$ przebieg nie osiada w żadnym punkcie stałym: krąży
+  wokół jednego ustalonego wiru, potem wokół drugiego, przeskakując
+  nieregularnie i nigdy się nie powtarzając. Trzy liczby to najmniej, ile
+  \textbf{przepływ} potrzebuje do chaosu, i wystarczą.
+\item Dwa przebiegi o jedną stumilionową od siebie rozchodzą się w mniej
+  więcej dwadzieścia jednostek czasu. \textbf{Wykładnik Lapunowa} przepływu
+  to około \val{ch09.lambda} na jednostkę czasu, a wzór na horyzont z
+  rozdziału~\ref{ch:lyapunov} przewiduje średni czas rozejścia.
+\item Każdy przebieg zostaje ściągnięty na ten sam ograniczony zbiór w
+  kształcie motyla: \textbf{atraktor}. Układ chaotyczny nie może pójść, gdzie
+  zechce.
+\item \textbf{Statystyki atraktora}, takie jak część czasu na każdym
+  skrzydle i średnia wysokość, są takie same z każdego startu. Droga jest
+  nieprzewidywalna; to, gdzie układ mieszka, nie.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Co słowami robi z wirem reguła na tempo $x$, $\sigma(y - x)$, gdy $y$
+  jest większe od $x$?
+  \answerto{Sprawia, że $x$ rośnie: wir przyspiesza w stronę różnicy
+  temperatur.}
+\item Gdzie przy $\rho = 28$ leżą trzy punkty stałe reguł Lorenza?
+  \answerto{Nieruchomy garnek, $(0, 0, 0)$, oraz dwa ustalone wiry,
+  $x = y = \pm\sqrt{72}$ (około \val{ch09.fixed.xy}) z $z = 27$.}
+\item Dlaczego przepływ z dwiema liczbami nie może być chaotyczny i ile liczb
+  używa model Lorenza?
+  \answerto{Na płaszczyźnie droga nie może przeciąć samej siebie, więc może
+  tylko osiąść, zwijać się spiralą albo krążyć po stałej pętli. Model
+  Lorenza używa trzech, najmniej, ile pozwala drodze przechodzić nad sobą i
+  pod sobą.}
+\item Wykładnik to około \val{ch09.lambda} na jednostkę czasu. Gdyby start
+  był znany tysiąc razy dokładniej, o ile dłużej dwa przebiegi pozostałyby
+  bliżej niż $1$ od siebie?
+  \answerto{O około $\ln(1000) / \val{ch09.lambda}$, czyli mniej więcej
+  \val{ch09.gain.thousand} jednostek czasu: z mniej więcej dwudziestu do
+  mniej więcej dwudziestu ośmiu, a nie tysiąc razy dłużej.}
+\item Ktoś twierdzi, że przebieg Lorenza, skoro jest chaotyczny, może
+  kiedyś dojść do $z = 200$. Co mu odpowiesz?
+  \answerto{Nie dojdzie: każdy przebieg zostaje ściągnięty na ten sam
+  ograniczony atraktor, na którym $z$ pozostaje mniej więcej między
+  \val{ch09.long.zlo} a \val{ch09.long.zhi}.}
+\item Jaką część długiego przebiegu zajmuje prawe skrzydło i skąd możesz to
+  wiedzieć, niczego nie uruchamiając?
+  \answerto{Połowę. Jednoczesna zmiana znaków $x$ i $y$ nie zmienia reguł,
+  więc oba skrzydła są swoimi lustrzanymi odbiciami.}
+\item Podaj liczbę opisującą przebieg Lorenza, której nie przewiduje żadna
+  symetria, a która z każdego startu wychodzi taka sama.
+  \answerto{Średnia wysokość $z$, od \val{ch09.height.lo} do
+  \val{ch09.height.hi} z pięciu różnych startów; wykładnik Lapunowa, około
+  \val{ch09.lambda}, to kolejna.}
+\end{checkpoint}

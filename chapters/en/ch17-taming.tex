@@ -38,13 +38,13 @@ be made to agree?
 
 \begin{outcomes}
 \outcome{find a fixed point of the logistic map that the rule cannot keep,
-  and say why a chaotic orbit keeps passing near it}
+  and count how often a chaotic orbit comes near it}
 \outcome{work out the small change of a parameter that cancels the miss one
   step would make}
-\outcome{run a controller that holds a chaotic map on a point it cannot keep
-  by itself, and measure the size of its nudges}
+\outcome{run a small-nudge controller on a chaotic map, and measure how long
+  it waits and how large its nudges are}
 \outcome{drive a copy of the Lorenz system with one number from the original
-  and measure how fast the two agree}
+  and measure the gap between the two as time goes on}
 \outcome{say where control and synchronisation of chaos have been shown to
   work, and what they are not}
 \end{outcomes}
@@ -174,7 +174,7 @@ with nudges; knocked away, it waits again.}{wait, catch, hold}
 \index{control of chaos!cost}
 
 \noindent
-Now run it. The listing below leaves the map alone for $100$ steps from
+Now run the controller. The listing below leaves the map alone for $100$ steps from
 $x = \num{0.2}$, then switches the controller on with nudges of at most one
 per cent, and prints the state now and then.
 
@@ -215,7 +215,6 @@ steps and then controlled. The dashed line is the fixed point. Below, the
 change made to $r$: zero, apart from one small dip at the catch.}{control
 switched on mid-run}
 
-\noindent
 The tempting alternative is force: turn the knob until the chaos stops.
 Chapter~\ref{ch:logistic} found that the fixed point is stable only while $r$
 is below $3$. Set $r = \num{2.9}$ and leave it there, and the orbit does

@@ -1,44 +1,476 @@
 %% ch14 --- Pogoda, klimat i prognoza zespołowa
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
-%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
-%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
-%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
-%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
-%% już generowany.
+%% Napisany we wrześniu 2026. Rozdział, w którym ostrzeżenie z części II
+%% staje się metodą: prognoza z niedokładnego startu nie może być jedną
+%% liczbą, więc jest wieloma, a wiele przebiegów daje rozrzut i
+%% prawdopodobieństwo. Każda liczba, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/measure/ch14.py, który importuje TE SAME funkcje, które
+%% drukują listingi (code/ch14/), a każda trajektoria to zabawkowa atmosfera
+%% Lorenza z 1996 roku liczona samymi + - * /, więc żadna cyfra na stronie
+%% nie zależy od maszyny.
+%%
+%% CZEGO TEN ROZDZIAŁ NIE MOŻE POWIEDZIEĆ. Korzysta z wykładnika i reguły
+%% horyzontu z rozdziału 7 i ich nie wyprowadza; stosuje odkrycie z
+%% rozdziału 9, że statystyka atraktora nie zależy od startu, i nie dowodzi
+%% go ponownie; to, dlaczego policzona orbita wciąż daje dobrą statystykę,
+%% należy do rozdziału 16. Granica dwóch tygodni jest przytaczana jako
+%% powszechnie cytowana liczba, nigdy jako pomiar zabawki, a podrozdział o
+%% klimacie mówi, o co pyta projekcja, nie opowiadając się za żadną.
+%%
+%% Bliźniak: chapters/en/ch14-weather.tex. Podrozdział za podrozdziałem,
+%% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
 
 \chapter{Pogoda, klimat i prognoza zespołowa}
 \label{ch:weather}
+\index{prognoza pogody}\index{prognoza zespołowa}
 
-\chapterstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\noindent
+Prognoza w twoim telefonie mówi, że jutro po południu szansa na deszcz
+wynosi $70$ procent. Siedemdziesiąt procent czego? Nie nieba i nie
+popołudnia: nikt nie spodziewa się deszczu nad siedmioma dziesiątymi miasta
+przez siedem dziesiątych czasu. Ta liczba to wynik liczenia, a do końca tego
+rozdziału sam zrobisz taką prognozę na małym modelu atmosfery i sprawdzisz,
+czy można jej ufać.
 
-Argument: weather forecasting is the place chaos theory changed practice
-most. Because the atmosphere has a positive Lyapunov exponent and many
-scales of motion, Lorenz argued in 1969 that detailed weather has a finite
-predictability of about two weeks however good the data \dash{} the commonly
-quoted figure, labelled as such. Forecasters answered with the ENSEMBLE: run
-the model many times from slightly different starts consistent with what was
-measured, and report the spread \dash{} a forecast becomes a probability.
-The reader builds one on the Lorenz system and on Lorenz's 1996 forty-
-variable toy atmosphere: the ensemble spread grows with lead time, and the
-spread itself says how far ahead the forecast is worth trusting. Weather
-against climate: climate is the statistics of the attractor, which Chapter 9
-showed are predictable when individual paths are not, so the claim that we
-cannot predict the weather next month so we cannot predict climate confuses
-the path with the attractor \dash{} and changing a parameter (the forcing)
-moves the statistics, which is what a climate projection asks. Payoff: the
-reader can build an ensemble forecast, read its spread as confidence,
-compute a probability from it, and separate a weather question from a
-climate question. Traps to elicit: a forecast is a single number; if the
-weather is unpredictable the climate is too; a 30 per cent chance of rain
-forecast that was followed by rain was wrong. Listings: an ensemble on the
-Lorenz system; ensemble spread against lead time; Lorenz-96 ensemble;
-climate statistics under two parameter values. Labs: turn an ensemble into a
-probability; measure the lead time at which spread saturates. Figures: an
-ensemble plume fanning out; spread against lead time; statistics shifting
-with a parameter.
+Tu złe wieści z części~II zamieniają się w metodę. Atmosfera jest
+chaotyczna, więc pojedyncza prognoza ma horyzont, a
+rozdział~\ref{ch:lyapunov} pokazał, że lepsze pomiary przesuwają go tylko
+trochę. Synoptycy nie mogli zmienić żadnego z tych faktów. Zmienili pytanie,
+na które odpowiadają \dash{} z jednej prognozy na wiele \dash{} i jest to
+najbardziej udane praktyczne zastosowanie, jakie znalazła teoria chaosu.
 
-\medskip
-\textbf{Budżet słów:} 3500.
-}
+\begin{outcomes}
+\outcome{uruchomić prognozę zespołową na zabawkowej atmosferze i odczytać
+  jej rozrzut jako miarę pewności}
+\outcome{zamienić zespół w prawdopodobieństwo i powiedzieć, jak ocenia się
+  prognozę probabilistyczną}
+\outcome{zmierzyć, jak daleko naprzód prognoza wygrywa z podawaniem średniej
+  klimatycznej}
+\outcome{użyć reguły z rozdziału~\ref{ch:lyapunov}, żeby powiedzieć, co
+  lepszy start daje prognozie}
+\outcome{odróżnić pytanie o pogodę od pytania o klimat}
+\end{outcomes}
+
+\section{Zabawkowa atmosfera}
+\label{sec:ch14-toy}
+\index{model Lorenza-96}
+
+\noindent
+Model pogody dzieli powietrze na pudełka, każdemu przypisuje kilka liczb
+\dash{} temperaturę, ciśnienie, wiatr, wilgotność \dash{} i za pomocą fizyki
+płynów opisuje, jak każda z nich się zmienia. Pierwszą prognozę zrobioną w
+ten sposób na komputerze elektronicznym policzono na ENIAC-u w 1950 roku;
+dzisiejsze modele globalne niosą wiele milionów liczb.
+
+W 1996 roku Edward Lorenz, którego trzy równania poznałeś w
+rozdziale~\ref{ch:lorenz}, zaproponował model dość mały, żeby dało się o nim
+myśleć, i dość duży, żeby zachowywał się jak pogoda. Rozmieść $40$ liczb, od
+$x_1$ do $x_{40}$, wokół równoleżnika tak, żeby każda oznaczała pogodę w
+jednym miejscu, a sąsiadem ostatniej była pierwsza. Lewą stronę czytaj tak,
+jak nauczył cię rozdział~\ref{ch:motion}: jako to, jak szybko zmienia się
+$x_i$:
+\[ \frac{\dd x_i}{\dd t} = (x_{i+1} - x_{i-2})\, x_{i-1} - x_i + F . \]
+Słowami: każdą liczbę niosą jej sąsiedzi (iloczyn, który przesuwa pogodę
+wokół koła tak jak wiatr), każda wycieka (to $-x_i$, które gra rolę tarcia)
+i każdą pcha stały napęd $F$, \emph{wymuszenie}, które gra rolę słońca.
+Standardowe wymuszenie Lorenza to $F = \val{ch14.forcing}$, a w
+\pkg{chaoslab} cała reguła to jedna linijka:
+
+\pyregion{code/src/chaoslab/systems.py}{lorenz96}{Czterdziestoliczbowa zabawkowa atmosfera Lorenza}{lst:ch14-lorenz96}
+
+\noindent
+Koło zamyka się samo: gdy \code{i} wynosi $0$, Python czyta
+\code{s[i - 2]} jako \code{s[-2]}, czyli drugą liczbę od końca.
+
+\begin{think}
+Ustaw każdą liczbę na $8$, czyli wartość wymuszenia. Co według reguły każda
+z nich zrobi dalej?
+\end{think}
+\reveal{Nic. Sąsiedzi się znoszą, $(8 - 8) \times 8 = 0$, a wyciek o $8$
+znosi pchnięcie o $8$, więc każde tempo zmian wynosi zero.}
+Idealnie spokojna atmosfera pozostaje spokojna. Spokój jest punktem stałym
+i, jak w rozdziale~\ref{ch:feedback}, pytanie brzmi, czy jest stabilny. Nie
+jest: listingi poniżej trącają jedną liczbę o jedną setną i czekają, a
+spokój rozpada się na fale, które wędrują wokół koła i nigdy się nie
+uspokajają.
+
+Lorenz dobrał jednostki tak, że jedna jednostka czasu to mniej więcej pięć
+dni prawdziwej pogody, więc krok listingów, \val{ch14.dt}, to około sześciu
+godzin. Zmierzony funkcją \api{lyapunov\_flow} z \pkg{chaoslab} wykładnik z
+rozdziału~\ref{ch:lyapunov} wynosi \val{ch14.lambda} na jednostkę czasu:
+mały błąd podwaja się co \val{ch14.double} jednostki, czyli mniej więcej co
+dwa dni.
+
+\section{Dwadzieścia prognoz zamiast jednej}
+\label{sec:ch14-ensemble}
+\index{analiza (meteorologia)}\index{prognoza zespołowa!rozrzut}
+
+\noindent
+Prognoza zaczyna się od \emph{analizy}: najlepszego oszacowania obecnego
+stanu atmosfery, zbudowanego z pomiarów, które nigdy nie są dokładne.
+Powiedzmy, że analiza jest trafna z dokładnością do \val{ch14.error} dla
+każdej z czterdziestu liczb. Z rozdziału~\ref{ch:butterfly} wiesz, co zrobi
+pojedyncza prognoza z niej wystartowana: przez jakiś czas będzie podążać za
+prawdziwą pogodą, a potem przestanie.
+
+Służba meteorologiczna nie zna jutrzejszej prawdy w chwili, gdy prognozuje.
+My ją znamy, bo sami gramy rolę natury. Uruchom model raz i nazwij ten
+przebieg \emph{prawdą}; zrób analizę, dodając do prawdy błąd; prognozuj z
+analizy; oceń prognozę, porównując ją z prawdą. Model i prawda podlegają tej
+samej regule, więc każdy błąd poniżej pochodzi ze startu, a żaden z modelu:
+zabawka ma wszystkie przewagi, których brakuje prawdziwej prognozie.
+
+Teraz nowy pomysł. Zamiast jednej prognozy zrób ich \val{ch14.members}.
+Każdy \emph{członek} startuje z analizy trąconej kolejnym błędem tej samej
+wielkości, więc członkowie różnią się od siebie mniej więcej tak, jak analiza
+mogłaby się różnić od prawdy. Razem tworzą \emph{zespół}.
+
+\pyregion{code/ch14/ensemble.py}{setup}{Zabawkowa atmosfera, spokojny start i błąd zadanej wielkości}{lst:ch14-setup}
+
+\noindent
+\code{rng.uniform(-size, size)} losuje liczbę między \code{-size} a
+\code{size}, każdą wartość z tą samą szansą, więc \api{perturb} dodaje do
+każdej liczby inny mały błąd. Resztę robią trzy miary. \emph{Średnia zespołu}
+uśrednia każdą liczbę po członkach. \emph{Rozrzut} to typowa odległość
+członków od tej średniej: podnieś każdą różnicę do kwadratu, uśrednij
+kwadraty, wyciągnij pierwiastek. \emph{Błąd} to ten sam przepis zastosowany
+do prognozy i prawdy. Rozrzut i błąd są więc liczbami tego samego rodzaju,
+mierzonymi względem siebie nawzajem albo względem prawdy.
+
+\begin{think}
+Członkowie startują w odległości kilku setnych od siebie. Czy w miarę biegu
+prognozy ich rozrzut rośnie bez końca?
+\end{think}
+\reveal{Nie. Rośnie szybko, a potem się wyrównuje: członkowie nie mogą
+rozejść się bardziej niż dwa niezwiązane ze sobą dni pogody, a atraktor
+ogranicza, jak bardzo te mogą się różnić.}
+
+\pyregion{code/ch14/ensemble.py}{forecast}{Prognoza zespołowa oceniana przy każdym wyprzedzeniu}{lst:ch14-forecast}
+
+\transcript{ch14-ensemble}
+
+\noindent
+\emph{Wyprzedzenie}, w tabeli \enquote{lead}, to to, jak daleko naprzód
+patrzy prognoza, w jednostkach czasu. Przez pierwszą jednostkę czy dwie
+rozrzut jest mały, a średnia zespołu blisko prawdy; do szóstej rozrzut
+przestaje rosnąć, bo członkowie zapomnieli, skąd wystartowali. Pojedynczy
+przebieg z analizy, w ostatniej kolumnie, jest na początku tak dobry jak
+średnia, a później dużo gorszy. Oto punkt 0 dla każdego członka, narysowany
+na tle prawdy:
+
+\plotfig{ch14-plume}{Dwudziestu członków powyższej prognozy w punkcie 0, z
+prawdą na pomarańczowo. Przez prawie trzy jednostki czasu poruszają się
+niemal jak jeden, potem się rozchodzą; do piątej są rozrzuceni po całym
+zakresie pogody.}{wachlarz prognozy zespołowej}
+
+\begin{think}
+W prawdziwej prognozie nie widzisz prawdy, więc nie policzysz dwóch kolumn z
+błędami. Spójrz na tabelę: czy rozrzut, który policzyć możesz, mógłby ci
+powiedzieć, jak duży jest błąd średniej?
+\end{think}
+\reveal{Tak, w przybliżeniu. Uśrednione po \val{ch14.cases} prognozach z
+różnych dni rozrzut i błąd średniej wynoszą \val{ch14.sp.one} i
+\val{ch14.err.one} przy wyprzedzeniu jednej jednostki czasu oraz
+\val{ch14.sp.three} i \val{ch14.err.three} przy trzech.}
+Prawda jest, na ile ktokolwiek może to stwierdzić, jeszcze jednym członkiem:
+analiza różni się od niej błędem tej samej wielkości co trącenia członków.
+Leży więc mniej więcej tak daleko od średniej zespołu jak oni, a szerokość
+wachlarza mierzy wielkość pomyłki, choć nikt nie widzi prawdy.
+
+\begin{trapbox}
+\textbf{\enquote{Prognoza to jedna liczba.}} Jedna liczba to najmniej, co
+prognoza może ci powiedzieć. Zespół podaje liczbę razem z ostrzeżeniem: w
+dniu, w którym członkowie się zgadzają, ufaj średniej; w dniu, w którym się
+rozchodzą, ta sama liczba zasługuje na wzruszenie ramion. Szerokość
+wachlarza zmienia się z dnia na dzień razem z samą pogodą i mówi, jak daleko
+naprzód prognozę warto czytać.
+\end{trapbox}
+
+\noindent
+Ośrodek prognoz robi to codziennie i zamyka pętlę: dzisiejszą analizę tworzy
+się, łącząc nowe pomiary z wczorajszą prognozą.
+
+\mermaidfig{ch14-forecast-cycle}{Cykl prognozy. Niedokładna analiza staje
+się wieloma zaburzonymi kopiami; ich rozrzut i ich liczenie stają się
+prognozą; jutro prognoza spotyka nowe pomiary i staje się następną
+analizą.}{analiza, zespół, prognoza}
+
+\section{Szansa na deszcz}
+\label{sec:ch14-rain}
+\index{prognoza probabilistyczna}\index{wiarygodność prognozy}
+
+\noindent
+Teraz te siedemdziesiąt procent. Nazwij punkt 0 swoim miastem i przyjmij,
+że pada tam zawsze, gdy jego liczba przekracza \val{ch14.rain}. Liczby
+Lorenza nie są deszczem; to reguła zamiany liczby na pogodę i nic poniżej
+nie zależy od tego wyboru. W długim przebiegu pada w \val{ch14.clim.rain}
+procentach przypadków: to klimat twojego miasta, zmierzony w ostatnim
+podrozdziale.
+
+\begin{think}
+Przy pewnym wyprzedzeniu $15$ z \val{ch14.members} członków pokazuje deszcz
+w twoim mieście. Jaka jest prognozowana szansa na deszcz?
+\end{think}
+\reveal{$75$ procent: $15$ z $20$ to trzy czwarte.}
+Tym właśnie jest szansa na deszcz: ułamkiem jednakowo prawdopodobnych
+przyszłości, w których pada. Oto ona dla prognozy, którą śledzisz.
+
+\pyregion{code/ch14/chance_of_rain.py}{chance}{Szansa na deszcz to liczba członków}{lst:ch14-chance}
+
+\transcript{ch14-rain}
+
+\noindent
+Przez kilka pierwszych jednostek czasu każdy członek mówi \enquote{sucho} i
+jest sucho. Potem się dzielą. Przy jednym wyprzedzeniu trzech członków na
+czterech mówi \enquote{deszcz} i pada; później mówi tak tylko jeden na
+czterech, a pada i wtedy. Pod koniec szanse krążą wokół klimatu twojego
+miasta: prognoza zapomniała swój start.
+
+\begin{lab}{l14_01_chance}{Szansa na deszcz i rozliczanie prognoz}
+Napisz \api{chance}, która zamienia listę członków w prawdopodobieństwo,
+oraz \api{hit\_rate}, która ocenia wiele prognoz naraz: jaka część tych,
+które dały szansę z danego przedziału, zakończyła się deszczem? Jeden z
+testów uruchamia prognozę z tego rozdziału i oczekuje, że twoja \api{chance}
+zgodzi się z tabelą powyżej.
+\end{lab}
+
+\begin{think}
+Pod koniec tabeli zespół dał deszczowi jedną szansę na cztery i spadł
+deszcz. Czy prognoza była błędna?
+\end{think}
+\reveal{Z jednego dnia tego nie rozstrzygniesz. Szansa jeden na cztery mówi,
+że w mniej więcej ćwierci takich dni pada, a ten może być jednym z nich.}
+
+\begin{trapbox}
+\textbf{\enquote{Prognoza 30 procent szansy na deszcz, po której spadł
+deszcz, była błędna.}} Dobra prognoza tego rodzaju sprawdza się mniej więcej
+trzy razy na dziesięć i to był jeden z tych razów. Błędną uczyniłaby ją
+dopiero historia: gdyby na setki prognoz $30$ procent padało po $10$
+procentach z nich albo po $60$. Synoptycy nazywają to sprawdzenie
+\emph{wiarygodnością} i można je przeprowadzić tylko na wielu prognozach,
+nigdy na jednej.
+\end{trapbox}
+
+\noindent
+Prowadź więc rachunek. Pomiar z tego rozdziału robi \val{ch14.rel.pairs}
+prognoz, w każdym punkcie i w wielu różnych dniach, każdą na dwie jednostki
+czasu naprzód. Spośród \val{ch14.rel.low.n} przypadków, w których zespół dał
+deszczowi szansę od $25$ do $35$ procent, padało w \val{ch14.rel.low}
+procentach. Spośród \val{ch14.rel.high.n}, w których dał od $65$ do $75$
+procent, padało w \val{ch14.rel.high} procentach. Procenty znaczą to, co
+mówią, a więcej prawdopodobieństwo obiecać nie może.
+
+\begin{worldbox}
+Każdego dnia Europejskie Centrum Prognoz Średnioterminowych z siedzibą w
+Reading uruchamia zespół około pięćdziesięciu członków swojego modelu
+globalnego, każdy z nieco innej analizy, na piętnaście dni naprzód. Służby
+meteorologiczne na całym świecie zamieniają takie zespoły, często po
+statystycznej korekcie, w procenty w twoim telefonie i w ostrzeżenia przed
+burzami i powodziami. Zespoły liczy się codziennie od ponad trzydziestu lat,
+a szansa na deszcz w twoim telefonie jest za kulisami liczeniem bardzo
+podobnym do tego z listingu powyżej.
+\end{worldbox}
+
+\section{Jak daleko naprzód?}
+\label{sec:ch14-horizon}
+\index{sprawdzalność prognozy}\index{klimatologia}
+
+\noindent
+Jedna prognoza nie potrzebuje żadnego modelu: zawsze podawaj klimat. Jutro w
+dowolnym punkcie liczba wyniesie około \val{ch14.clim.average}, plus minus
+\val{ch14.clim.swing} \dash{} to długoterminowa średnia i typowe wahanie,
+które mierzy ostatni podrozdział. Taka prognoza nigdy nie jest dobra, ale jej
+typowy błąd nigdy nie jest większy niż to wahanie. Prognoza ma
+\emph{sprawdzalność} tylko dopóty, dopóki z nią wygrywa.
+
+\begin{think}
+Długo po horyzoncie pojedynczy przebieg z analizy jest jeszcze jednym dniem
+pogody bez związku z prawdą. Która prognoza jest wtedy lepsza: ten przebieg
+czy średnia klimatyczna?
+\end{think}
+\reveal{Średnia klimatyczna. Dwa niezwiązane dni pogody różnią się bardziej,
+niż każdy z nich różni się od średniej: o mniej więcej $\sqrt{2}$, czyli
+\num{1.4}, typowego wahania.}
+
+\plotfig{ch14-skill}{Rozrzut i błędy w zależności od wyprzedzenia, każde
+uśrednione po czterdziestu prognozach. Rozrzut (linia przerywana) nadąża za
+błędem średniej zespołu; pojedynczy przebieg kończy wyraźnie powyżej linii
+kropkowanej, czyli błędu mówienia zawsze średniej.}{rozrzut i błąd a
+wyprzedzenie}
+
+\noindent
+Zmierzony błąd pojedynczego przebiegu ustala się na \val{ch14.sat.one}, a
+gorszy od średniej klimatycznej staje się przy wyprzedzeniu
+\val{ch14.horizon} jednostki czasu \dash{} w skali Lorenza po mniej więcej
+dwóch tygodniach. Prognoza pewna siebie i błędna jest gorsza od takiej,
+która nic nie wie. Średnia zespołu nigdy nie przekracza tej linii: gdy
+członkowie zapominają swój start, sama dryfuje ku średniej klimatycznej, a
+jej błąd ustala się na \val{ch14.sat.mean}, odrobinę powyżej wahania, bo
+dwudziestu członków to nie nieskończenie wielu.
+
+\begin{lab}{l14_02_saturation}{Kiedy zespół przestaje się rozchodzić?}
+Napisz \api{spread} dla całego zespołu, a potem \api{saturation\_lead}:
+pierwsze wyprzedzenie, przy którym rozrzut osiąga dziewięć dziesiątych
+poziomu, na którym się ustala. Test przepuszcza prognozę z tego rozdziału
+przez twój kod. Jedna prognoza to jeden rzut kostką, więc spodziewaj się, że
+twoja odpowiedź będzie się różnić od średniej z czterdziestu prognoz,
+\val{ch14.saturate} jednostki czasu.
+\end{lab}
+
+\begin{think}
+Przypuśćmy, że analiza jest dziesięć razy lepsza, trafna z dokładnością do
+jednej setnej zamiast jednej dziesiątej. Korzystając z reguły z
+rozdziału~\ref{ch:lyapunov}, powiedz, o ile mniej więcej później pojedynczy
+przebieg przegra z klimatem.
+\end{think}
+\reveal{Mniej więcej o $\ln 10$ podzielone przez wykładnik, niezależnie od
+błędu startowego: $\ln 10 \approx \num{2.3}$, a po podzieleniu przez
+\val{ch14.lambda} daje to \val{ch14.law.step} jednostki czasu.}
+W pomiarze horyzont przesuwa się z \val{ch14.horizon} na \val{ch14.law.two},
+a przy analizie jeszcze dziesięć razy lepszej na \val{ch14.law.three}: zyski
+\val{ch14.law.gain.a} i \val{ch14.law.gain.b}, bliskie regule. Każda
+dziesięciokrotna poprawa kupuje ten sam dodatkowy odcinek, nigdy dziesięć
+razy dłuższy.
+
+Prawdziwa atmosfera jest mniej hojna niż zabawka, a Lorenz wyjaśnił dlaczego
+w 1969 roku. Ma ruchy w wielu skalach, od szerokości oceanu aż po podmuch;
+małe psują się najszybciej, a ich błędy rozchodzą się w górę, do dużych.
+Lepsze pomiary opóźniają szkodę, ale jej nie zatrzymują. Jego wniosek, wciąż
+powszechnie przytaczany, brzmi: szczegółowej pogody nie da się przewidzieć
+dalej niż mniej więcej dwa tygodnie naprzód, choćby dane były najlepsze.
+Prognozy mimo to stale się poprawiały \dash{} lepsze obserwacje, także z
+satelitów, lepsze modele, większe komputery \dash{} ale zysk ocenia się
+zwykle na mniej więcej jeden dzień użytecznego wyprzedzenia na dekadę: to
+logarytm z reguły z rozdziału~\ref{ch:lyapunov}, spłacany dekadami.
+
+\begin{rigourbox}
+Liczba dwóch tygodni nie jest w tej książce wyprowadzona, a horyzont
+zabawki, który przesuwa się za każdym razem, gdy zmienia się jej błąd
+analizy, nie jest jej pomiarem. Pochodzi z oszacowań, jak szybko rosną błędy
+w każdej skali prawdziwej atmosfery, zapoczątkowanych przez Lorenza w 1969
+roku i poprawianych od tamtej pory przez porównywanie prognoz z tym, co potem
+się wydarzyło. Zabawka pokazuje, dlaczego horyzont istnieje.
+\end{rigourbox}
+
+\section{Pogoda i klimat}
+\label{sec:ch14-climate}
+\index{klimat}\index{projekcja klimatyczna}
+
+\noindent
+Skoro nikt nie potrafi powiedzieć, czy za trzy tygodnie będzie padać w twoim
+mieście, to czy ktokolwiek potrafi powiedzieć, jak często będzie tam padać w
+przyszłym roku?
+
+\begin{think}
+Uruchom model dwa razy z różnych startów, za każdym razem na $500$ jednostek
+czasu, czyli kilka lat pogody Lorenza. Po kilku pierwszych jednostkach ich
+pogoda nie ma ze sobą nic wspólnego. Czy ich długoterminowe średnie, typowe
+wahania i to, jak często pada, też będą się różnić?
+\end{think}
+\reveal{Nie. Oba przebiegi dają średnią \val{ch14.clim.average}, wahanie
+\val{ch14.clim.swing} i deszcz w \val{ch14.clim.rain} procentach przypadków,
+z dokładnością do wydrukowanych cyfr, podczas gdy w ostatnim kroku punkt 0
+pokazuje zupełnie różne liczby.}
+
+\pyregion{code/ch14/climate.py}{climate}{Długi przebieg sprowadzony do trzech statystyk}{lst:ch14-climate}
+
+\transcript{ch14-climate}
+
+\noindent
+To odkrycie z rozdziału~\ref{ch:lorenz} na większym modelu: trajektoria jest
+nieprzewidywalna, atraktor nie, a to, jak często trajektoria odwiedza każdy
+obszar, należy do reguły, a nie do startu. Pogoda to trajektoria. Klimat to
+statystyka atraktora. Prognozowanie pogody to \emph{zagadnienie początkowe}:
+odpowiedź zależy od tego, skąd startujesz, a chaos daje jej horyzont. Klimat
+od startu nie zależy wcale.
+
+\begin{trapbox}
+\textbf{\enquote{Skoro nie da się przewidzieć pogody, nie da się też
+przewidzieć klimatu.}} To odpowiedzi na różne pytania. Chaos ogranicza
+pytania o trajektorię: czy tego dnia będzie padać? Pytania o statystykę
+\dash{} jak często pada, jak szeroko waha się pogoda \dash{} mają stabilne
+odpowiedzi, a dwa przebiegi powyżej nie zgadzają się co do żadnego dnia,
+zgadzając się co do klimatu.
+\end{trapbox}
+
+\noindent
+Klimat zmienia natomiast reguła. Trzeci wiersz wydruku podkręca wymuszenie z
+\val{ch14.forcing} do \val{ch14.hot}, czyli daje zabawce więcej słońca, i
+statystyki się przesuwają: średnia wynosi teraz \val{ch14.hot.average},
+wahanie \val{ch14.hot.swing}, a pada w \val{ch14.hot.rain} procentach
+przypadków zamiast w \val{ch14.clim.rain}. Pogoda w dowolnym pojedynczym
+dniu jest dokładnie tak samo nieprzewidywalna jak przedtem.
+
+\plotfig{ch14-climate}{Jak często każda wartość pojawia się w długim
+przebiegu. Dwa przebiegi z wymuszeniem $8$, z różnych startów, leżą jeden na
+drugim; przy wymuszeniu $10$ rozkład się poszerza i więcej go leży powyżej
+linii deszczu przy $5$.}{statystyki klimatu przy dwóch wymuszeniach}
+
+\noindent
+Tak wygląda projekcja klimatyczna. Model klimatu uruchamia się nie od
+dzisiejszej pogody, lecz przy zmienionym wymuszeniu \dash{} w prawdziwym
+przypadku przy zmienionym składzie atmosfery \dash{} i pyta się go, jak
+przesuwają się statystyki. Nazywa się to \emph{projekcją}, a nie
+przewidywaniem, bo wynik zależy od przyjętego wymuszenia. Wymuszenie jest
+\emph{warunkiem brzegowym}: należy do reguły, a nie do dzisiejszego stanu,
+więc horyzont pogody nie wyklucza projekcji. Czy konkretny model klimatu
+dobrze oddaje to przesunięcie, to inne pytanie, rozstrzygane przez
+sprawdzanie go na klimatach przeszłości, i ta zabawka go nie rozstrzygnie.
+Pokazuje za to logikę: warunek początkowy decyduje o pogodzie, a warunek
+brzegowy o klimacie.
+
+\begin{summarybox}
+\begin{itemize}
+\item \textbf{Zabawkowa atmosfera} Lorenza z 1996 roku rozmieszcza
+  czterdzieści liczb wokół koła; pchają je sąsiedzi, tłumi wyciek, a napędza
+  \textbf{wymuszenie}. Jej stan spokoju jest niestabilny, a błędy podwajają
+  się w niej mniej więcej co \val{ch14.double} jednostki czasu.
+\item \textbf{Zespół} to wiele prognoz z trąconych kopii \textbf{analizy}. Jego
+  \textbf{rozrzut} rośnie z wyprzedzeniem, wyrównuje się i nadąża za błędem
+  średniej zespołu, choć nikt nie widzi prawdy.
+\item \textbf{Szansa na deszcz} to ułamek członków, w których pada. Prognozę
+  probabilistyczną ocenia się po \textbf{wiarygodności}, na wielu
+  prognozach, nigdy na jednym dniu.
+\item Prognoza ma \textbf{sprawdzalność}, dopóki wygrywa ze średnią
+  klimatyczną. Pojedynczy przebieg przegrywa z nią na \textbf{horyzoncie} i
+  kończy mniej więcej $\sqrt{2}$ razy gorzej; każda dziesięciokrotnie lepsza
+  analiza przesuwa horyzont o tyle samo, a powszechnie przytaczana granica
+  dla prawdziwej pogody to około dwóch tygodni.
+\item \textbf{Pogoda} to trajektoria i zależy od startu; \textbf{klimat} to
+  statystyka atraktora i od startu nie zależy. Zmiana wymuszenia,
+  \textbf{warunku brzegowego}, przesuwa statystyki i właśnie o to pyta
+  \textbf{projekcja klimatyczna}.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Czym jest analiza i dlaczego prognoza z niej psuje się nawet przy
+  doskonałym modelu?
+  \answerto{To najlepsze oszacowanie obecnego stanu, zbudowane z pomiarów,
+  które nigdy nie są dokładne. Jej błąd rośnie, jak w każdym układzie
+  chaotycznym, aż prognoza zapomni start.}
+\item W zespole liczącym $50$ członków $12$ pokazuje deszcz. Jaka jest szansa
+  na deszcz?
+  \answerto{$24$ procent: $12$ z $50$.}
+\item W ciągu roku synoptyk powiedział \enquote{$80$ procent szansy na
+  deszcz} $100$ razy, a padało $55$ razy. Czy te prognozy były wiarygodne?
+  \answerto{Nie. Po wiarygodnych $80$ procentach deszcz pada mniej więcej $80$
+  razy na $100$; te prognozy były zbyt pewne siebie.}
+\item Dlaczego długo po horyzoncie pojedyncza prognoza jest gorsza od
+  podawania średniej klimatycznej i mniej więcej o ile?
+  \answerto{Jest wtedy jeszcze jednym dniem pogody, niezwiązanym z prawdą, a
+  dwa niezwiązane dni różnią się o mniej więcej $\sqrt{2}$ typowego wahania,
+  podczas gdy średnia myli się tylko o jedno wahanie.}
+\item W zabawkowej atmosferze błąd analizy zmniejszono sto razy. O ile mniej
+  więcej przesuwa się horyzont?
+  \answerto{O dwa razy \val{ch14.law.step}, czyli około \num{2.7} jednostki
+  czasu: każda dziesięciokrotna poprawa kupuje ten sam dodatkowy czas.}
+\item Pogoda czy klimat: czy w przyszłe Boże Narodzenie spadnie śnieg w
+  Warszawie? Ile śnieżnych grudniowych dni będzie miała Warszawa około 2050
+  roku przy zadanym wymuszeniu?
+  \answerto{Pierwsze to pytanie o pogodę, daleko za horyzontem, więc
+  najlepszą odpowiedzią są szanse z klimatu. Drugie to pytanie o klimat, o
+  statystyki przy podanym wymuszeniu, i chaos go nie wyklucza.}
+\end{checkpoint}

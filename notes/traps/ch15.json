@@ -1,0 +1,50 @@
+[
+  {
+    "n": 151,
+    "label": "sec:ch15-twins",
+    "en": {
+      "habit": "A random-looking sequence must come from randomness.",
+      "truth": "The logistic map at $r = 4$ looks as random as a shuffle of its own values and has no chance in it at all. Looking random is a fact about the look; only a test of order says anything about the cause."
+    },
+    "pl": {
+      "habit": "Ciąg, który wygląda na losowy, musi pochodzić z losowości.",
+      "truth": "Odwzorowanie logistyczne przy $r = 4$ wygląda na równie losowe jak przetasowanie jego własnych wartości, a nie ma w nim ani grama przypadku. Losowy wygląd to fakt o wyglądzie; o przyczynie mówi dopiero test porządku."
+    }
+  },
+  {
+    "n": 152,
+    "label": "sec:ch15-life",
+    "en": {
+      "habit": "Irregular data proves chaos.",
+      "truth": "Chaos and noise are both irregular. A claim of chaos needs evidence of a rule: structure in the return map, a forecast that starts good and worsens at a steady rate, and a record long and clean enough for either to mean something."
+    },
+    "pl": {
+      "habit": "Nieregularne dane dowodzą chaosu.",
+      "truth": "Nieregularne są i chaos, i szum. Twierdzenie o chaosie wymaga dowodów na regułę: struktury w odwzorowaniu powrotu, prognozy dobrej na początku i pogarszającej się równomiernie oraz zapisu dość długiego i czystego, by jedno i drugie coś znaczyło."
+    }
+  },
+  {
+    "n": 153,
+    "label": "sec:ch15-evidence",
+    "en": {
+      "habit": "Chaos in markets means you can predict them.",
+      "truth": "Chaos is forecastable only a few steps ahead and not at all beyond its horizon, so chaotic prices would promise a short horizon with a hard limit, not a crystal ball; and the evidence for low-dimensional chaos in prices is weak and contested."
+    },
+    "pl": {
+      "habit": "Chaos na rynkach oznacza, że da się je przewidzieć.",
+      "truth": "Chaos da się prognozować tylko na kilka kroków naprzód i wcale poza horyzontem, więc chaotyczne ceny obiecywałyby krótki horyzont z twardą granicą, a nie szklaną kulę; a dowody na chaos o niewielu wymiarach w cenach są słabe i sporne."
+    }
+  },
+  {
+    "n": 154,
+    "label": "sec:ch15-evidence",
+    "en": {
+      "habit": "A good forecast one step ahead proves chaos.",
+      "truth": "A series with memory, like daily temperature, is forecastable a day ahead with no chaos at all. The signature of chaos is a forecast that is good a step ahead and worsens at a steady rate, and that beats surrogates keeping the series' slow ups and downs."
+    },
+    "pl": {
+      "habit": "Dobra prognoza o krok naprzód dowodzi chaosu.",
+      "truth": "Szereg z pamięcią, jak dobowa temperatura, daje się prognozować na dzień naprzód bez żadnego chaosu. Podpisem chaosu jest prognoza dobra o krok naprzód, pogarszająca się w stałym tempie i wygrywająca z surogatami, które zachowują powolne wzrosty i spadki szeregu."
+    }
+  }
+]

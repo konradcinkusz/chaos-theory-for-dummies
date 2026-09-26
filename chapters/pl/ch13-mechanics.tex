@@ -1,43 +1,451 @@
 %% ch13 --- Wahadła i planety
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
-%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
-%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
-%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
-%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
-%% już generowany.
+%% Napisany we wrześniu 2026. Każda liczba, której czytelnik nie policzy w
+%% pamięci, pochodzi z code/measure/ch13.py, który importuje TE SAME funkcje,
+%% które drukują listingi (code/ch13/). Wahadło podwójne woła sin i cos, których
+%% ostatnia cyfra dwójkowa może się różnić między maszynami, więc nic nie jest
+%% zapisywane z późnej części chaotycznego przebiegu: chwila rozejścia jest
+%% brana długo przed tym, zanim różnica ostatniej cyfry mogłaby mieć znaczenie,
+%% a skrypt odmawia zapisania każdej liczby, którą zmieniłaby inna długość kroku
+%% albo puszczenie przesunięte o 1e-12 rad.
+%%
+%% Bliźniak: chapters/en/ch13-mechanics.tex. Podrozdział za podrozdziałem,
+%% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
 
 \chapter{Wahadła i planety}
 \label{ch:mechanics}
+\index{wahadło podwójne}\index{Układ Słoneczny}
 
-\chapterstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\noindent
+Zegar stojący odmierza czas, bo wahadło to najbardziej regularna rzecz, jaką
+większość ludzi kiedykolwiek będzie mieć w domu: puść je, a będzie się kołysać
+w tym samym rytmie, dopóki zegar jest nakręcony. Rozdział~\ref{ch:motion}
+pokazał dlaczego: stan wahadła to dwie liczby, a bez tarcia krążą one po tej
+samej zamkniętej pętli bez końca. Wszechświat jak mechanizm zegara z
+rozdziału~\ref{ch:models} zbudowano właśnie na takiej mechanice.
 
-Argument: the clockwork of Chapter 1 was built on mechanics, and mechanics
-is where chaos was first seen. Hang a second pendulum from the first and the
-motion becomes chaotic: two double pendulums released a fraction of a degree
-apart swing together, then apart, measured here with energy conservation as
-the check that the divergence is physics and not numerical error. Poincaré
-found the same in the three-body problem while competing for King Oscar II's
-prize (the memoir published in 1890), and his corrected work is the first
-description of chaos. The solar system itself is chaotic on long timescales:
-Laskar's 1989 computation gives a Lyapunov time of about five million years
-for the inner planets, which means the positions of the planets cannot be
-predicted a hundred million years ahead even though their orbits will stay
-roughly where they are for billions \dash{} the attractor idea again, as
-bounded unpredictability. Friction-free mechanics conserves energy and so
-has no attractor; chaos there is a sea around islands of regular motion,
-stated in words (KAM) and shown with a double pendulum at low and high
-energy. Payoff: the reader can simulate a double pendulum, check energy
-conservation, measure divergence, and separate the parts of the solar-system
-story that are measured from those that are folklore. Traps to elicit: the
-solar system is a perfect clock; a system that conserves energy cannot be
-chaotic; chaos needs friction or randomness. Listings: the double pendulum
-with RK4 and an energy check; divergence of two releases; low against high
-energy. Labs: implement the energy function; find the time two releases
-separate. Figures: two double pendulum tips diverging; energy error against
-time.
+Teraz zawieś drugie wahadło u dołu pierwszego, na zawiasie w miejscu, gdzie
+się łączą, i puść je z wysoka. Reguła wciąż pochodzi od Newtona, wciąż jest
+dokładna i nie ma w niej nic losowego. Co ono zrobi? Ten rozdział odpowiada
+pomiarem, a potem idzie za tym samym pytaniem od wahadła na biurku aż do
+planet krążących wokół Słońca, gdzie zadano je po raz pierwszy.
 
-\medskip
-\textbf{Budżet słów:} 3500.
-}
+\begin{outcomes}
+\outcome{przeprowadzić wahadło podwójne krok po kroku metodą RK4 i odczytać
+  jego stan z wydruku}
+\outcome{sprawdzić symulację układu bez tarcia, obserwując jego energię, i
+  powiedzieć, czego ten sprawdzian dowodzi, a czego nie}
+\outcome{zmierzyć, po jakim czasie rozchodzą się dwa puszczenia różniące się
+  odrobinę, i pokazać, że wynik nie zależy od długości kroku}
+\outcome{odróżnić łagodne puszczenie od dzikiego i wyjaśnić, jak układ, który
+  zachowuje energię, może mimo to być chaotyczny}
+\outcome{oddzielić to, co zmierzono na temat chaosu w Układzie Słonecznym, od
+  tego, co jest legendą}
+\end{outcomes}
+
+\section{Wahadło na wahadle}
+\label{sec:ch13-double}
+\index{wahadło podwójne!stan}
+
+\noindent
+Weź dwa pręty o długości metra i przymocuj drugi zawiasem do końca
+pierwszego. Na zawiasie umieść ciężarek o masie jednego kilograma, a drugi
+taki sam na wolnym końcu; całą masę niosą ciężarki, a pręty traktujemy jak
+nieważkie. Unieś oba ramiona tak, by były odchylone o 120° od pionu, i puść.
+
+\begin{think}
+Jedno wahadło kołysze się z doskonałą regularnością. Czy spodziewasz się, że
+dwa, jedno zawieszone na drugim, ułożą się w jakiś powtarzający się wzór
+\dash{} bardziej skomplikowany niż u jednego wahadła, ale mimo to regularny?
+\end{think}
+\reveal{Nie. Puszczone z wysoka wahadło podwójne nie układa się w żaden
+powtarzający się wzór, jaki dałoby się znaleźć: dolne ramię śmiga dookoła,
+czasem przelatując nad samą górą, a ruch wciąż się zmienia. Nic losowego tu
+nie działa.}
+Różnica tkwi w tym, ile jest liczb. Stan jednego wahadła to dwie liczby: kąt i
+to, jak szybko ten kąt się zmienia. Stan wahadła podwójnego to cztery liczby,
+dwa kąty i dwie prędkości ich zmian, a rozdział~\ref{ch:motion} mówił, że
+gładka reguła potrzebuje co najmniej trzech liczb, żeby mogła być chaotyczna.
+
+Prawa Newtona dają regułę zmiany dla tych czterech liczb: znając stan teraz,
+mówi ona, jak szybko zmienia się każda z nich. To mniej więcej piętnaście
+wierszy arytmetyki z sinusami i cosinusami i nie trzeba jej czytać, żeby jej
+używać; to \api{double\_pendulum} z biblioteki książki, \pkg{chaoslab}. RK4 z
+rozdziału~\ref{ch:motion} prowadzi ją krok po kroku, o tysięczną część sekundy
+naraz:
+
+\pyregion{code/ch13/release.py}{setup}{Puszczenie: cztery liczby i długość jednego kroku}{lst:ch13-setup}
+
+\noindent
+\code{math.radians} zamienia stopnie na radiany, jednostkę, której oczekują
+sinus i cosinus w Pythonie. Pełny obrót to $2\pi$ radianów, nieco ponad sześć,
+więc jeden radian to około 57°. Potem listing prowadzi stan przez dziesięć
+sekund i wypisuje go co dwie:
+
+\pyregion{code/ch13/release.py}{run}{Dziesięć sekund wahadła podwójnego, wypisane co dwie}{lst:ch13-run}
+
+\transcript{ch13-release}
+
+\noindent
+Najpierw przeczytaj ramiona. Kąt ujemny to wychylenie na drugą stronę, a kąt
+powyżej 360° oznacza, że ramię obróciło się dookoła: 758° po dziesięciu
+sekundach to dwa pełne obroty i jeszcze 38°. Dolne ramię wiruje. Teraz
+przeczytaj ostatnią kolumnę.
+
+\section{Liczba, która nie może drgnąć}
+\label{sec:ch13-energy}
+\index{energia}\index{symulacja!sprawdzian energii}
+
+\noindent
+Wahadło bez tarcia nie może zyskać ani stracić energii: nic go nie popycha i
+nic nie spowalnia. Jego energia ma dwie części. Energia wysokości: każdy
+ciężarek o masie jednego kilograma wnosi $g \times h$, gdzie $g$ to
+\num{9.81}, a wysokość $h$ mierzy się w górę od punktu zawieszenia. Energia
+ruchu: połowa kwadratu prędkości każdego ciężarka. Gdy wahadło opada,
+wysokość zamienia się w prędkość, i z powrotem; suma pozostaje dokładnie taka
+sama.
+
+\begin{think}
+Załóżmy, że puszczasz wahadło z obydwoma ramionami ustawionymi poziomo, w tę
+samą stronę, pod kątem 90°. Jaka jest jego energia, jeśli wysokości mierzymy
+od punktu zawieszenia?
+\end{think}
+\reveal{Zero. Oba ciężarki są na wysokości punktu zawieszenia, więc obie
+wysokości są zerowe, a oba stoją w miejscu, więc nie ma też energii ruchu.}
+Wysokości poniżej punktu zawieszenia liczą się jako ujemne, więc wahadło
+wiszące w spoczynku ma energię ujemną; znaczenie mają tylko zmiany energii.
+Dla puszczenia z wydruku odrobina geometrii umieszcza górny ciężarek pół
+metra nad punktem zawieszenia, a dolny cały metr, więc energia wynosi
+$\num{9.81} \times (\num{0.5} + 1)$, czyli około \val{ch13.energy.start}
+dżula \dash{} od tego zaczyna się kolumna energii. Przeczytaj ją w dół: przez
+dziesięć sekund wirowania zmienia się o jedną jednostkę na ósmym miejscu po
+przecinku, o stumilionową część dżula.
+
+To jest sprawdzian i to najpożyteczniejszy nawyk w symulowaniu mechaniki.
+Komputer nie rozwiązuje reguły; robi małe kroki, każdy odrobinę błędny.
+Prawdziwe wahadło zachowuje energię dokładnie, więc każda zmiana energii w
+symulacji to zmierzony błąd samych kroków.
+
+\begin{lab}{l13_01_energy}{Liczba, która nie może drgnąć}
+Napisz energię wahadła podwójnego sam: \code{heights} podaje wysokość każdego
+ciężarka nad punktem zawieszenia, a \code{energy} \dash{} całość. Plik
+startowy objaśnia jedyny krok, który wymaga uwagi: dolny ciężarek jest
+niesiony przez górny, więc jego prędkość składa się z dwóch ruchów. Test
+porównuje twoją energię z energią z biblioteki, a potem obserwuje ją podczas
+kołysania, w którym nie może się zmienić.
+\end{lab}
+
+\section{Milionowa część radiana}
+\label{sec:ch13-apart}
+\index{wrażliwość na warunki początkowe!wahadło podwójne}
+
+\noindent
+Teraz puść dwa wahadła podwójne. Drugie jest dokładnie takie jak pierwsze, z
+wyjątkiem tego, że jego górne ramię zaczyna o jedną milionową część radiana
+dalej: na końcu metrowego ramienia to tysięczna część milimetra, dużo mniej
+niż grubość włosa. Oba słuchają tej samej dokładnej reguły, z tym samym
+krokiem.
+
+\begin{think}
+Oba wahadła zachowują energię, jak pokazał sprawdzian, i nic losowego ich nie
+dotyka. Czy pod koniec dziesięciu sekund z wydruku powyżej wciąż będą się
+kołysać razem? Po minucie? Czy się rozejdą, a jeśli tak, to mniej więcej
+kiedy?
+\end{think}
+\reveal{Rozchodzą się. Po \val{ch13.apart.seconds} sekundy różnią się o więcej
+niż jedną dziesiątą radiana, około sześciu stopni, co zobaczyłby każdy
+obserwator. Kilka sekund później robią już zupełnie co innego.}
+
+\pyregion{code/ch13/two_releases.py}{gap}{Jak daleko od siebie są dwa wahadła}{lst:ch13-gap}
+
+\pyregion{code/ch13/two_releases.py}{run}{Dwa puszczenia różniące się o milionową część radiana}{lst:ch13-pair}
+
+\transcript{ch13-two-releases}
+
+\noindent
+\code{7e-05} to w zapisie Pythona $7 \times 10^{-5}$, czyli siedem
+stutysięcznych. Różnica nie rośnie gładko: wznosi się i opada w rytm
+kołysania ramion. Ale tendencja jest nieubłagana. Od milionowej do
+dziesiątej części to pięć razy po dziesięć w mniej więcej dziesięć sekund,
+więc średnio różnica mnoży się przez dziesięć co dwie sekundy: to efekt
+motyla z rozdziału~\ref{ch:butterfly}, w maszynie, którą dałoby się zbudować
+na stole warsztatowym.
+
+\plotfig{ch13-two-releases}{Dwa wahadła podwójne puszczone z różnicą
+milionowej części radiana. U góry: dolne ramię każdego z nich, nie do
+odróżnienia przez około dziesięć sekund. U dołu: różnica między nimi w skali
+logarytmicznej, rosnąca nierówno, aż staje się dość duża, by ją
+zobaczyć.}{dwa puszczenia, które się rozchodzą}
+
+\noindent
+Oto wątpliwość, która powinna ci przyjść do głowy. Każdy krok jest odrobinę
+błędny: a co, jeśli rozejście wywołują te błędy, a nie wahadło? Wtedy
+dokładniejsze kroki by je przesunęły. Uruchom więc te same dwa puszczenia z
+czterema długościami kroku, obserwując przy tym energię:
+
+\pyregion{code/ch13/step_check.py}{parting}{Ta sama para, z dowolną długością kroku}{lst:ch13-parting}
+
+\transcript{ch13-step-check}
+
+\noindent
+Każde skrócenie kroku o połowę dzieli błąd energii mniej więcej przez
+\val{ch13.energy.shrink}, tak jak obiecywał przepis RK4 z
+rozdziału~\ref{ch:motion}, a chwila, w której para się rozchodzi, nie
+przesuwa się nawet o setną część sekundy. Przy kroku używanym w książce,
+\val{ch13.dt} sekundy, energia zmienia się, zanim para się rozejdzie, o około
+\val{ch13.energy.moved} dżula: mniej więcej o jedną część na
+\val{ch13.energy.parts}. Rozejście należy do wahadła, nie do komputera.
+
+\plotfig{ch13-energy-error}{Jak daleko energia w symulacji odchodzi od swojej
+prawdziwej, stałej wartości, dla czterech długości kroku. Każde skrócenie
+kroku o połowę obniża całą krzywą mniej więcej o ten sam czynnik, a linia
+kropkowana zaznacza chwilę, w której dwa puszczenia się rozchodzą, taką samą
+dla wszystkich czterech.}{sprawdzian energii}
+
+\begin{note}
+Ten sprawdzian ma granicę. Policz jedno puszczenie dwa razy, z krokiem
+książki i z jego połową, a te dwa obliczenia też się rozejdą, po około
+\val{ch13.stepper.apart} sekundach. Drobny błąd każdego kroku jest
+pchnięciem, a chaos powiększa je jak każde inne. Zaczyna się jednak od czegoś
+dużo mniejszego niż milionowa część radiana, dlatego nasza para rozchodzi się
+pierwsza, a każda długość kroku zgadza się co do tego, kiedy.
+Rozdział~\ref{ch:computers} pyta, czemu jeszcze można ufać potem.
+\end{note}
+
+\begin{trapbox}
+\textbf{\enquote{Wahadło, które zachowuje energię, bez tarcia i bez niczego
+losowego, nie może być chaotyczne.}} Nie potrzebuje ani tarcia, ani
+przypadku. Zachowanie energii tylko częściowo trzyma wahadło w ryzach. Stan
+jednego wahadła to dwie liczby; ustalona energia zostawia mu jeden kierunek
+ruchu, wokół jednej zamkniętej pętli, i dlatego się powtarza. Stan wahadła
+podwójnego to cztery liczby; ustalona energia zostawia trzy kierunki, a trzy
+wystarczą do chaosu. Sprawdzian energii dowodzi, że symulacja jest uczciwa.
+Nie sprawia, że ruch staje się przewidywalny.
+\end{trapbox}
+
+\begin{lab}{l13_02_apart}{Kiedy dwa puszczenia się rozchodzą?}
+Zamień listing w funkcję. \code{seconds\_until\_apart} prowadzi krok po kroku
+dwa wahadła obok siebie i zwraca pierwszą chwilę, w której różnią się o
+więcej niż zadana tolerancja, albo \code{None}, jeśli wciąż są razem, gdy
+skończy się czas. Potem jej użyj: o ile dłużej rozchodzą się puszczenia
+różniące się o miliardową część radiana niż takie, które różnią się o
+milionową? Porównaj odpowiedź z arytmetyką horyzontów z
+rozdziału~\ref{ch:lyapunov}.
+\end{lab}
+
+\section{Łagodne kołysania i dzikie}
+\label{sec:ch13-islands}
+\index{twierdzenie KAM}\index{wyspy ruchu regularnego}
+
+\noindent
+Wszystko dotąd było puszczeniem z wysoka, z dużą energią. Wahadło podwójne
+można też puścić łagodnie.
+
+\begin{think}
+Puść to samo wahadło z obydwoma ramionami pod kątem 10° zamiast 120°: ta sama
+reguła, ta sama maszyna, to samo pchnięcie o milionową część radiana. Czy
+różnica wciąż urośnie w ciągu dwudziestu sekund do czegoś, co każdy by
+zobaczył?
+\end{think}
+\reveal{Nie. Przy 10° oba pozostają w odległości kilku milionowych części
+radiana od siebie: pchnięcie prawie nie rośnie. Ta sama maszyna jest spokojna
+przy małych wychyleniach i dzika przy dużych.}
+
+\pyregion{code/ch13/gentle_wild.py}{fate}{Co robi para puszczona pod jednym kątem}{lst:ch13-fate}
+
+\transcript{ch13-gentle-wild}
+
+\noindent
+Aż do \val{ch13.calm.upto}° każda para jest wciąż razem po
+\val{ch13.window} sekundach, a nawet przy \val{ch13.calm.upto}° największa
+różnica wynosi \val{ch13.calm.gap} radiana: pchnięcie urosło kilka razy, a
+nie sto tysięcy razy. Od \val{ch13.wild.from}° w górę każda para się
+rozchodzi. Wykres wypełnia kąty pomiędzy.
+
+\plotfig{ch13-gentle-wild}{Każda kropka to puszczenie obu ramion pod jednym
+kątem, razem z kopią przesuniętą o milionową część radiana. Małe wychylenia
+pozostają razem przez dwadzieścia sekund; duże się rozchodzą, a zmiana
+następuje w przedziale kilku stopni.}{spokojne i dzikie puszczenia}
+
+\noindent
+Tak właśnie żyje chaos w układzie bez tarcia. Przy małej energii wahadło
+podwójne jest prawie dwoma prostymi kołysaniami, z ramionami poruszającymi
+się razem albo przeciwnie, i jego ruch jest regularny. Daj mu więcej
+energii, a pojawia się chaos; jeszcze więcej, a chaos przejmuje władzę, a
+ruch regularny przetrwa tylko w zakamarkach: chaotyczne morze z wyspami
+ruchu regularnego.
+
+\begin{rigourbox}
+Ta książka nie dowodzi, że wahadło podwójne jest chaotyczne; mierzy
+wrażliwość dla kilku puszczeń. Twierdzenie stojące za morzem i jego wyspami
+nazywa się KAM, od Andrieja Kołmogorowa, który ogłosił je w 1954 roku, oraz
+Jürgena Mosera i Władimira Arnolda, którzy udowodnili jego wersje w latach
+1962 i 1963. Mówi ono, że gdy regularny układ bez tarcia zostanie lekko
+zaburzony, większość jego regularnych ruchów przetrwa, nieco wygięta, a chaos
+zostaje zamknięty w cienkich warstwach między nimi; gdy zaburzenie rośnie,
+warstwy się poszerzają. Jego dowód to matematyka na poziomie wyższych lat
+studiów, do znalezienia w książkach o mechanice takich układów.
+\end{rigourbox}
+
+\noindent
+Jeszcze jedna różnica względem rozdziału~\ref{ch:lorenz}. Równania Lorenza
+zawierają tarcie, a tarcie ściska każdy start na jeden atraktor. Wahadło
+podwójne nie ma tarcia: każdy start zachowuje swoją energię na zawsze i nie
+ma atraktora. Jest za to płot. Energia mówi, które stany w ogóle da się
+osiągnąć, a ruch, choćby najdzikszy, pozostaje w środku.
+
+\section{Dwa ciała, trzy ciała}
+\label{sec:ch13-three}
+\index{problem trzech ciał}\index{Poincaré, Henri}
+
+\noindent
+Mechanizmem zegara z rozdziału~\ref{ch:models} był Układ Słoneczny, a jego
+triumfem problem dwóch ciał: jednej planety i Słońca. Johannes Kepler odkrył
+na początku XVII wieku, że planety poruszają się po elipsach, a Isaac Newton
+pokazał w 1687 roku, że jego prawo grawitacji każe dwóm ciałom robić dokładnie
+to. Dwa ciała mają wzór: elipsę, zataczaną bez końca. Na każde pytanie o nie
+istnieje odpowiedź, którą da się zapisać.
+
+Dodaj trzecie ciało, a wzoru takiego rodzaju w ogóle nie ma. W 1889 roku
+Henri Poincaré zdobył nagrodę ufundowaną w imieniu króla Szwecji Oskara II za
+pracę nad problemem kilku ciał poruszających się pod wpływem wzajemnej
+grawitacji. Gdy jego nagrodzoną rozprawę przygotowywano do druku, znaleziono
+w niej błąd. Poprawiając go, Poincaré odkrył, że orbity w pobliżu prostego,
+powtarzającego się ruchu trzech ciał mogą owijać się wokół niego w plątaninę
+tak zawiłą, że później napisał, iż nawet nie będzie próbował jej narysować.
+Poprawiona rozprawa ukazała się w 1890 roku, a to, co opisuje, uznaje się
+dziś za pierwszy przebłysk chaosu: regułę równie dokładną jak reguła
+Newtona, a za nią ruch, za którym nie nadąży żaden wzór.
+
+W 1908 roku, pisząc dla szerokiej publiczności, Poincaré ujął tę lekcję
+słowami, które ta książka właśnie mierzy: przyczyna zbyt mała, by ją
+zauważyć, może zdecydować o skutku, którego nie da się przeoczyć, i wtedy
+przewidywanie staje się niemożliwe.
+
+\mermaidfig{ch13-bodies}{Dwa ciała mają wzór; trzy nie mają żadnego; planety
+są chaotyczne w skali dziesiątek milionów lat, a mimo to pozostają na swoich
+miejscach.}{dwa ciała, trzy ciała, planety}
+
+\section{Czy Układ Słoneczny jest zegarem?}
+\label{sec:ch13-solar}
+\index{Laskar, Jacques}\index{Hyperion}
+
+\noindent
+Przez dwa stulecia Układ Słoneczny był wzorem doskonałego zegara. Pod koniec
+XVIII wieku Joseph-Louis Lagrange i Pierre-Simon Laplace obliczyli, z
+dokładnością, na jaką pozwalały ich metody, że rozmiary orbit planet się
+chwieją, ale nie dryfują. Demon Laplace'a z rozdziału~\ref{ch:models} miał
+planety za dowód.
+
+W 1989 roku Jacques Laskar obliczył powolne wahania orbit planet na
+przestrzeni dwustu milionów lat i stwierdził, że ruch planet wewnętrznych
+\dash{} Merkurego, Wenus, Ziemi i Marsa \dash{} jest chaotyczny. Czas
+Lapunowa, który znalazł, w sensie z rozdziału~\ref{ch:lyapunov}, wynosił
+około pięciu milionów lat: błąd położenia planet mnoży się przez $e$, około
+\num{2.7}, co pięć milionów lat.
+
+\begin{think}
+Sto milionów lat to dwadzieścia takich czasów Lapunowa. Mniej więcej ile
+razy mnoży się błąd przez dwadzieścia z nich: sto razy, milion razy czy
+miliard razy?
+\end{think}
+\reveal{Około \val{ch13.solar.factor} razy: bliżej miliarda niż miliona.
+Błąd jednego metra w dzisiejszym położeniu Ziemi urósłby do
+\val{ch13.solar.km} kilometrów, więcej niż odległość do Księżyca.}
+
+\begin{trapbox}
+\textbf{\enquote{Układ Słoneczny to doskonały zegar.}} W skali kilku tysięcy
+lat jest zegarem tak dobrym jak cokolwiek, co mamy: zaćmienia przewiduje się
+na stulecia naprzód. W skali dziesiątek milionów lat nie da się go odczytać.
+Żaden pomiar i żaden komputer nie powie, gdzie na swojej orbicie będzie
+Ziemia za sto milionów lat. Reguła jest dokładna; stan początkowy nie.
+\end{trapbox}
+
+\noindent
+Nieprzewidywalny to nie to samo co niestabilny. Wynik Laskara nie mówi, że
+planety się rozlecą, a późniejsze obliczenia, sięgające miliardów lat, w
+niemal każdym przebiegu pokazują planety na orbitach o mniej więcej tych
+samych rozmiarach i kształtach. Nie umiemy powiedzieć, gdzie na orbicie
+będzie Ziemia za sto milionów lat; umiemy powiedzieć, że najpewniej będzie na
+orbicie bardzo podobnej do obecnej. To lekcja z rozdziału~\ref{ch:lorenz} w
+nowym miejscu: drogi nie da się przewidzieć, a obszar, po którym się porusza
+\dash{} tak.
+
+Chaos ujawnia się szybciej w niektórych zakątkach Układu Słonecznego. Księżyc
+Saturna Hyperion to nieforemna bryła na wydłużonej orbicie, a obliczenia
+przewidują, że jego obrót nie może się ustalić, tylko koziołkuje
+chaotycznie, szarpany przez Saturna raz w jedną, raz w drugą stronę.
+Obserwacje z sond Voyager i Cassini zgadzają się z tym przewidywaniem:
+Hyperion nie ma stałej doby.
+
+\begin{worldbox}
+Geolodzy datują warstwy osadów według rytmów klimatu w nich zapisanych.
+Powolne cykle kształtu orbity Ziemi i nachylenia jej osi, nazwane od
+nazwiska Milutina Milankovicia, zmieniają to, jak światło słoneczne pada na
+planetę, a klimat zostawia w skałach pasujące do nich pasma. Żeby zamienić
+pasma w daty, trzeba znać orbitę Ziemi daleko w przeszłość, i geolodzy biorą
+ją z obliczeń zespołu Laskara. Tym obliczeniom ufa się, cykl po cyklu, wstecz
+do mniej więcej pięćdziesięciu milionów lat i nie dalej \dash{} z powodu
+chaosu opisanego w tym podrozdziale.
+\end{worldbox}
+
+\begin{summarybox}
+\begin{itemize}
+\item Stan \textbf{wahadła podwójnego} to cztery liczby, dwa kąty i dwie
+  prędkości ich zmian. Jego reguła pochodzi od Newtona, jest dokładna i nie
+  ma w niej przypadku, a RK4 prowadzi ją krok po kroku.
+\item Bez tarcia \textbf{energia} nie może się zmienić, więc energia
+  symulacji mierzy błąd kroków: przy kroku książki około jednej części na
+  \val{ch13.energy.parts}.
+\item Puszczenia różniące się o milionową część radiana rozchodzą się po
+  \val{ch13.apart.seconds} sekundy przy każdej długości kroku:
+  \textbf{rozejście to fizyka}. Zachowanie energii nie zapobiega chaosowi.
+\item Łagodne puszczenia są \textbf{regularne}, a dzikie chaotyczne: morze z
+  wyspami, jak opisuje twierdzenie KAM. Bez tarcia nie ma atraktora; energia
+  ogradza ruch.
+\item Dwa ciała mają wzór, a trzy nie. Poprawiona nagrodzona rozprawa
+  \textbf{Poincarégo} z 1890 roku była pierwszym przebłyskiem chaosu.
+\item Laskar stwierdził, że planety wewnętrzne są chaotyczne, a ich
+  \textbf{czas Lapunowa} wynosi około pięciu milionów lat: ich położeń nie da
+  się przewidzieć na sto milionów lat naprzód, choć ich orbity pozostają
+  mniej więcej takie, jakie są.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Dlaczego wahadło podwójne może być chaotyczne, a pojedyncze nie, choć
+  żadne z nich nie traci energii?
+  \answerto{Ustalenie energii dwuliczbowego stanu pojedynczego wahadła
+  zostawia jeden kierunek, wokół zamkniętej pętli. Ustalenie jej dla czterech
+  liczb wahadła podwójnego zostawia trzy, a to wystarcza do chaosu.}
+\item Wahadło podwójne puszczono ze spoczynku z obydwoma ramionami
+  skierowanymi pionowo w górę. Jaka jest jego energia, jeśli wysokości
+  mierzymy od punktu zawieszenia?
+  \answerto{Ciężarki są metr i dwa metry wyżej, więc $\num{9.81} \times
+  (1 + 2)$, czyli około \num{29.4} dżula.}
+\item Twoja symulacja maszyny bez tarcia traci w ciągu minuty jedną dziesiątą
+  energii. Co z tego wnioskujesz?
+  \answerto{Błąd kroków jest za duży, by ufać wynikowi. Skracaj krok, aż
+  energia się utrzyma, a potem sprawdź, czy twoja odpowiedź przetrwa kolejne
+  skrócenie kroku o połowę.}
+\item Dwa puszczenia rozchodzą się po dziesięciu sekundach. Skracasz krok o
+  połowę i teraz rozchodzą się po trzech. Co ci to mówi?
+  \answerto{Że rozejście wywołały przynajmniej częściowo błędy kroków, więc
+  żadnej z tych liczb nie można ufać. Rozejście, które jest fizyką, nie
+  przesuwa się, gdy zmienia się krok.}
+\item Wahadło podwójne nie ma atraktora. Co powstrzymuje jego ruch przed
+  pójściem gdziekolwiek?
+  \answerto{Jego energia, która nigdy się nie zmienia i decyduje, które stany
+  w ogóle da się osiągnąć.}
+\item Przy czasie Lapunowa wynoszącym pięć milionów lat mniej więcej przez
+  ile mnoży się błąd w ciągu dziesięciu milionów?
+  \answerto{Dwa razy przez $e$: $\num{2.7} \times \num{2.7}$, nieco ponad
+  siedem.}
+\item Czy chaos Układu Słonecznego oznacza, że planety się rozlecą?
+  \answerto{Nie. Ich położeń nie da się przewidzieć dalej niż na kilkadziesiąt
+  milionów lat, ale obliczenia sięgające miliardów lat w niemal każdym
+  przebiegu pokazują, że ich orbity zachowują mniej więcej te same rozmiary i
+  kształty.}
+\end{checkpoint}

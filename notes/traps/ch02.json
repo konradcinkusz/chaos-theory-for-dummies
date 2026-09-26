@@ -1,0 +1,26 @@
+[
+  {
+    "n": 21,
+    "label": "sec:ch02-until",
+    "en": {
+      "habit": "Exponential growth means fast growth.",
+      "truth": "It means growth in proportion to what is already there, and the multiplier can be close to one: at 1 per cent a year a sum takes about \\val{ch02.dbl.one.log} years to double. What exponential growth guarantees is not speed but that it eventually overtakes any growth that adds a fixed amount."
+    },
+    "pl": {
+      "habit": "Wzrost wykładniczy to szybki wzrost.",
+      "truth": "To wzrost proporcjonalny do tego, co już jest, a mnożnik może być bliski jedności: przy 1 procencie rocznie suma podwaja się po mniej więcej \\val{ch02.dbl.one.log} latach. Wzrost wykładniczy gwarantuje nie szybkość, tylko to, że w końcu prześcignie każdy wzrost, który dodaje stałą kwotę."
+    }
+  },
+  {
+    "n": 22,
+    "label": "sec:ch02-stability",
+    "en": {
+      "habit": "A fixed point is where the system ends up.",
+      "truth": "It is where the system stays if it is exactly there. Only a stable fixed point, where each step shrinks the gap ($\\abs{a} < 1$ for $x \\mapsto a\\,x + b$), draws nearby states in; an unstable one, like a loan's break-even balance, pushes them away."
+    },
+    "pl": {
+      "habit": "Punkt stały to miejsce, w którym układ w końcu się znajdzie.",
+      "truth": "To miejsce, w którym układ pozostaje, jeśli jest w nim dokładnie. Tylko stabilny punkt stały, w którym każdy krok zmniejsza odległość ($\\abs{a} < 1$ dla $x \\mapsto a\\,x + b$), przyciąga pobliskie stany; niestabilny, jak saldo kredytu, przy którym rata pokrywa odsetki, je odpycha."
+    }
+  }
+]

@@ -1,39 +1,512 @@
 %% ch08 --- Droga do chaosu i liczba, której nikt się nie spodziewał
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
-%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
-%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
-%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
-%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
-%% już generowany.
+%% Napisany we wrześniu 2026. Każda liczba, której czytelnik nie policzy w
+%% pamięci, pochodzi z code/measure/ch08.py, który importuje TE SAME funkcje,
+%% które drukują listingi (code/ch08/), więc strona i listingi nie mogą się
+%% rozejść. Rozwidlenia i punkty orientacyjne odwzorowania logistycznego
+%% liczone są tylko przez + - * i /, więc ich cyfry są takie same na każdej
+%% maszynie; odwzorowanie sinusowe woła math.sin, więc to, co strona z niego
+%% drukuje, jest zaokrąglone do dwóch miejsc (czterech dla miejsca, gdzie
+%% kończą się jego podwojenia) i sprawdzone, że nie leży na granicy
+%% zaokrąglenia.
+%%
+%% CZEGO TEN ROZDZIAŁ NIE MOŻE POWIEDZIEĆ. Cztery zachowania odwzorowania
+%% logistycznego i utrata stabilności punktu stałego przy r = 3 należą do
+%% rozdziału 5; tu są przypomniane, nie uczone. Wykładnik Lapunowa w funkcji r
+%% należy do rozdziału 7. To, że cały diagram bifurkacyjny leży wzdłuż linii
+%% przez zbiór Mandelbrota -- i przeliczenie r na c -- to wypłata rozdziału 12:
+%% ten rozdział wskazuje na nią jednym zdaniem i niczego z niej nie liczy.
+%%
+%% Bliźniak: chapters/en/ch08-bifurcations.tex. Podrozdział za podrozdziałem,
+%% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
 
 \chapter{Droga do chaosu i liczba, której nikt się nie spodziewał}
 \label{ch:bifurcations}
+\index{diagram bifurkacyjny}\index{stała Feigenbauma}
 
-\chapterstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\noindent
+W rozdziale~\ref{ch:logistic} ustawiłeś jedno pokrętło, $r$, w czterech
+pozycjach i zobaczyłeś cztery zachowania. Przy $r = \num{2.8}$ odwzorowanie
+logistyczne ustaliło się na jednej wartości; przy \num{3.2} przeskakiwało
+między dwiema; przy \num{3.5} krążyło po czterech; przy \num{3.9} nigdy się
+nie powtórzyło. Cztery zdjęcia jednej maszyny. Co dzieje się pomiędzy nimi?
+Czy porządek zamienia się w chaos przy jednym ustawieniu pokrętła, tak jak
+woda wrze w stu stopniach, czy po drodze?
 
-Argument: the whole of Chapter 5 fits in one picture \dash{} the bifurcation
-diagram, the long-run values of x plotted against r \dash{} and the picture
-has structure. Period one splits to two, two to four, four to eight, at
-parameter values that crowd together geometrically; the ratio of successive
-gaps tends to Feigenbaum's constant, about 4.669, which the reader computes
-from the map's superstable parameters. The same number comes out of a
-completely different rule (the sine map \code{x[n+1] = s*sin(pi*x[n])}),
-which is universality: the number belongs to the route, not to the equation
-\dash{} and it has been measured in real fluids and circuits, within the
-precision of those experiments. Inside the chaos there are windows of order;
-the period-3 window opens at \code{r = 1 + sqrt(8)}, and Li and Yorke's 1975
-paper title, period three implies chaos, says what that means. Payoff: the
-reader can draw a bifurcation diagram, compute the first few period-doubling
-parameters and Feigenbaum's ratio, and explain why a constant of nature can
-come out of a toy model. Traps to elicit: the transition from order to chaos
-is a sudden switch; a different equation gives a different route; chaos,
-once reached, is everywhere beyond it. Listings: the bifurcation data;
-superstable parameters by bisection; the ratios for two maps. Labs: locate a
-superstable parameter; compute a Feigenbaum ratio. Figures: the bifurcation
-diagram; a zoom showing self-similarity; the ratios converging.
+Odpowiedzią jest jeden obraz, jeden z najczęściej reprodukowanych w nauce, a
+ukryta jest w nim liczba, której nikt tam nie umieścił. Wychodzi też z innych
+równań, zmierzono ją w ciekłym helu, a pod koniec rozdziału sam obliczysz ją
+z dokładnością do pięciu cyfr, używając wyłącznie dodawania, odejmowania,
+mnożenia i dzielenia.
 
-\medskip
-\textbf{Budżet słów:} 3500.
-}
+\begin{outcomes}
+\outcome{odczytać diagram bifurkacyjny i powiedzieć, co robi odwzorowanie
+  przy każdym pokazanym na nim ustawieniu pokrętła}
+\outcome{zlokalizować podwojenie okresu, obserwując przebiegi odwzorowania,
+  i powiedzieć, co ogranicza dokładność takiego pomiaru}
+\outcome{znaleźć parametr superstabilny metodą bisekcji, używając wyłącznie
+  $+$, $-$, $\times$ i $\div$}
+\outcome{obliczyć stosunek kolejnych odstępów między podwojeniami i
+  oszacować, gdzie podwojenia się kończą}
+\outcome{przeprowadzić to samo poszukiwanie dla drugiej reguły i powiedzieć,
+  co pokazuje porównanie}
+\outcome{znaleźć okno porządku w zakresie chaotycznym i przytoczyć, co Li i
+  Yorke udowodnili o okresie trzy}
+\end{outcomes}
+
+\section{Jeden obraz dla każdego ustawienia pokrętła}
+\label{sec:ch08-picture}
+\index{diagram bifurkacyjny}\index{stan przejściowy}
+
+\noindent
+Żeby zobaczyć wszystkie $r$ naraz, potrzebujesz przepisu, który zamienia
+cały przebieg w kilka kropek, a potem rysujesz kropki tysięcy przebiegów
+obok siebie.
+
+\begin{enumerate}
+\item Wybierz wartość $r$ i zacznij odwzorowanie od $x = \num{0.5}$.
+\item Wykonaj tysiąc kroków i wyrzuć je. Ten odcinek to \emph{stan
+  przejściowy}: orbita szuka drogi tam, dokąd zmierza.
+\item Wykonaj jeszcze trzysta i nad $r$ narysuj kropkę na wysokości każdej
+  wartości.
+\end{enumerate}
+
+\pyregion{code/ch08/bifurcation.py}{longrun}{Przepis: pozwól orbicie się ustalić, potem zachowaj to, co odwiedza}{lst:ch08-longrun}
+
+\noindent
+\code{orbit} to funkcja z biblioteki książki, która stosuje regułę raz za
+razem i zachowuje każdą wartość; \code{xs[burn + 1:]} zostawia te po stanie
+przejściowym.
+
+\begin{think}
+Przy $r = \num{2.8}$ odwzorowanie ustala się w punkcie stałym $1 - 1/r$,
+który znalazłeś w rozdziale~\ref{ch:logistic}. Ile różnych kropek narysuje
+przepis nad $r = \num{2.8}$, gdy stan przejściowy zostanie wyrzucony?
+\end{think}
+\reveal{Jedną. Wszystkie trzysta wartości to \val{ch08.fixed} z dokładnością
+do czterech miejsc po przecinku, czyli $1 - 1/\num{2.8}$, więc kropki lądują
+jedna na drugiej.}
+Cykl dwóch wartości rysuje dwie kropki, cykl czterech \dash{} cztery, a
+orbita, która nigdy się nie powtarza, rysuje trzysta różnych: krótką pionową
+smugę. Reszta listingu pyta o sześć wartości $r$:
+
+\transcript{ch08-bifurcation}
+
+\noindent
+Dwa wiersze są nowe: przy \num{3.56} orbita krąży po ośmiu wartościach, a
+przy \num{3.567} po szesnastu. Teraz wykonaj przepis dla tysięcy wartości
+$r$ między \num{2.8} a $4$ i narysuj wszystkie kropki naraz.
+
+\plotfig{ch08-diagram}{Diagram bifurkacyjny odwzorowania logistycznego. Nad
+każdą wartością $r$ kropki pokazują, gdzie $x$ spędza czas po zakończeniu
+stanu przejściowego: jedna linia tam, gdzie się ustala, dwie tam, gdzie
+przeskakuje, smuga tam, gdzie nigdy się nie powtarza.}{diagram bifurkacyjny}
+
+\noindent
+To jest \emph{diagram bifurkacyjny}, cały rozdział~\ref{ch:logistic} w
+jednym kadrze. Czytaj go od lewej do prawej, jak podróż wzdłuż pokrętła.
+Jedna linia aż do $r = 3$; tam rozdziela się na dwie; w pobliżu \num{3.45}
+każda gałąź rozdziela się znowu; potem wszystko rozpływa się w smugę
+poprzecinaną jasnymi pasami. \emph{Bifurkacja} (od łacińskiego słowa
+oznaczającego dwuzębne widły) to wartość pokrętła, przy której zmienia się
+rodzaj długoterminowego zachowania. Każde rozwidlenie tutaj to
+\emph{podwojenie okresu}: każda odwiedzana wartość staje się dwiema, więc
+cykl potrzebuje dwa razy więcej czasu, żeby się zamknąć.
+
+\begin{think}
+Spójrz na obraz między $r = \num{3.5}$, gdzie orbita ma okres cztery, a
+smugą. Czy porządek ustępuje chaosowi przy jednej wartości $r$, jak po
+przestawieniu przełącznika?
+\end{think}
+\reveal{Wygląda jak przełącznik, ale nim nie jest. Powiększ odcinek przed
+smugą, a każda gałąź rozdzieli się znowu i znowu: okresy $8$, $16$, $32$ i
+tak dalej bez końca, wszystkie mieszczące się przed $r = \val{ch08.end}$.
+Tabela złapała już dwa z nich.}
+
+\begin{trapbox}
+\textbf{\enquote{Przejście od porządku do chaosu to nagłe przełączenie.}}
+Nie na tej drodze. Porządek rozpada się w nieskończonej \emph{kaskadzie}
+podwojeń, z których każde przychodzi szybciej niż poprzednie, a chaos
+zaczyna się tam, gdzie kaskada się kończy. Smuga wygląda na nagłą tylko
+dlatego, że jej ostatnie rozwidlenia leżą zbyt blisko siebie, by je
+narysować. Inne układy dochodzą do chaosu innymi drogami; ta,
+\emph{kaskada podwojeń okresu}, to droga, którą idzie pojedynczy garb.
+\end{trapbox}
+
+\section{Rozwidlenia, które się zagęszczają}
+\label{sec:ch08-cascade}
+\index{podwojenie okresu}\index{bisekcja}
+
+\noindent
+Gdzie dokładnie leży każde rozwidlenie? Tabela wyznacza dla nich
+przedziały: okres jeden przy \num{2.8}, okres dwa przy \num{3.2}, więc
+pierwsze rozwidlenie leży pomiędzy. Wypróbuj środek przedziału, sprawdź, na
+jakim okresie odwzorowanie się tam ustala, zatrzymaj połowę, w której wciąż
+jest zmiana, i powtórz. Dwadzieścia rund zmniejsza przedział milion razy. To
+jest \emph{bisekcja}, a potrzebuje ona tylko sposobu, żeby zapytać
+\enquote{czy tutaj to wciąż okres $p$?}
+
+\pyregion{code/ch08/doublings.py}{fork}{Namierzanie rozwidlenia przez połowienie przedziału}{lst:ch08-fork}
+
+\noindent
+\code{settled\_period} wykonuje dwadzieścia tysięcy kroków odwzorowania i
+pyta biblioteczną funkcję \code{period}, co się powtarza. Listing uruchamia
+\code{fork} na czterech przedziałach, które daje tabela.
+
+\begin{think}
+Okazuje się, że pierwsze dwa rozwidlenia dzieli \val{ch08.gap.one} w $r$, a
+kolejne dwa \val{ch08.gap.two}. Ile razy mniejszy jest drugi odstęp? Jeśli
+następny zmaleje o ten sam czynnik, ile będzie wynosił?
+\end{think}
+\reveal{Około \val{ch08.ratio.one} razy mniejszy:
+$\val{ch08.gap.one} \div \val{ch08.gap.two}$. Ten sam czynnik jeszcze raz
+dałby następny odstęp około \num{0.02}.}
+Oto, co zmierzył listing:
+
+\transcript{ch08-doublings}
+
+\noindent
+Trzeci odstęp wynosi \val{ch08.gap.three}; drugi podzielony przez trzeci
+daje \val{ch08.ratio.two}. Każdy odstęp jest więc nieco mniej niż pięć razy
+większy od następnego, a pozostałe odstępy (ostatni podzielony przez
+\num{4.7}, potem jeszcze raz przez \num{4.7} i tak dalej) sumują się do
+ostatniego odstępu podzielonego przez $\num{4.7} - 1$, czyli nieco ponad
+jego ćwierci. Nieskończenie wiele rozwidleń mieści się na skończonym odcinku
+pokrętła: kaskada kończy się niedaleko za \val{ch08.fork.four}.
+
+\begin{think}
+Pierwsze rozwidlenie znamy dokładnie. W rozdziale~\ref{ch:logistic} okazało
+się, że punkt stały traci stabilność przy $r = 3$, gdzie jego nachylenie,
+$2 - r$, przekracza $-1$. Tabela podaje \val{ch08.fork.one}. Co poszło nie
+tak?
+\end{think}
+\reveal{Nic w regule: pomiarowi zabrakło cierpliwości. Przy
+$r = \num{2.9998}$ każdy krok mnoży małe zaburzenie przez
+$2 - r = \num{-0.9998}$, więc zaburzenie maleje o jedną pięćdziesiątą
+procenta na krok, a po dwudziestu tysiącach kroków orbita wciąż wyraźnie
+przeskakuje z boku na bok. \code{settled\_period} uznaje to za cykl o
+okresie dwa.}
+Każde rozwidlenie mierzone przez obserwację wypada za wcześnie z tego
+samego powodu: blisko rozwidlenia cykl, który traci stabilność, ustala się
+bardzo powoli.
+
+\begin{note}
+Drugie rozwidlenie da się znaleźć dokładnie. Przy jednym obiegu cyklu o
+okresie dwa zaburzenie jest mnożone przez nachylenie w każdym z jego dwóch
+punktów, a strona szkolnej algebry pokazuje, że iloczyn wynosi
+$4 + 2r - r^{2}$. Osiąga on $-1$, gdy $r^{2} - 2r - 5 = 0$, czyli przy
+$r = 1 + \sqrt{6} = \val{ch08.fork.two.exact}$; \val{ch08.fork.two} z tabeli
+wypada za wcześnie, zgodnie z oczekiwaniem. Późniejsze rozwidlenia nie mają
+tak prostego wzoru.
+\end{note}
+
+\section{Szczyt garbu}
+\label{sec:ch08-superstable}
+\index{cykl superstabilny}\index{Feigenbaum, Mitchell}
+
+\noindent
+W 1975 roku Mitchell Feigenbaum, fizyk z laboratorium w Los Alamos w Nowym
+Meksyku, wyznaczał położenie tych rozwidleń na programowalnym kalkulatorze
+kieszonkowym i zauważył wzór, który właśnie zobaczyłeś: każdy odstęp to
+stała część poprzedniego. Żeby zmierzyć tę część dokładnie, użyj lepiej
+położonego punktu orientacyjnego niż rozwidlenie, na którym cykl trzyma się
+resztkami sił: punktu na każdym odcinku, w którym cykl trzyma się
+najmocniej.
+
+Nachylenie odwzorowania logistycznego w punkcie $x$ wynosi $r(1 - 2x)$
+\dash{} to współczynnik rozciągnięcia, który nauczyłeś się mierzyć w
+rozdziale~\ref{ch:feedback}. Jest równe zeru przy $x = \num{0.5}$, na
+szczycie garbu. Cykl przechodzący przez $\num{0.5}$ mnoży każde zaburzenie
+przez to zero raz na obieg i je wymazuje. Taki cykl nazywa się
+\emph{superstabilnym}, a dla każdego okresu $1, 2, 4, 8, \ldots$ jest na
+drodze dokładnie jedna wartość $r$, przy której to się dzieje: w tym
+rozdziale nazywamy te wartości \emph{punktami orientacyjnymi}. Każdy z nich
+to rozwiązanie jednego równania: zacznij od $\num{0.5}$, zrób tyle kroków,
+ile wynosi okres, i wróć do $\num{0.5}$.
+
+\begin{think}
+Dla okresu jeden: przy jakim $r$ jeden krok przenosi $\num{0.5}$ z powrotem
+prosto do $\num{0.5}$? Krok to $r \times \num{0.5} \times \num{0.5}$.
+\end{think}
+\reveal{$r = 2$. Połowa połowy to ćwierć, a $2 \times \num{0.25} =
+\num{0.5}$.}
+Dla dłuższych okresów nie ma skrótu w pamięci, a bisekcja żadnego nie
+potrzebuje. \code{from\_top} podaje, jak daleko od $\num{0.5}$ kończy się
+orbita; ta odległość jest dodatnia po jednej stronie punktu orientacyjnego i
+ujemna po drugiej:
+
+\pyregion{code/ch08/superstable.py}{search}{Zacznij na szczycie i połowiaj przedział, aż orbita do niego wróci}{lst:ch08-search}
+
+\noindent
+Pierwsze dwa punkty orientacyjne otaczamy przedziałami na oko, z obrazu.
+Potem każdy odstęp jest mniejszy od poprzedniego, więc następnego punktu
+szukamy między jedną dziesiątą a połową ostatniego odstępu dalej \dash{} to
+hojny przedział dla odstępów malejących o czynnik bliski pięciu.
+\emph{Rodzina} to funkcja, która dla danego $r$ buduje regułę.
+
+\pyregion{code/ch08/superstable.py}{landmarks}{Punkty orientacyjne dla okresów $1, 2, 4, 8, \ldots$, każdy otoczony na podstawie poprzedniego}{lst:ch08-landmarks}
+
+\noindent
+Listing znajduje pierwszych \val{ch08.landmark.count} punktów
+orientacyjnych, dla okresów od $1$ do $1024$, używając wyłącznie $+$, $-$,
+$\times$ i $\div$, więc każda cyfra jest taka sama na każdym komputerze:
+
+\transcript{ch08-superstable}
+
+\noindent
+Spójrz w dół ostatniej kolumny: każdy odstęp podzielony przez następny.
+Przez kilka wierszy się waha, a potem przestaje się zmieniać:
+\val{ch08.delta}. To \emph{stała Feigenbauma}, oznaczana $\delta$ (grecka
+litera delta). Punkty orientacyjne dają ją znacznie dokładniej niż
+rozwidlenia, bo w punkcie orientacyjnym orbita ustala się od razu, a nie
+ledwie wcale. Rozwidlenia i punkty orientacyjne występują na drodze na
+zmianę, po jednym z każdego na okres, więc jedne i drugie zagęszczają się w
+tym samym tempie ku temu samemu końcowi, $r = \val{ch08.end}$. Punkt
+orientacyjny okresu dwa, \val{ch08.super.two}, to dokładnie $1 + \sqrt{5}$,
+gdzie iloczyn z notatki, $4 + 2r - r^{2}$, jest równy zeru.
+
+Feigenbaum opublikował wyniki w 1978 roku; Pierre Coullet i Charles Tresser
+we Francji znaleźli tę samą liczbę niezależnie, mniej więcej w tym samym
+czasie. To, co zrobił potem, sprawiło, że ta liczba jest sławna.
+
+\begin{lab}{l08_01_superstable}{Znajdź punkt orientacyjny sam}
+Napisz \code{from\_top} i \code{bisect}, a potem połącz je w
+\code{superstable}. Sprawdź swoją odpowiedź dla okresu dwa, porównując ją z
+$1 + \sqrt{5}$. Następnie znajdź $r$ między \num{3.82} a \num{3.84}, przy
+którym $\num{0.5}$ wraca do siebie po \emph{trzech} krokach. Jeszcze
+spotkasz tę liczbę.
+\end{lab}
+
+\section{Liczba, która należy do drogi}
+\label{sec:ch08-universal}
+\index{uniwersalność}\index{odwzorowanie sinusowe}
+
+\noindent
+Następnym krokiem Feigenbauma było wypróbowanie innej reguły,
+\emph{odwzorowania sinusowego}
+\[ x_{n+1} = s \sin(\pi x_{n}), \]
+które zwraca $s$ razy sinus z $\pi x$. Nie potrzebujesz trygonometrii, żeby
+za nim nadążyć: dla $x$ między $0$ a $1$ sinus z $\pi x$ to gładki garb,
+który rośnie od $0$ do $1$ przy $x = \num{0.5}$ i opada z powrotem do $0$.
+Odwzorowanie sinusowe ma więc kształt odwzorowania logistycznego \dash{}
+jeden garb ze szczytem w $\num{0.5}$ \dash{} i nic z jego wzoru: żadnego
+$x(1 - x)$, inne pokrętło $s$, krzywą, która nie jest parabolą.
+
+\begin{think}
+Przeprowadź to samo poszukiwanie punktów orientacyjnych dla odwzorowania
+sinusowego. Czy spodziewasz się, że jego odstępy będą maleć znowu o
+\val{ch08.delta} z odwzorowania logistycznego, czy o jakąś inną liczbę,
+należącą do sinusa?
+\end{think}
+\reveal{O tę samą liczbę. Odstępy odwzorowania sinusowego maleją najpierw o
+\val{ch08.sine.first}, a potem, punkt po punkcie, zbliżają się do
+\val{ch08.sine.delta}, na której zatrzymują się też stosunki odwzorowania
+logistycznego.}
+Listing nie wie o odwzorowaniu sinusowym nic poza jego rodziną i dwoma
+przedziałami odczytanymi z jego diagramu:
+
+\pyregion{code/ch08/two_maps.py}{compare}{To samo poszukiwanie dla dwóch niepowiązanych reguł}{lst:ch08-compare}
+
+\transcript{ch08-two-maps}
+
+\noindent
+Obie drogi kończą się w różnych miejscach (ostatni wiersz: \val{ch08.end} i
+\val{ch08.sine.end}) i inaczej się zaczynają, a jednak zatrzymują się na tym
+samym stosunku, co do każdej wydrukowanej cyfry. Funkcja \code{ratios} dzieli
+każdy odstęp przez następny; drugie laboratorium prosi cię, żebyś ją
+napisał.
+
+\plotfig{ch08-ratios}{Każdy odstęp między punktami orientacyjnymi podzielony
+przez następny, dla dwóch reguł, które łączy tylko pojedynczy gładki garb.
+Zaczynają daleko od siebie i kończą na tej samej liczbie.}{stosunki dla
+dwóch reguł zbiegają się}
+
+\begin{trapbox}
+\textbf{\enquote{Inne równanie daje inną drogę.}} Daje inne drogowskazy
+\dash{} rozwidlenia leżą przy innych wartościach pokrętła \dash{} ale droga
+ma ten sam kształt, a jej rozwidlenia zagęszczają się w tym samym tempie. Ta
+liczba należy do drogi, nie do równania. To jest \emph{uniwersalność} i
+dlatego stała przyrody może wyjść z zabawkowego modelu.
+\end{trapbox}
+
+\noindent
+Dlaczego? O każdym kolejnym rozwidleniu decyduje coraz krótszy odcinek
+odwzorowania w pobliżu szczytu garbu, oglądany przez coraz silniejsze szkło
+powiększające. Powiększ dowolny gładki, zaokrąglony garb dostatecznie mocno
+wokół szczytu, a wygląda jak parabola; wszystko, co czyniło odwzorowanie
+sinusowe sinusem, zostało powiększone poza pole widzenia. Stałe szkolnej
+geometrii, takie jak $\pi$, należą do kształtów. Ta należy do procesu.
+
+\mermaidfig{ch08-universal}{Uniwersalność w jednym zdaniu: każda reguła z
+jednym gładkim garbem idzie tą samą drogą, a droga niesie własny
+stosunek.}{każdy garb, jedna droga, jeden stosunek}
+
+\noindent
+Był to szok, bo przewidywał coś o układach, których równań nikt nie potrafił
+zapisać: jeśli któryś dochodzi do chaosu przez podwajanie okresu, jego
+rozwidlenia powinny się zagęszczać w tempie Feigenbauma, bez względu na to, z
+czego jest zrobiony.
+
+\begin{worldbox}
+Około 1980 roku Albert Libchaber i Jean Maurer w Paryżu podgrzewali od dołu
+maleńkie pudełko z ciekłym helem i rejestrowali temperaturę w jednym
+punkcie, gdy płyn się kotłował. Gdy zwiększali grzanie, rytm temperatury
+podwoił okres, a potem podwoił go znowu. Późniejsze doświadczenia z
+konwekcją w cieczach i z obwodami elektronicznymi mierzyły stosunek
+kolejnych odstępów i znajdowały liczby bliskie liczbie Feigenbauma: nie z
+dokładnością do czterech miejsc po przecinku, bo w laboratorium da się
+rozróżnić tylko kilka pierwszych podwojeń, ale na tyle bliskie, że nikt nie
+uważa tego za przypadek. W 1986 roku Feigenbaum i Libchaber otrzymali
+wspólnie Nagrodę Wolfa w dziedzinie fizyki.
+\end{worldbox}
+
+\begin{rigourbox}
+Nie dowodzimy tutaj, dlaczego każdy gładki garb daje tę samą stałą
+$\delta$. Feigenbaum wyjaśnił to metodą z fizyki, \emph{renormalizacją},
+która porównuje odwzorowanie po każdym podwojeniu z przeskalowaną kopią
+samego siebie; Oscar Lanford podał dowód wspomagany komputerowo w 1982 roku.
+\emph{Gładkość} ma znaczenie: garb o szczycie bardziej płaskim niż u
+paraboli daje inną stałą.
+\end{rigourbox}
+
+\begin{lab}{l08_02_ratio}{Stosunek Feigenbauma i miejsce, w którym kończą się podwojenia}
+Napisz \code{ratios}, które dzieli każdy odstęp przez następny, oraz
+\code{where\_it\_ends}, które sumuje wszystkie pozostałe odstępy, zakładając,
+że każdy to poprzedni podzielony przez ostatni stosunek. Test podaje twoim
+funkcjom punkty orientacyjne obu odwzorowań: jeden stosunek, dwa różne
+końce.
+\end{lab}
+
+\section{Porządek wewnątrz chaosu}
+\label{sec:ch08-windows}
+\index{okno okresowe}\index{twierdzenie Li--Yorke'a}
+
+\noindent
+Za $r = \val{ch08.end}$ podwojenia się wyczerpują, a diagram zamienia się w
+smugę.
+
+\begin{think}
+Czy od $r = \val{ch08.end}$ do $r = 4$ odwzorowanie logistyczne jest
+chaotyczne przy każdym ustawieniu pokrętła, tak jak przy \num{3.9}?
+\end{think}
+\reveal{Nie. Spójrz jeszcze raz na obraz: smugę przecinają jasne pasy, a w
+każdym z nich orbita wraca do krótkiego cyklu. Najszerszy, w pobliżu
+\num{3.83}, to okno okresu trzy.}
+\code{code/ch08/windows.py} przeprowadza $r$ przez ten pas z tą samą funkcją
+\code{settled\_period}, a potem szuka punktów orientacyjnych w jego
+wnętrzu:
+
+\transcript{ch08-windows}
+
+\noindent
+Przy \num{3.8284} orbita się nie powtarza; przy \num{3.8285} ustaliła się
+już w cyklu o okresie trzy. Okno otwiera się pomiędzy nimi, dokładnie przy
+$r = 1 + \sqrt{8} = \val{ch08.window.open}$. Cykl o okresie trzy podwaja się
+potem do sześciu i dwunastu, a przy \num{3.85} znów rozpływa się w smugę.
+Cała droga powtarza się w miniaturze. Pierwszy punkt orientacyjny okna to
+$r$, które znalazłeś w pierwszym laboratorium, \val{ch08.super.three}, a jego
+punkty orientacyjne zagęszczają się w stosunku \val{ch08.window.delta}:
+znowu liczba Feigenbauma, tym razem dla okresów $3, 6, 12, \ldots$ zamiast
+$1, 2, 4, \ldots$.
+
+\plotfig{ch08-zoom}{Po lewej: okno okresu trzy. Po prawej: środkowa gałąź
+okna w powiększeniu: mała kopia całego diagramu bifurkacyjnego, z własną
+kaskadą, własną smugą i własnymi oknami.}{okno okresu trzy w powiększeniu}
+
+\begin{trapbox}
+\textbf{\enquote{Gdy układ raz osiągnie chaos, jest chaotyczny wszędzie
+dalej.}} Między $r = \val{ch08.end}$ a $4$ odwzorowanie logistyczne wraca do
+porządku nieskończenie wiele razy, w oknach o każdym okresie. Przekręć
+pokrętło odrobinę, a chaotyczny układ może stać się idealnie okresowy;
+przekręć je odrobinę dalej, a znów jest chaotyczny. Wykładnik z
+rozdziału~\ref{ch:lyapunov} spada poniżej zera dokładnie w tych pasach.
+\end{trapbox}
+
+\begin{note}
+W 1975 roku Tien-Yien Li i James Yorke opublikowali pracę, której tytuł był
+jej wynikiem: \emph{Period three implies chaos} (okres trzy pociąga za sobą
+chaos). W skrócie: jeśli ciągła reguła przenosi przedział w siebie, tak jak
+odwzorowanie logistyczne przenosi przedział od $0$ do $1$, i jakiś punkt
+startowy wraca do siebie po dokładnie trzech krokach, to reguła ma cykle
+każdej długości oraz punkty startowe, których orbity nigdy nie ustalają się
+w żadnym cyklu. Praca nadała słowu \emph{chaos} jego matematyczne znaczenie;
+silniejszy wynik udowodnił w 1964 roku Ołeksandr Szarkowski w Kijowie, ale
+na Zachodzie był mało znany aż do czasu tej pracy. W oknie prawie każdy
+punkt startowy kończy na cyklu o okresie trzy, ale twierdzenie nadal
+obowiązuje: pozostałe cykle są na miejscu, niestabilne, a orbita może długo
+błąkać się między nimi, zanim się ustali.
+\end{note}
+
+\noindent
+Diagram ma jeszcze jedną niespodziankę, a należy ona do
+rozdziału~\ref{ch:mandelbrot}: cały ten obraz leży wzdłuż linii
+przecinającej najsłynniejszy obraz matematyki, a rozwidlenia i okno są
+dokładnie tam, gdzie umieszcza je jednolinijkowe przeliczenie.
+
+\begin{summarybox}
+\begin{itemize}
+\item \textbf{Diagram bifurkacyjny} pokazuje dla każdej wartości pokrętła,
+  gdzie orbita przebywa po zakończeniu stanu przejściowego.
+  \textbf{Bifurkacja} to wartość, przy której zmienia się rodzaj
+  długoterminowego zachowania; na tej drodze każda jest \textbf{podwojeniem
+  okresu}.
+\item Rozwidlenia się zagęszczają, każdy odstęp jest nieco mniej niż pięć
+  razy większy od następnego, więc nieskończenie wiele z nich mieści się
+  przed $r = \val{ch08.end}$. Zmierzone przez obserwację rozwidlenie wypada
+  za wcześnie, bo w jego pobliżu orbita ustala się bardzo powoli.
+\item W \textbf{superstabilnym} punkcie orientacyjnym cykl przechodzi przez
+  szczyt garbu, gdzie nachylenie jest zerowe. Każdy taki punkt to jedno
+  równanie, rozwiązywane \textbf{bisekcją} za pomocą $+$, $-$, $\times$ i
+  $\div$, a stosunek odstępów między nimi zatrzymuje się na \textbf{stałej
+  Feigenbauma}, \val{ch08.delta}.
+\item Odwzorowanie sinusowe daje ten sam stosunek: liczba należy do drogi,
+  którą idzie każda gładka reguła z jednym garbem, a nie do wzoru. To jest
+  \textbf{uniwersalność}, zmierzona w cieczach i obwodach.
+\item Za kaskadą chaos przerywają \textbf{okna} porządku. Najszersze, okresu
+  trzy, otwiera się przy $1 + \sqrt{8}$ i zawiera miniaturę całej drogi; Li
+  i Yorke udowodnili, że okres trzy pociąga za sobą chaos.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Co pokazuje kolumna kropek nad jedną wartością $r$ na diagramie
+  bifurkacyjnym i jak wygląda dla punktu stałego, cyklu o okresie dwa i
+  chaosu?
+  \answerto{Gdzie orbita przebywa na dłuższą metę przy tym $r$, po stanie
+  przejściowym: jedna kropka dla punktu stałego, dwie dla cyklu o okresie
+  dwa, smuga dla chaosu.}
+\item Dwa kolejne odstępy między rozwidleniami wynoszą \num{0.08} i
+  \num{0.017}. Mniej więcej jaki jest ich stosunek i ile powinien wynosić
+  następny odstęp?
+  \answerto{Około \num{4.7}, z $\num{0.08} \div \num{0.017}$; następny odstęp
+  powinien więc wynosić około $\num{0.017} \div \num{4.7}$, czyli mniej
+  więcej \num{0.0036}.}
+\item Dlaczego rozwidlenie zlokalizowane przez obserwację orbity wypada
+  nieco za wcześnie?
+  \answerto{Blisko rozwidlenia cykl, który traci stabilność, mnoży
+  zaburzenie przy każdym obiegu przez prawie $-1$, więc ustala się niezwykle
+  powoli, a przebieg o skończonej długości wciąż pokazuje przeskakiwanie
+  między wartościami.}
+\item Czym jest superstabilny punkt orientacyjny i dlaczego da się go
+  znaleźć z dokładnością do wielu cyfr za pomocą samych $+$, $-$, $\times$ i
+  $\div$?
+  \answerto{To $r$, przy którym cykl przechodzi przez szczyt garbu,
+  $x = \num{0.5}$, gdzie nachylenie jest zerowe. Jest rozwiązaniem jednego
+  równania (zacznij od $\num{0.5}$, zrób tyle kroków, ile wynosi okres, wróć
+  do $\num{0.5}$), które bisekcja rozwiązuje, połowiąc przedział.}
+\item Podwojenia odwzorowania sinusowego kończą się około
+  \val{ch08.sine.end}, a logistycznego około \val{ch08.end}. Czy to przeczy
+  uniwersalności?
+  \answerto{Nie. Uniwersalność mówi, że stosunek kolejnych odstępów dąży do
+  tej samej liczby, około \val{ch08.delta}, dla każdej reguły z jednym
+  gładkim garbem; to, gdzie kończy się każda droga, zależy od reguły.}
+\item Czy odwzorowanie logistyczne jest chaotyczne przy $r = \num{3.83}$? Co
+  Li i Yorke udowodnili o okresie trzy?
+  \answerto{Nie: \num{3.83} leży w oknie okresu trzy, które otwiera się przy
+  $1 + \sqrt{8}$, około \val{ch08.window.open}. Li i Yorke udowodnili, że
+  ciągła reguła przenosząca przedział w siebie, mająca punkt o okresie trzy,
+  ma cykle każdej długości i punkty startowe, które nigdy nie ustalają się w
+  żadnym cyklu.}
+\end{checkpoint}

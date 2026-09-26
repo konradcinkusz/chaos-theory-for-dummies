@@ -1,0 +1,50 @@
+[
+  {
+    "n": 131,
+    "label": "sec:ch13-double",
+    "en": {
+      "habit": "A pendulum is a simple machine, so its motion must be simple.",
+      "truth": "True for one pendulum, whose state is two numbers. Hang a second from it and the state is four numbers, and a release from high up never settles into a repeating pattern."
+    },
+    "pl": {
+      "habit": "Wahadło to prosta maszyna, więc jego ruch musi być prosty.",
+      "truth": "Prawda dla jednego wahadła, którego stan to dwie liczby. Zawieś na nim drugie, a stan to cztery liczby, i puszczone z wysoka wahadło nie układa się w żaden powtarzający się wzór."
+    }
+  },
+  {
+    "n": 132,
+    "label": "sec:ch13-apart",
+    "en": {
+      "habit": "A system that keeps its energy, with no friction and nothing random in it, cannot be chaotic.",
+      "truth": "Fixing the energy of a four-number state still leaves three directions to move in, which is enough for chaos. Two double pendulums a millionth of a radian apart part within seconds, with the energy of each constant to about one part in $10^{8}$."
+    },
+    "pl": {
+      "habit": "Układ, który zachowuje energię, bez tarcia i bez niczego losowego, nie może być chaotyczny.",
+      "truth": "Ustalenie energii czterech liczb stanu wciąż zostawia trzy kierunki ruchu, a to wystarcza do chaosu. Dwa wahadła podwójne różniące się o milionową część radiana rozchodzą się w ciągu sekund, choć energia każdego jest stała z dokładnością do około jednej części na $10^{8}$."
+    }
+  },
+  {
+    "n": 133,
+    "label": "sec:ch13-solar",
+    "en": {
+      "habit": "The solar system is a perfect clock.",
+      "truth": "Over thousands of years it is an excellent one. Laskar found the inner planets chaotic, with a Lyapunov time of about five million years, so where Earth will be on its orbit a hundred million years from now cannot be predicted."
+    },
+    "pl": {
+      "habit": "Układ Słoneczny to doskonały zegar.",
+      "truth": "W skali tysięcy lat jest zegarem znakomitym. Laskar stwierdził, że planety wewnętrzne są chaotyczne, z czasem Lapunowa około pięciu milionów lat, więc nie da się przewidzieć, gdzie na orbicie będzie Ziemia za sto milionów lat."
+    }
+  },
+  {
+    "n": 134,
+    "label": "sec:ch13-solar",
+    "en": {
+      "habit": "A chaotic solar system is an unstable one: the planets will fly apart.",
+      "truth": "Unpredictable is not unstable. Computations over billions of years find the planets keeping orbits of much the same size and shape in almost every run; only their positions along those orbits cannot be foretold."
+    },
+    "pl": {
+      "habit": "Chaotyczny Układ Słoneczny to układ niestabilny: planety się rozlecą.",
+      "truth": "Nieprzewidywalny to nie niestabilny. Obliczenia sięgające miliardów lat w niemal każdym przebiegu pokazują planety na orbitach o mniej więcej tych samych rozmiarach i kształtach; nie da się przewidzieć tylko, gdzie na tych orbitach będą."
+    }
+  }
+]

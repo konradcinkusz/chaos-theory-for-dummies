@@ -1,0 +1,38 @@
+[
+  {
+    "n": 161,
+    "label": "sec:ch16-formulas",
+    "en": {
+      "habit": "A deterministic program always gives the same answer.",
+      "truth": "On the same machine, with the same compiler and libraries, it does. Change any of those, or the order of a sum, and the roundings change; a chaotic computation carries a last-digit difference to the first digit in about fifty steps."
+    },
+    "pl": {
+      "habit": "Program deterministyczny zawsze daje ten sam wynik.",
+      "truth": "Na tej samej maszynie, z tym samym kompilatorem i bibliotekami, tak. Zmień którąkolwiek z tych rzeczy albo kolejność sumowania, a zmienią się zaokrąglenia; chaotyczne obliczenie przenosi różnicę na ostatniej cyfrze na pierwszą w mniej więcej pięćdziesiąt kroków."
+    }
+  },
+  {
+    "n": 162,
+    "label": "sec:ch16-exact",
+    "en": {
+      "habit": "More decimal places make a simulation exact.",
+      "truth": "Each extra digit buys a fixed number of correct steps, never all of them: at $r = 4$ the logistic map uses up one binary digit per step, and exact fractions double their digits at every step."
+    },
+    "pl": {
+      "habit": "Więcej miejsc po przecinku czyni symulację dokładną.",
+      "truth": "Każda dodatkowa cyfra kupuje stałą liczbę poprawnych kroków, nigdy wszystkie: przy $r = 4$ odwzorowanie logistyczne zużywa jedną cyfrę dwójkową na krok, a dokładne ułamki podwajają liczbę cyfr w każdym kroku."
+    }
+  },
+  {
+    "n": 163,
+    "label": "sec:ch16-random",
+    "en": {
+      "habit": "A chaotic map makes a good random-number generator.",
+      "truth": "Chaos gives unpredictability and nothing else a generator needs: the logistic map's values pile up near $0$ and $1$, each fixes the next, and on a computer it falls into a short loop. Good generators are designed with number theory to have one enormous loop."
+    },
+    "pl": {
+      "habit": "Chaotyczne odwzorowanie to dobry generator liczb losowych.",
+      "truth": "Chaos daje nieprzewidywalność i nic więcej z tego, czego potrzebuje generator: wartości odwzorowania logistycznego gromadzą się przy $0$ i $1$, każda wyznacza następną, a w komputerze wpada ono w krótką pętlę. Dobre generatory projektuje się za pomocą teorii liczb tak, by miały jedną ogromną pętlę."
+    }
+  }
+]

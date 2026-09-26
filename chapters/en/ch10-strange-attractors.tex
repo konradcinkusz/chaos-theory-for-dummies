@@ -88,6 +88,7 @@ other.}
 
 \pyregion{code/ch10/kneading.py}{knead}{Kneading a strip of dough: stretch, then fold}{lst:ch10-knead}
 
+\needspace{13\baselineskip}
 \transcript{ch10-kneading}
 
 \noindent
@@ -152,14 +153,13 @@ $(-\num{0.4}, \num{0.3})$.}
 
 \pyregion{code/ch10/henon.py}{rule}{Hénon's map: two numbers, one line of arithmetic each}{lst:ch10-henon}
 
+\needspace{9\baselineskip}
 \transcript{ch10-henon}
 
 \noindent
 The listing carries on where your hand stopped. The point jumps about without
 settling, repeating or running away: however long you let it go, $x$ stays
-between \val{ch10.attractor.left} and \val{ch10.attractor.right}. The rule
-uses only multiplication, addition and subtraction, so every digit printed is
-the same on every computer.
+between \val{ch10.attractor.left} and \val{ch10.attractor.right}.
 
 \section{One shape for every start}
 \label{sec:ch10-cloud}
@@ -182,6 +182,7 @@ apart along that set.}
 
 \pyregion{code/ch10/cloud.py}{cloud}{A cloud of starts, and whether each lands on the attractor}{lst:ch10-cloud}
 
+\needspace{8\baselineskip}
 \transcript{ch10-cloud}
 
 \noindent
@@ -253,6 +254,7 @@ measures the area inside the new outline.
 
 \pyregion{code/ch10/area.py}{area}{Measuring what the map does to an area}{lst:ch10-area}
 
+\needspace{7\baselineskip}
 \transcript{ch10-area}
 
 \noindent
@@ -277,6 +279,7 @@ Chapter~\ref{ch:lyapunov}, now for a map of the plane.
 
 \pyregion{code/ch10/stretch.py}{arrow}{The average stretch of a tiny arrow}{lst:ch10-arrow}
 
+\needspace{11\baselineskip}
 \transcript{ch10-stretch}
 
 \noindent
@@ -290,6 +293,7 @@ map squeezes by \val{ch10.squeeze}. Multiply the two and you get back about
 \val{ch10.b}, the area factor. Stretch one way, squeeze the other, fold to
 fit: that is the whole recipe.
 
+\needspace{10\baselineskip}
 \begin{lab}{l10_02_henon}{One step, and its area}
 Write \code{step}, one step of Hénon's map, and \code{area\_factor}, which
 moves three corners of a tiny square one step, reads off the two new sides as

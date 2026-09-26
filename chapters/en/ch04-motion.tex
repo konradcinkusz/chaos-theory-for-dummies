@@ -210,11 +210,6 @@ either: over a thousand seconds it loses \val{ch04.rk4.ppm.thousand} parts in
 a million. It too is right for longer rather than right, only very much
 longer.
 
-\plotfig{ch04-euler-rk4}{The same spring followed for ten seconds by two
-steppers with the same step. Left: in the plane of states, Euler (red)
-spirals outwards off the real circle while RK4 (blue) stays on it. Right: the
-energy each one reports.}{Euler spiralling out against RK4}
-
 \begin{lab}{l04_02_drift}{Measure the drift}
 Write the spring's energy, and a function that follows the spring with a
 given stepper for a given time and reports how much its energy has changed.
@@ -223,6 +218,11 @@ times smaller does each method's drift in energy become? (The comment in the
 RK4 listing is about the error in position, a different measure.) Predict
 before you run.
 \end{lab}
+
+\plotfig{ch04-euler-rk4}{The same spring followed for ten seconds by two
+steppers with the same step. Left: in the plane of states, Euler (red)
+spirals outwards off the real circle while RK4 (blue) stays on it. Right: the
+energy each one reports.}{Euler spiralling out against RK4}
 
 \section{The map of every state}
 \label{sec:ch04-phase}
@@ -242,9 +242,9 @@ sideways and falls to nothing when it points straight down or straight up.
 (That is the sine, which \code{chaoslab}'s pendulum rule calls.)
 
 \begin{think}
-Released further out, a pendulum has further to go, but it also moves
-faster. Does a pendulum released at $90$ degrees take longer to swing out and
-back than one released at $10$?
+Released further out, a pendulum has further to go but moves faster. Does
+one released at $90$ degrees take longer to swing out and back than one
+released at $10$?
 \end{think}
 \reveal{Longer: \val{ch04.pend.ninety} seconds against \val{ch04.pend.ten},
 about \val{ch04.pend.ninety.pct} per cent more. Released at $170$ degrees it

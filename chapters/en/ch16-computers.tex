@@ -228,7 +228,7 @@ In one sentence: at $r = 4$ the map uses up one binary digit of accuracy per
 step, so a double's \val{ch16.bits.double} digits last about fifty steps.
 \emph{Single precision}, which graphics cards and much machine-learning
 software use because it takes half the memory, keeps \val{ch16.bits.single}
-binary digits; the same arithmetic predicts \val{ch16.predict.single} steps,
+binary digits, about \val{ch16.decimal.single} decimal ones; the same arithmetic predicts \val{ch16.predict.single} steps,
 and it lasts \val{ch16.wrong.single}.
 
 \plotfig{ch16-parting}{Distance from the true orbit of one tenth, on a
@@ -348,9 +348,9 @@ graduate texts on dynamical systems.
 \noindent
 Now the payoff. A shadow is a true orbit, so it spends its time as true
 orbits do. The last two lines of the output measure that: over a million
-steps both formulas spend the fraction \val{ch16.stats.a} of their time below
-$\num{0.1}$, and the exact answer, from a formula this book does not derive,
-is \val{ch16.stats.exact}. Two programs whose paths parted after fifty steps
+steps the first formula spends the fraction \val{ch16.stats.a} of its time
+below $\num{0.1}$, the second \val{ch16.stats.b}, and the exact answer, from
+a formula this book does not derive, is \val{ch16.stats.exact}. Two programs whose paths parted after fifty steps
 agree about where the orbit lives. That is why the lobe fractions of
 Chapter~\ref{ch:lorenz} and the climate statistics of
 Chapter~\ref{ch:weather} can be trusted when no single computed path can.

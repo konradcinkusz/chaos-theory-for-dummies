@@ -207,12 +207,6 @@ dokładne: w tysiąc sekund traci \val{ch04.rk4.ppm.thousand} części na
 milion. Ono również jest poprawne dłużej, a nie poprawne, tylko o wiele
 dłużej.
 
-\plotfig{ch04-euler-rk4}{Ta sama sprężyna śledzona przez dziesięć sekund
-dwiema metodami z tym samym krokiem. Po lewej: na płaszczyźnie stanów Euler
-(czerwony) oddala się spiralą od prawdziwego okręgu, a RK4 (niebieski)
-zostaje na nim. Po prawej: energia, którą podaje każda z
-nich.}{Euler uciekający spiralą i RK4}
-
 \begin{lab}{l04_02_drift}{Zmierz dryf}
 Napisz energię sprężyny i funkcję, która śledzi sprężynę daną metodą przez
 dany czas i podaje, o ile zmieniła się jej energia. Potem odpowiedz na
@@ -220,6 +214,12 @@ pytanie, które rozdział zostawia otwarte: zmniejsz krok o połowę \dash{} ile
 razy mniejszy stanie się dryf energii w każdej z metod? (Komentarz w listingu
 RK4 dotyczy błędu położenia, a to inna miara.) Przewiduj, zanim uruchomisz.
 \end{lab}
+
+\plotfig{ch04-euler-rk4}{Ta sama sprężyna śledzona przez dziesięć sekund
+dwiema metodami z tym samym krokiem. Po lewej: na płaszczyźnie stanów Euler
+(czerwony) oddala się spiralą od prawdziwego okręgu, a RK4 (niebieski)
+zostaje na nim. Po prawej: energia, którą podaje każda z
+nich.}{Euler uciekający spiralą i RK4}
 
 \section{Mapa wszystkich stanów}
 \label{sec:ch04-phase}
@@ -325,21 +325,21 @@ pętlę.}{ustalanie się w punkcie i na pętli}
 \begin{think}
 Dlaczego dwie różne drogi na takiej mapie nigdy się nie przecinają?
 \end{think}
-\reveal{W punkcie przecięcia stan miałby dwie przyszłości, a reguła daje w
-każdym punkcie jedną strzałkę: jeden stan, jedna przyszłość.}
+\reveal{W punkcie przecięcia stan miałby dwie przyszłości, a reguła daje
+jedną strzałkę: jeden stan, jedna przyszłość.}
 Na płaszczyźnie ten jeden fakt ma wielką siłę. Droga, która nie może
 przeciąć ani siebie, ani żadnej innej drogi, i nie opuszcza ograniczonego
 obszaru, jest ogrodzona własną przeszłością. Może zwijać się do punktu
-stałego albo do pętli, albo uciec do nieskończoności. Nie może błąkać się w
-nieskończoność, nigdy się nie ustalając.
+stałego albo do pętli, albo uciec do nieskończoności. Nie może błąkać się bez
+końca.
 
 \begin{rigourbox}
 To \emph{twierdzenie Poincarégo--Bendixsona}, od nazwisk Henriego Poincarégo
-i szwedzkiego matematyka Ivara Bendixsona. Wymaga gładkiej reguły, a jego
+i Szweda Ivara Bendixsona. Wymaga gładkiej reguły, a jego
 dokładne sformułowanie dopuszcza jeszcze jedno zakończenie, łańcuch punktów
-stałych połączonych drogami. Dowód zajmuje kilka stron kursu uniwersyteckiego
-i jest w każdym podręczniku układów dynamicznych. Dotyczy ruchu w czasie
-ciągłym: reguła, która skacze krokami, może przeskoczyć nad własną drogą, a
+stałych połączonych drogami. Dowód, na kilka stron, jest w każdym podręczniku
+układów dynamicznych. Dotyczy ruchu w czasie
+ciągłym: reguła skacząca krokami może przeskoczyć własną drogę, a
 rozdział~\ref{ch:logistic} znajduje dzikie zachowanie w regule krokowej z
 jedną liczbą. I wymaga płaszczyzny: w trzech wymiarach droga może przejść
 nad sobą i pod sobą.

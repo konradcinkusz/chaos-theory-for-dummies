@@ -62,7 +62,7 @@ książki?
 \reveal{Na tym, jak szybko rośnie mały błąd stanu początkowego. W ruchach
 Ziemi i Księżyca rośnie tak wolno, że przez tysiąclecia pozostaje mały; w
 powietrzu rośnie, aż staje się tak duży jak sama pogoda.}
-Test na to jest tym, który rozdział~\ref{ch:butterfly} zamienił w pomiar:
+Sprawdza się to testem, który rozdział~\ref{ch:butterfly} zamienił w pomiar:
 uruchom regułę dwa razy, z dwóch stanów początkowych bliższych sobie, niż
 potrafiłby je rozróżnić jakikolwiek przyrząd, i patrz na różnicę. Oto trzy
 reguły, które już znasz z tej książki, każda uruchomiona dwa razy z
@@ -75,7 +75,7 @@ odległości jednej miliardowej:
 \noindent
 Stygnąca herbata zapomina o zaburzeniu: różnica jest co minutę mnożona
 przez \num{0.9}. Odwzorowanie logistyczne przy $r = \num{2.8}$ też
-zapomina, bo osiada w swoim punkcie stałym. Przy $r = 4$ miliardowa część
+zapomina, bo osiada w swoim punkcie stałym. Przy $r = 4$ jedna miliardowa
 rośnie, aż staje się tak duża, jak pozwala samo odwzorowanie. Jeśli
 różnica maleje, trajektorię da się przewidzieć tak długo, jak długo reguła
 jest poprawna. Jeśli rośnie, następne pytanie brzmi: jak szybko?
@@ -90,8 +90,8 @@ inna trudność niż chaos.
 \index{horyzont prognozy}\index{wykładnik Lapunowa}
 
 \noindent
-Rosnący błąd zwykle rośnie mniej więcej o ten sam czynnik w każdym kroku, a
-rozdział~\ref{ch:lyapunov} zamienił ten czynnik w jedną liczbę: wykładnik
+Rosnący błąd jest zwykle w każdym kroku mnożony przez mniej więcej ten sam
+czynnik, a rozdział~\ref{ch:lyapunov} zamienił ten czynnik w jedną liczbę: wykładnik
 Lapunowa, zapisywany $\lambda$ (grecka litera lambda), czyli logarytm
 naturalny $\ln$ średniego czynnika. Czynnik $2$ to wykładnik $\ln 2$, mniej
 więcej \val{ch18.ln.two}. Załóżmy, że stan początkowy jest błędny o $e_0$,
@@ -108,8 +108,8 @@ podzielony przez wykładnik. Biblioteka książki ma to w jednym wierszu
 \noindent
 Wypróbuj go na odwzorowaniu logistycznym przy $r = 4$, którego wykładnik ten
 rozdział mierzy jako \val{ch18.lam.logistic} na krok ($\ln 2$, jak pokazuje
-rozdział~\ref{ch:lyapunov}). Znaj stan początkowy z dokładnością do sześciu
-miejsc po przecinku, więc $e_0$ to jedna milionowa, i uznaj prognozę za
+rozdział~\ref{ch:lyapunov}). Przyjmij, że znasz stan początkowy z dokładnością do
+sześciu miejsc po przecinku, więc $e_0$ to jedna milionowa, i uznaj prognozę za
 bezużyteczną, gdy myli się o więcej niż $T = \num{0.1}$. Wtedy
 $T / e_0 = 100\,000$, a $n \approx \val{ch18.ln.six} /
 \val{ch18.lam.logistic} \approx \val{ch18.hor.six}$ kroku.
@@ -162,8 +162,8 @@ Ta sama arytmetyka wyjaśnia zaćmienie. Obliczenia Układu Słonecznego, które
 Jacques Laskar przeprowadził w 1989 roku, przytoczone w
 rozdziale~\ref{ch:mechanics}, dały planetom wewnętrznym wykładnik około
 jednej piątej na milion lat: czas Lapunowa, czyli odwrotność wykładnika,
-wynosi mniej więcej pięć milionów lat. Znaj położenie Ziemi z dokładnością
-do metra i uznaj prognozę za bezużyteczną, gdy błąd dorówna rozmiarom jej
+wynosi mniej więcej pięć milionów lat. Przyjmij, że znasz położenie Ziemi z
+dokładnością do metra, i uznaj prognozę za bezużyteczną, gdy błąd dorówna rozmiarom jej
 orbity, 150 milionom kilometrów. Horyzont to pięć milionów lat razy
 $\ln 150\,000\,000\,000 \approx \val{ch18.planets.ln}$, czyli jakieś
 \val{ch18.planets.hor} milionów lat, a milimetr dodałby tylko około
@@ -189,14 +189,14 @@ wiedzy, i właśnie tę część teorii chaosu najczęściej się przeocza.
 
 \begin{think}
 Czterdzieści kroków naprzód trajektoria odwzorowania logistycznego jest
-stracona kilka razy z rzędu. Czy o kroku czterdziestym da się jeszcze coś
+dawno stracona. Czy o kroku czterdziestym da się jeszcze coś
 przewidzieć?
 \end{think}
 \reveal{Tak: szanse. Szansa, że $x$ jest poniżej \num{0.25} w kroku
-czterdziestym, wynosi mniej więcej jeden do trzech, i taki sam jest ułamek
+czterdziestym, wynosi mniej więcej jedną trzecią, i taki sam jest ułamek
 czasu, który spędza tam każdy długi przebieg. Trajektoria przepadła; jej
 statystyki nie.}
-Progności dostają takie szanse, uruchamiając model wiele razy, ze stanów
+Twórcy prognoz uzyskują takie szanse, uruchamiając model wiele razy, ze stanów
 początkowych rozłożonych po wszystkim, na co pozwala pomiar, i licząc. To
 jest zespół, a rozdział~\ref{ch:weather} buduje go dla pogody. Oto
 najmniejsza wersja:
@@ -388,7 +388,7 @@ zadaj jej wszystkie siedem pytań.
 \index{chaos!dlaczego ma znaczenie}
 
 \noindent
-\emph{Zakończył erę mechanizmu zegara}, nie dodając ani jednego losowego
+\emph{Chaos zakończył erę mechanizmu zegara}, nie dodając ani jednego losowego
 składnika: dokładna reguła i prawie dokładny stan początkowy dają przyszłość
 znaną tylko do horyzontu, który rośnie jak logarytm twojej dokładności.
 
@@ -501,7 +501,7 @@ mniej, i po raz pierwszy będziesz umieć powiedzieć dlaczego, liczbą.
   \answerto{Mniej więcej o $\val{ch18.ln.ten} / \num{0.5} \approx \num{4.6}$
   dnia dłużej: stały dodatkowy odcinek, nie dziesięć razy dłużej.}
 \item Daleko za horyzontem zespół przebiegów odwzorowania logistycznego przy
-  $r = 4$ daje szansę jeden do trzech, że $x$ jest poniżej \num{0.25}. Czy
+  $r = 4$ daje szansę jedną na trzy, że $x$ jest poniżej \num{0.25}. Czy
   ta prognoza jest bezwartościowa?
   \answerto{Nie. To poprawna prognoza: ułamek czasu, który odwzorowanie tam
   spędza, taki sam z każdego stanu początkowego.}

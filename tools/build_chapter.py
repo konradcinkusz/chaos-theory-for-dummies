@@ -111,7 +111,7 @@ def main() -> int:
 \\setcounter{{chapter}}{{{num - 1}}}
 \\input{{chapters/{lang}/{chap['file']}}}
 \\appendix
-\\chapter{{Answers}}
+\\chapter{{{'Odpowiedzi' if lang == 'pl' else 'Answers'}}}
 \\answersbody
 \\listoflabs
 \\listofplots

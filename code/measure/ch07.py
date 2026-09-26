@@ -77,12 +77,22 @@ assert abs(exponent(3.0)) < 0.001
 # --- 4. The horizon -------------------------------------------------------
 v.num("lyap.time", 1 / LN2, ".2f")
 tol = 0.1
-v.num("hz.million", horizon(LN2, 1e-6, tol), ".0f")
-v.num("hz.billion", horizon(LN2, 1e-9, tol), ".0f")
 v.num("ln.thousand", math.log(1000), ".2f")
 gain = math.log(1000) / LN2
 v.num("extra.thousand", gain, ".0f")
 v.num("per.ten", math.log(10) / LN2, ".1f")
+# The page calls this Chapter 6's per-digit count, derived; Chapter 6
+# measured it by counting. If both are committed they must print alike.
+_ch06 = Path(__file__).resolve().parents[2] / "figures" / "values" / "ch06.tex"
+if _ch06.is_file():
+    _per = [ln for ln in _ch06.read_text(encoding="utf8").splitlines()
+            if ln.startswith(r"\pyval{ch06.worth.per}")]
+    if _per:
+        assert _per[0].endswith("{" + f"{math.log(10) / LN2:.1f}" + "}"), _per
+# The think in section 4: a two-day Lyapunov time, six good days, a tenfold
+# better start; the page does this arithmetic inline.
+assert f"{6 + 2 * math.log(10):.1f}" == "10.6"
+assert f"{2 * math.log(10):.1f}" == "4.6"
 # The count agrees with the formula to within a step, and every thousandfold
 # improvement buys the same ten steps, measured.
 means = []

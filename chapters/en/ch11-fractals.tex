@@ -148,6 +148,7 @@ The rule itself is \api{koch} in \pkg{chaoslab}. The one unfamiliar line is
 the tent's tip: half a piece along the middle third, then sideways by
 \code{h} times the piece, the height of an equilateral triangle.
 
+\needspace{18\baselineskip}
 \pyregion{code/src/chaoslab/fractals.py}{koch}{The Koch rule, in chaoslab}{lst:ch11-kochrule}
 
 \begin{think}
@@ -242,6 +243,7 @@ shrinks (rightwards). A smooth curve settles; the Koch curve climbs for ever
 and the Cantor set shrinks to nothing, each along a straight line whose slope
 is its dimension minus one.}{three fates of a length}
 
+\needspace{12\baselineskip}
 \begin{lab}{l11_01_cantor}{The Cantor set by rule}
 Write \code{cantor}, which returns the pieces left after a number of rounds,
 and \code{length\_left}, which adds them up. Then write
@@ -299,6 +301,7 @@ neighbouring sizes instead of all ten and the slope lands anywhere from
 honest size of the error, and it is why a box-counting dimension is fitted
 over as wide a range of sizes as the data allow.
 
+\needspace{12\baselineskip}
 \begin{lab}{l11_02_boxes}{Count the boxes yourself}
 Write \code{count\_boxes}, which says how many squares of a given side hold at
 least one point, and \code{box\_dimension}, which fits the slope over a list
