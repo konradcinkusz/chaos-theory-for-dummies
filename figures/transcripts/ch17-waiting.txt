@@ -1,0 +1,4 @@
+largest nudge    average wait    longest wait
+ 10.0 per cent         31             199
+  1.0 per cent        360            2202
+  0.1 per cent       3828           29737

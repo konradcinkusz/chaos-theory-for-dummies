@@ -61,13 +61,11 @@ you have 1050. After the second it adds 5 per cent of 1050 and you have
 \val{ch02.save.two}; after the third, \val{ch02.save.three}. Every year the
 same thing happens to whatever is there.
 
-Rules like this need a little notation. Call the balance after $n$ years
-$x_n$, read \enquote{$x$ sub $n$}: the small $n$ says which year and is not
-multiplied by anything. So $x_0 = 1000$ is where you start and $x_1 = 1050$
-is the balance a year later. The bank's rule is then
+Call the balance after $n$ years $x_n$, read \enquote{$x$ sub $n$}: the
+small $n$ says which year and is not multiplied by anything. So $x_0 = 1000$
+is where you start and $x_1 = 1050$ is a year later, and the bank's rule is
 \[ x_{n+1} = \num{1.05}\, x_n , \]
-next year's balance is \num{1.05} times this year's, for every year at
-once.
+next year's balance is \num{1.05} times this year's, every year.
 
 Every stepping rule in this book has this shape. There is a \emph{state}, a
 number $x$ saying where things are now; a \emph{rule} $f$, which stands for
@@ -90,9 +88,9 @@ $x_0 = 1$, what are $x_1$, $x_2$ and $x_3$?
 \end{think}
 \reveal{$3$, $7$ and $15$. Twice $1$ plus one is $3$; twice $3$ plus one
 is $7$; twice $7$ plus one is $15$.}
-There is no way to reach $x_3$ except through $x_1$ and $x_2$. To know an
-orbit after a hundred steps you take a hundred steps, which is tedious by
-hand and effortless for a machine.
+There is no way to $x_3$ except through $x_1$ and $x_2$: a hundred steps
+ahead takes a hundred steps, tedious by hand and effortless for a
+machine.
 
 \begin{projectbox}
 The book's library, \pkg{chaoslab}, takes the steps for you. Its
@@ -179,9 +177,9 @@ ahead after thirty years?
 \reveal{Account A, with $1000 + 30 \times 50 = 2500$ against B's
 \val{ch02.acc.grows.thirty}. B does not overtake until year
 \val{ch02.acc.cross}.}
-If you chose B, you were reasoning from the word rather than the rule: 2
-per cent of 1000 is 20, less than A's 50, and B needs decades of growing on
-its own growth before its 2 per cent is worth more.
+If you chose B, you reasoned from the word rather than the rule: 2 per
+cent of 1000 is 20, less than A's 50, and B needs decades of growing on its
+own growth to catch up.
 
 \begin{trapbox}
 \textbf{\enquote{Exponential growth means fast growth.}} It means growth in
@@ -197,10 +195,8 @@ fraction. The exponential account is behind for most of a century, and then
 it is not.}{linear against exponential growth}
 
 \noindent
-The useful question to ask of exponential growth is \enquote{how many steps
-until it doubles?}, because the answer does not depend on the start: from
-1000 or from \num{1000000}, 7 per cent a year doubles a sum in the same
-time.
+The useful question about exponential growth is \enquote{how many steps
+until it doubles?}, and the answer does not depend on the start.
 
 \begin{think}
 At 7 per cent a year, roughly how many years does a sum take to double:
@@ -229,26 +225,23 @@ $\ln \num{1.07} = \val{ch02.ln.seven}$, that is \val{ch02.dbl.seven.log}.
 \transcript{ch02-doubling}
 
 \noindent
-The count is the logarithm rounded up to a whole step. At 2 per cent they
-disagree by a whole year, \val{ch02.dbl.two.log} against
-\val{ch02.dbl.two.count}: after 35 years the balance is
-\val{ch02.dbl.two.short} times what went in, a hair short of double. The
-last column is the \emph{rule of 70}: divide 70 by the percentage. It works
-because for a small rate $\ln a$ is close to the rate itself
-($\ln \num{1.07}$ is nearly \num{0.07}), and $100 \times \ln 2$ is about
+The count is the logarithm rounded up. At 2 per cent that is
+\val{ch02.dbl.two.log} against \val{ch02.dbl.two.count}: after 35 years
+the balance is \val{ch02.dbl.two.short} times what went in, a hair short of
+double. The last column, the \emph{rule of 70}, divides 70 by the
+percentage; it works because $\ln a$ is close to a small rate itself
+($\ln \num{1.07}$ is nearly \num{0.07}) and $100 \times \ln 2$ is about
 70.
 
 Shrinking works the same way. A drug of which the body clears a fifth every
-hour keeps \num{0.8} of itself each hour, and the time until half is left,
-its \emph{half-life}, is $\ln \num{0.5} / \ln \num{0.8}$, about
-\val{ch02.half.fifth} hours. The tablets, halved daily, have a half-life of
-one day.
+hour keeps \num{0.8} each hour, and the time until half is left, its
+\emph{half-life}, is $\ln \num{0.5} / \ln \num{0.8}$, about
+\val{ch02.half.fifth} hours.
 
 \begin{lab}{l02_01_until}{How many steps until?}
 Write \code{steps\_until}, which counts the steps of $x \mapsto a\,x$ from
 $1$ until $x$ reaches a target, and \code{time\_until}, which asks the
-logarithm the same question; the test checks that the count is the
-logarithm rounded up, for growth and for decay. Then write
+logarithm the same question, for growth and for decay. Then write
 \code{half\_life}. Python's natural logarithm is \code{math.log}.
 \end{lab}
 
@@ -334,7 +327,7 @@ anything will be there.
 
 \noindent
 The difference is one number. Follow the gap between a state $x$ and the
-fixed point $x^{*}$ through one step:
+fixed point $x^{*}$ through a step:
 \[ f(x) - x^{*} = (a\,x + b) - (a\,x^{*} + b) = a\,(x - x^{*}) . \]
 The first equals sign uses the fact that $x^{*}$ is fixed, so $a\,x^{*} +
 b$ is $x^{*}$ itself. The $b$ cancels, and what is left says: \textbf{each
@@ -342,13 +335,13 @@ step multiplies the gap by $a$}. The tablets halve it; the loan grows it by
 1 per cent a month; the tea, with $a = \num{0.9}$, is why the two cups of
 Chapter~\ref{ch:models} drew closer by a tenth every minute.
 
-What matters is the size of $a$, written $\abs{a}$, which ignores its sign:
-$\abs{\num{-0.5}} = \num{0.5}$. If $\abs{a}$ is below 1 the gap shrinks and
-the fixed point is stable; above 1 it grows and the fixed point is
-unstable. The sign says only whether the gap keeps its side or flips.
+What matters is the size of $a$, written $\abs{a}$, which ignores the
+sign: $\abs{\num{-0.5}} = \num{0.5}$. Below 1 the gap shrinks and the fixed
+point is stable; above 1 it grows and the fixed point is unstable. The sign
+says only whether the gap keeps its side or flips.
 
 You have felt a negative $a$ in a hotel shower. You want 38 degrees, the
-water is at 30, and the tap is slow, so you overdo it: each turn moves the
+water is at 30, and you overdo it: each turn of the tap moves the
 temperature by one and a half times the error, the other way. The rule is
 $x \mapsto x - \num{1.5}(x - 38)$, which is $x \mapsto \num{-0.5}\,x + 57$.
 From 30 you go to 42, 36, 39, \num{37.5}: too hot, too cold, too hot, each
@@ -371,9 +364,8 @@ below $-1$ & grows, flipping side & runs away, swinging wider \\
 \begin{lab}{l02_02_fixed}{Where does it stop, and does it stay?}
 For the rule $x \mapsto a\,x + b$, write \code{fixed\_point};
 \code{is\_stable}, which decides whether a nudge away from the fixed point
-shrinks (by experiment, if you like: start a little off, take one step,
-compare the gaps); and \code{steps\_to\_settle}. The tests use the tablets,
-the tea, the loan and the shower.
+shrinks (try it: start a little off, take one step, compare the gaps); and
+\code{steps\_to\_settle}.
 \end{lab}
 
 \section{The slope: how much a nudge is multiplied}
@@ -437,11 +429,11 @@ no arithmetic. Draw the rule's line and the diagonal $y = x$, whose height
 always equals its position along the bottom. Then:
 
 \begin{enumerate}
-\item From $x_0$ on the bottom axis, go up or down to the rule's line. The
-  height you reach is $x_1$.
-\item Go straight across to the diagonal. There height equals position, so
-  you are now standing above $x_1$, ready to use it as the next input.
-\item Up or down to the line again gives $x_2$; across, and so on.
+\item From $x_0$ on the bottom axis, go up or down to the line. The height
+  you reach is $x_1$.
+\item Go across to the diagonal, where height equals position: you now
+  stand above $x_1$, ready to use it as the next input.
+\item Up or down to the line gives $x_2$; across, and so on.
 \end{enumerate}
 
 \noindent
@@ -480,22 +472,19 @@ drawn.
 
 So you have something rare in this book: complete foresight. Given
 $x \mapsto a\,x + b$ and a start, you can say without taking a step what it
-will do for ever: settle at $b/(1 - a)$ if $\abs{a} < 1$, run away if
-$\abs{a} > 1$, alternate if $a$ is negative, and a logarithm says how long
-any change will take. That certainty is what the rest of the book takes
-away. Bend the line, so that the slope differs from place to place, and a
-rule one line long can do things no formula here foresees.
-Chapter~\ref{ch:feedback} makes the first bend.
+will do for ever \dash{} settle at $b/(1 - a)$ if $\abs{a} < 1$, run away if
+$\abs{a} > 1$, alternate if $a$ is negative \dash{} and how long it will
+take. That certainty is what the rest of the book takes away: bend the line
+and a rule one line long can do things no formula here foresees.
 
 \begin{summarybox}
 \begin{itemize}
 \item A \textbf{rule of the next step} turns the state now into the next,
   $x_{n+1} = f(x_n)$. Repeating it is \textbf{iteration}; the list of
   states is the \textbf{orbit}.
-\item Savings, cooling, dosing and simple populations follow a
-  \textbf{linear rule}, $x \mapsto a\,x + b$: it grows without bound,
-  shrinks to nothing, or settles, and a negative $a$ makes it
-  \textbf{alternate}.
+\item Savings, cooling and dosing follow a \textbf{linear rule},
+  $x \mapsto a\,x + b$: it grows without bound, shrinks to nothing, or
+  settles; a negative $a$ makes it \textbf{alternate}.
 \item \textbf{Exponential} growth is proportional, not necessarily fast.
   The \textbf{logarithm} says how many steps a change by a factor $r$
   takes, $\ln r / \ln a$: the doubling time and the half-life.
@@ -504,9 +493,9 @@ Chapter~\ref{ch:feedback} makes the first bend.
 \item Each step multiplies the gap to the fixed point by $a$: it is
   \textbf{stable} if $\abs{a} < 1$ and \textbf{unstable} if $\abs{a} > 1$,
   and nothing ends up at an unstable one.
-\item The \textbf{slope} is how far the output moves per unit the input
-  moves: the factor a small error is multiplied by in one step. A line has
-  one slope; a curve, a different one at each point.
+\item The \textbf{slope}, how far the output moves per unit the input
+  moves, is the factor a small error is multiplied by in one step. A
+  curve's slope differs from point to point.
 \item The \textbf{cobweb diagram} draws an orbit on the rule's graph; on a
   line it closes in on the crossing with the diagonal when the slope is
   below one in size.

@@ -1,0 +1,38 @@
+[
+  {
+    "n": 61,
+    "label": "sec:ch06-lorenz",
+    "en": {
+      "habit": "If I run a chaotic model again, I will get something different.",
+      "truth": "Not from the same start: a chaotic rule gives the same future from the same start, to the last digit. What changes the future is a changed start, however small."
+    },
+    "pl": {
+      "habit": "Jeśli uruchomię model chaotyczny jeszcze raz, dostanę coś innego.",
+      "truth": "Nie z tego samego punktu startowego: reguła chaotyczna daje z tego samego punktu tę samą przyszłość, co do ostatniej cyfry. Przyszłość zmienia zmieniony punkt startowy, choćby najmniej."
+    }
+  },
+  {
+    "n": 62,
+    "label": "sec:ch06-lorenz",
+    "en": {
+      "habit": "The butterfly causes the tornado.",
+      "truth": "Lorenz's question was about prediction, not power: a tiny disturbance changes which weather happens, and since every other disturbance does the same, no single one of them is the cause."
+    },
+    "pl": {
+      "habit": "Motyl wywołuje tornado.",
+      "truth": "Pytanie Lorenza dotyczyło przewidywania, nie siły: drobne zaburzenie zmienia to, jaka pogoda nastąpi, a skoro każde inne zaburzenie robi to samo, żadne z nich z osobna nie jest przyczyną."
+    }
+  },
+  {
+    "n": 63,
+    "label": "sec:ch06-determinism",
+    "en": {
+      "habit": "Chaos means random.",
+      "truth": "A chaotic system obeys its rule exactly at every step. What looks like randomness is the rule reading out digits of the start that nobody knows."
+    },
+    "pl": {
+      "habit": "Chaos oznacza losowość.",
+      "truth": "Układ chaotyczny w każdym kroku dokładnie trzyma się swojej reguły. To, co wygląda na losowość, to reguła odczytująca cyfry punktu startowego, których nikt nie zna."
+    }
+  }
+]
