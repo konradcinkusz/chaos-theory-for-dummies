@@ -40,9 +40,19 @@ answered in Appendix A.
 
 ## Reading it
 
-Once Pages is enabled for this repository, the latest PDFs are published on
-every push to `main`; every tagged release attaches both editions. To build
-locally, see below.
+Both editions are built and published on every push to `main`:
+
+- **English:** [Chaos-from-Zero.pdf](https://konradcinkusz.github.io/chaos-theory-for-dummies/Chaos-from-Zero.pdf)
+- **Polski:** [Chaos-od-zera.pdf](https://konradcinkusz.github.io/chaos-theory-for-dummies/Chaos-od-zera.pdf)
+- The book's page: <https://konradcinkusz.github.io/chaos-theory-for-dummies/>
+
+The links work once GitHub Pages is switched on for this repository, which
+only a repository admin can do, once: **Settings → Pages → Build and
+deployment → Source → GitHub Actions**. After that every push to `main`
+republishes both PDFs, and the Pages workflow's summary says so if the switch
+has not been made. Every tagged release (`v*`) also attaches both editions to
+the release page, and every CI run on a pull request keeps the two PDFs as
+downloadable artefacts for fourteen days. To build locally, see below.
 
 ## Running the laboratory
 
