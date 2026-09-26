@@ -1,0 +1,6 @@
+start known to  2 decimal places:  4.1 steps
+start known to  4 decimal places: 10.8 steps
+start known to  6 decimal places: 17.4 steps
+start known to  8 decimal places: 24.1 steps
+start known to 10 decimal places: 30.6 steps
+start known to 12 decimal places: 37.3 steps

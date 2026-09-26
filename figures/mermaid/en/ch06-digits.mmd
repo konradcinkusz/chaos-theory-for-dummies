@@ -1,0 +1,4 @@
+flowchart LR
+  S["START<br/>known to some digits"] --> R["RULE<br/>uses one digit a step"]
+  R --> F["FORECAST<br/>ends when they run out"]
+  F -. "measure more digits" .-> S
