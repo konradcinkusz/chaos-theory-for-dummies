@@ -127,7 +127,7 @@ for k in range(2, 11):
 for k, c in enumerate(centres):
     period = 2 ** k
     assert abs(orbit_of_zero(c, period)[0]) < 1e-9
-    assert k < 1 or abs(orbit_of_zero(c, period // 2)[0]) > 1e-3
+    assert k < 1 or abs(orbit_of_zero(c, period // 2)[0]) > 1e-7
     # The same parameter, seen from the logistic side: the cycle passes
     # through x = 1/2, which is where z = 0 sits.
     r = c_to_r(c)

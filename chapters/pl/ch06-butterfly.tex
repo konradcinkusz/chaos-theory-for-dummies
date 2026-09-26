@@ -1,40 +1,497 @@
 %% ch06 --- Efekt motyla, zmierzony
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
-%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
-%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
-%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
-%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
-%% już generowany.
+%% Napisany we wrześniu 2026 według wzoru rozdziału 1. Każda liczba, której
+%% czytelnik nie policzy w pamięci, pochodzi z code/measure/ch06.py, który
+%% importuje TE SAME funkcje, które drukują listingi (code/ch06/).
+%% Odwzorowanie logistyczne przy r = 4 i odwzorowanie podwajające używają
+%% tylko +, - i *, więc każda liczba kroków na tej stronie jest taka sama na
+%% każdym komputerze.
+%%
+%% CZEGO TEN ROZDZIAŁ NIE MOŻE POWIEDZIEĆ. Mierzy, że błędy ROSNĄ, pokazuje
+%% podwajanie w skali logarytmicznej, wyjaśnia je cyframi dwójkowymi
+%% odwzorowania podwajającego i liczy, ile jest warta cyfra punktu
+%% startowego. NIE podaje jednej liczby dla tego wzrostu (wykładnika
+%% Lapunowa, ln 2 przy r = 4) ani wzoru na horyzont: to rozdział 7. Nie
+%% pokazuje równań Lorenza (rozdział 9) i mówi jedno zdanie, nie więcej, o
+%% zaokrągleniach komputera (rozdział 16).
+%%
+%% Bliźniak: chapters/en/ch06-butterfly.tex. Podrozdział za podrozdziałem,
+%% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
 
 \chapter{Efekt motyla, zmierzony}
 \label{ch:butterfly}
+\index{efekt motyla}\index{wrażliwość na warunki początkowe}
 
-\chapterstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\noindent
+Rozdział~\ref{ch:models} zakończył się pytaniem, na które odpowiedział tylko
+dla łagodnych modeli. Jeśli reguła jest dokładna, to czy przyszłość jest
+znana? W przypadku stygnącej herbaty odpowiedź brzmiała: prawie tak. Dwa
+kubki, które zaczynały z różnicą jednego stopnia, z każdą minutą zbliżały
+się do siebie, więc termometr, który na początku trochę się mylił, później
+prawie nie miał znaczenia.
 
-Argument: sensitive dependence on initial conditions is not a metaphor but a
-measurement. Two runs of the logistic map at r = 4 that start one part in
-ten billion apart stay indistinguishable for a while, then separate
-completely within a few dozen steps \dash{} counted exactly, in pure Python
-arithmetic, so the number of steps on the page is the same on every machine.
-The separation roughly doubles each step, so the error grows exponentially,
-which is Chapter 2's growth law now working against us. Edward Lorenz's 1961
-discovery, when he restarted a run from a printout rounded to three decimals
-(0.506 for 0.506127) and got a different weather, and the title of his 1972
-talk about a butterfly in Brazil. Determinism and predictability are two
-different properties: the map is perfectly deterministic \dash{} the same
-start gives the same future, checked in code \dash{} and still unpredictable
-in practice, because no start is known exactly. Payoff: the reader can
-measure how fast two nearby starts separate and say, for a given measurement
-error, how many steps a prediction is good for. Traps to elicit: chaos means
-random; the butterfly causes the tornado; if I rerun it I will get something
-different. Listings: two nearby runs side by side; the separation table;
-Lorenz's rounding reproduced on the logistic map. Labs: find the step at
-which two runs first differ by more than a tolerance. Figures: two
-trajectories peeling apart; separation on a log scale, a straight line then
-a ceiling.
+Ten rozdział zadaje to samo pytanie jednolinijkowej regule z
+rozdziału~\ref{ch:logistic} i mierzy odpowiedź. Uruchom regułę dwa razy, z
+dwóch liczb, które różnią się na dziesiątym miejscu po przecinku \dash{} są
+sobie bliższe, niż jakikolwiek termometr, linijka czy waga kuchenna
+mogłyby kiedykolwiek odróżnić \dash{} i pozwól obu biec. Jak długo pozostaną
+razem? Odpowiedź to liczba kroków, jest taka sama na każdym komputerze i
+jest krótka.
 
-\medskip
-\textbf{Budżet słów:} 3500.
-}
+\begin{outcomes}
+\outcome{uruchomić jedną regułę z dwóch bliskich punktów startowych i
+  odczytać oba przebiegi obok siebie}
+\outcome{zmierzyć różnicę między dwoma przebiegami krok po kroku i odczytać
+  ją w skali logarytmicznej}
+\outcome{powiedzieć, co znaczy wrażliwość na warunki początkowe, w
+  kategoriach czegoś, co da się zmierzyć}
+\outcome{wyjaśnić za pomocą odwzorowania podwajającego, dlaczego prognoza się
+  kończy}
+\outcome{powiedzieć, dla danego błędu punktu startowego, mniej więcej przez
+  ile kroków przewidywanie pozostaje użyteczne}
+\outcome{odróżnić determinizm od przewidywalności i wiernie opowiedzieć o
+  odkryciu Lorenza}
+\end{outcomes}
+
+\section{Dwa punkty startowe, jedna dziesięciomiliardowa}
+\label{sec:ch06-twins}
+\index{odwzorowanie logistyczne}
+
+\noindent
+Reguła z rozdziału~\ref{ch:logistic} to $x_{n+1} = r\,x_n(1 - x_n)$.
+Słowami: weź liczbę $x_n$, którą masz po $n$ krokach, pomnóż ją przez
+$1 - x_n$ i przez pokrętło $r$, a wynikiem jest następna liczba, $x_{n+1}$.
+W tym rozdziale pokrętło ustawiamy na $r = 4$, największą wartość, przy
+której każde $x$ pozostaje między $0$ a $1$.
+
+Weź dwa punkty startowe: \val{ch06.start} oraz \num{0.2000000001}. Różnią
+się o jedną dziesięciomiliardową, $10^{-10}$: przecinek, dziewięć zer i
+jedynka. Przebiegi, które z nich wyjdą, nazwijmy bliźniakami.
+
+\begin{think}
+Uruchom regułę z obu punktów. Mniej więcej przez ile kroków oba przebiegi
+pozostaną od siebie bliżej niż o \val{ch06.tol}: około dziesięciu, około
+trzydziestu, około trzech tysięcy czy zawsze?
+\end{think}
+\reveal{Około trzydziestu. Oba przebiegi po raz pierwszy różnią się o więcej
+niż \val{ch06.tol} w kroku \val{ch06.twins.apart}.}
+Większość ludzi zgaduje tysiące albo \enquote{zawsze}, bo różnica na
+dziesiątym miejscu po przecinku wydaje się żadną różnicą. Dla herbaty
+rzeczywiście by nią nie była. Oto program, który to rozstrzyga.
+
+\pyregion{code/ch06/twins.py}{twins}{Dwa przebiegi jednej reguły z dwóch bliskich punktów startowych}{lst:ch06-twins}
+
+\noindent
+\code{logistic(4.0)} to reguła z rozdziału~\ref{ch:logistic} z pokrętłem
+ustawionym na $4$, wzięta z \pkg{chaoslab}, małej biblioteki, z której
+korzystają programy wszystkich rozdziałów. \code{twin\_runs} prowadzi dwie
+listy, \code{a} i \code{b}, i w każdym kroku podaje ostatnią liczbę każdej z
+nich z powrotem tej samej regule. Potem program wypisuje obie listy co piąty
+krok:
+
+\transcript{ch06-twins}
+
+\noindent
+Czytaj obie kolumny od góry. Aż do kroku \val{ch06.twins.million} przebiegi
+różnią się o mniej niż jedną milionową i każdy, kto przestałby czytać w tym
+miejscu, uznałby je za ten sam przebieg. W kroku~20 różnią się mniej więcej
+o jedną dziesięciotysięczną. W kroku~\val{ch06.twins.apart} nie zgadzają się
+nawet na pierwszym miejscu po przecinku, a od tej chwili są dwiema
+niezwiązanymi ze sobą listami liczb.
+
+\plotfig{ch06-peel}{Dwa przebiegi z listingu, krok po kroku. Biegną jedną
+ścieżką mniej więcej do kroku \val{ch06.twins.apart} (linia kropkowana), a
+po nim dwiema niezwiązanymi.}{dwa przebiegi się rozchodzą}
+
+\section{Różnica się podwaja}
+\label{sec:ch06-gap}
+\index{wzrost wykładniczy!błędu}
+
+\noindent
+W rozdziale~\ref{ch:models} obserwowałeś różnicę między dwoma kubkami. Zrób
+to samo tutaj. Poniższy program uruchamia oba punkty startowe, zapisuje
+odległość między przebiegami po każdym kroku i wypisuje obok, ile
+wynosiłaby ta różnica, gdyby podwajała się dokładnie w każdym kroku.
+Najpierw pytanie, na które odpowiesz arytmetyką podwajania
+z rozdziału~\ref{ch:iteration}.
+
+\begin{think}
+Jeśli różnica podwaja się w każdym kroku, to ile kroków potrzeba, żeby
+wzrosła tysiąc razy? A miliard razy?
+\end{think}
+\reveal{Dziesięć kroków na wzrost tysiąckrotny, bo $2^{10} = 1024$.
+Trzydzieści na miliardkrotny, bo miliard to tysiąc razy tysiąc razy
+tysiąc.}
+Od jednej dziesięciomiliardowej do jednej dziesiątej jest dokładnie miliard
+razy. Jeśli więc różnica podwaja się w każdym kroku, bliźniaki powinny się
+rozejść mniej więcej w trzydziestym kroku i dokładnie tak się stało.
+Sprawdź to krok po kroku:
+
+\pyregion{code/ch06/gap.py}{gap}{Różnica między bliźniakami obok różnicy, która podwaja się dokładnie}{lst:ch06-gap}
+
+\transcript{ch06-gap}
+
+\noindent
+Aż do kroku~30 obie kolumny dotrzymują sobie kroku. Krok po kroku zmierzona
+różnica jest poszarpana \dash{} niektóre kroki mnożą ją prawie przez cztery,
+kilka ją zmniejsza \dash{} ale na przestrzeni wielu kroków średnio się
+podwaja. Wzrost o ten sam czynnik w każdym kroku to wzrost wykładniczy z
+rozdziału~\ref{ch:iteration}, prawo procentu składanego. Tam rosły twoje
+oszczędności. Tu rośnie twój błąd.
+
+To jest właściwość, od której rozdział bierze nazwę. Reguła ma
+\emph{wrażliwość na warunki początkowe}, gdy odpycha od siebie bliskie
+punkty startowe, a różnica między nimi rośnie mniej więcej o ten sam czynnik
+w każdym kroku, aż oba przebiegi nie mają ze sobą nic wspólnego. Im bliżej
+siebie startują, tym dłużej to trwa, ale nigdy nie trwa wiecznie. Herbata z
+rozdziału~\ref{ch:models} mnożyła swoją różnicę przez \num{0.9} co minutę;
+odwzorowanie logistyczne przy $r = 4$ mnoży ją średnio przez dwa. Jeden
+czynnik mniejszy od jedności, drugi większy: na tym polega cała różnica
+między modelem, który ci wybacza, a takim, który nie wybacza.
+
+\begin{think}
+Kolumna podwajania rośnie dalej po kroku~35, przekracza jedynkę, a potem
+setkę. Dlaczego zmierzona różnica przestaje za nią nadążać?
+\end{think}
+\reveal{Każde $x$ leży między $0$ a $1$, więc dwa z nich nigdy nie mogą być
+od siebie dalej niż o $1$. Gdy różnica osiągnie rozmiar całego przedziału,
+nie może już rosnąć: błąka się, średnio wynosząc około \val{ch06.ceiling}.}
+W skali logarytmicznej, w której każdy krok w górę to dziesięciokrotność,
+cała historia to linia prosta i sufit. Porównaj to z rysunkiem herbaty z
+rozdziału~\ref{ch:models}: tam prosta opadała, tu się wznosi.
+
+\plotfig{ch06-gap-log}{Różnica między dwoma przebiegami w skali
+logarytmicznej. Wspina się, nierówno, wzdłuż przerywanej linii podwajania,
+aż osiągnie rozmiar całego przedziału i nie może wspiąć się
+wyżej.}{różnica, która rośnie, a potem sufit}
+
+\begin{projectbox}
+\pkg{chaoslab} ma dwie funkcje dla tego rozdziału. \api{separation}
+uruchamia regułę z dwóch punktów startowych i zwraca ich odległość po każdym
+kroku, czyli to, co wypisał powyższy listing; \api{steps\_until\_apart}
+zwraca pierwszy krok, w którym ta odległość przekracza wybraną przez ciebie
+tolerancję. Laboratorium poniżej prosi cię, żebyś napisał obie sam, zanim im
+zaufasz.
+\end{projectbox}
+
+\begin{lab}{l06_01_apart}{Kiedy dwa przebiegi się rozchodzą?}
+Napisz \code{gaps}, które uruchamia regułę z dwóch punktów startowych i
+zapamiętuje odległość między nimi w każdym kroku, oraz \code{first\_apart},
+które zwraca pierwszy krok, w którym ta odległość przekracza tolerancję,
+albo \code{None}, jeśli nigdy jej nie przekracza. Obie przyjmują regułę jako
+funkcję, więc test sprawdza je także na herbacie
+z rozdziału~\ref{ch:models}: jej dwa kubki nigdy się nie rozchodzą. Dla
+bliźniaków, z tolerancją \val{ch06.tol}, twoja odpowiedź musi brzmieć: krok
+\val{ch06.twins.apart}.
+\end{lab}
+
+\section{Skąd bierze się podwajanie}
+\label{sec:ch06-digits}
+\index{odwzorowanie podwajające}\index{cyfry dwójkowe}
+
+\noindent
+Dlaczego różnica miałaby się podwajać? Dla odwzorowania logistycznego
+odpowiedź wymaga trochę algebry i daje ją rozdział~\ref{ch:lyapunov}. Jest
+prostsza reguła, w której odpowiedź widać od razu: \emph{odwzorowanie
+podwajające}. Podwój liczbę, a jeśli wynik wynosi $1$ lub więcej, odejmij
+$1$. Zapisuje się je $x_{n+1} = 2x_n \bmod 1$, gdzie $\bmod 1$ znaczy
+\enquote{zostaw tylko część po przecinku}.
+
+\begin{think}
+Zacznij od \num{0.625}. Zapisz 1, jeśli liczba leży w górnej połowie
+(\num{0.5} lub więcej), albo 0, jeśli w dolnej, potem zastosuj
+odwzorowanie podwajające i powtarzaj, aż zapiszesz trzy cyfry.
+\end{think}
+\begin{revealblock}
+\num{0.625} leży w górnej połowie: 1. Po podwojeniu daje \num{1.25}, a po
+odjęciu $1$ zostaje \num{0.25}, w dolnej połowie: 0. Podwojone jeszcze raz
+daje \num{0.5}, w górnej połowie: 1. Zapisałeś 1, 0, 1.
+\end{revealblock}
+Teraz zapisz \num{0.625} w systemie \emph{dwójkowym}. W ułamkach
+dziesiętnych, których uczyłeś się w szkole, cyfry po przecinku liczą
+dziesiąte, setne i tysięczne. W systemie dwójkowym liczą połówki, ćwiartki
+i ósemki, a każda cyfra to $0$ albo $1$. Ponieważ \num{0.625} to
+$\tfrac12 + \tfrac18$, w systemie dwójkowym zapisuje się ją jako
+\num{0.101}: dokładnie te trzy cyfry, które przed chwilą zapisałeś.
+
+To nie przypadek. Podwojenie liczby dwójkowej przesuwa każdą cyfrę o jedno
+miejsce w lewo, tak jak mnożenie przez dziesięć przesuwa cyfry dziesiętne, a
+odjęcie $1$ usuwa cyfrę, która przekroczyła przecinek. Pierwsza cyfra po
+przecinku mówi, w której połowie leży liczba. Odwzorowanie podwajające
+odczytuje więc cyfry dwójkowe swojego punktu startowego, po jednej na krok:
+cała jego przyszłość jest z góry zapisana w coraz dalszych cyfrach
+teraźniejszości. Poniższy program sprawdza to dla dwóch punktów startowych z
+tego rozdziału.
+
+\pyregion{code/ch06/digits.py}{digits}{Cyfry dwójkowe policzone wprost i odczytane przez odwzorowanie podwajające}{lst:ch06-digits}
+
+\transcript{ch06-digits}
+
+\noindent
+Dla każdego punktu startowego cyfry i zapis odwzorowania podwajającego
+\dash{} górna czy dolna połowa \dash{} to ten sam ciąg. Oba punkty startowe
+mają wspólne pierwsze \val{ch06.digits.shared} cyfry dwójkowe, więc
+odwzorowanie trzyma je po tej samej stronie przez dokładnie
+\val{ch06.digits.shared} kroki, a potem zaczyna odczytywać cyfry, którymi się
+różnią.
+
+To jest wrażliwość na warunki początkowe bez żadnych tajemnic. Pomiar podaje
+ci pierwsze tyle a tyle cyfr stanu; reguła zużywa jedną cyfrę na krok; gdy
+zmierzone cyfry się wyczerpią, prognoza zależy od cyfr, których nikt nie
+zmierzył. Dziesięć to trochę więcej niż $2 \times 2 \times 2 = 8$, więc
+jedna cyfra dziesiętna niesie trochę więcej niż trzy dwójkowe, a dziesięć
+miejsc po przecinku \dash{} trochę ponad trzydzieści. Komputer też
+przechowuje tylko tyle a tyle cyfr dwójkowych każdej liczby; co to robi z
+obliczeniami chaotycznymi, jest tematem rozdziału~\ref{ch:computers}.
+
+\mermaidfig{ch06-digits}{Dlaczego prognoza chaotyczna się kończy. Punkt
+startowy znamy do kilku cyfr, reguła zużywa je krok po kroku, a zmierzenie
+większej liczby cyfr daje za każdą tylko kilka kroków więcej.}{cyfry na
+wejściu, kroki na wyjściu}
+
+\begin{lab}{l06_02_digits}{Znane cyfry, przewidziane kroki}
+Napisz \code{shared\_digits}, które liczy, ile początkowych cyfr dwójkowych
+mają wspólnych dwie liczby, oraz \code{steps\_together}, które uruchamia
+odwzorowanie podwajające na obu i liczy kroki, zanim znajdą się po różnych
+stronach połowy. Test sprawdza, że obie liczby zgadzają się dla wielu par, a
+dla dwóch punktów startowych z tego rozdziału obie wynoszą
+\val{ch06.digits.shared}.
+\end{lab}
+
+\section{Ile jest warta cyfra}
+\label{sec:ch06-worth}
+\index{przewidywanie!jak długo wystarcza}
+
+\noindent
+Odwzorowanie podwajające mówi, że każda poprawna cyfra dwójkowa punktu
+startowego daje o jeden krok prognozy więcej. Odwzorowanie logistyczne przy
+$r = 4$ nie jest odwzorowaniem podwajającym, ale widziałeś, że jego różnica
+średnio się podwaja, więc ta sama wymiana powinna dla niego obowiązywać, w
+przybliżeniu. To da się zmierzyć.
+
+\begin{think}
+Bliźniaki, których punkty startowe zgadzały się do dziesięciu miejsc po
+przecinku, pozostawały bliżej niż o \val{ch06.tol} przez mniej więcej
+trzydzieści kroków. Przyrząd sto razy dokładniejszy dałby ci dwanaście
+miejsc po przecinku. Mniej więcej ile kroków wtedy: około trzydziestu
+siedmiu czy około sześćdziesięciu?
+\end{think}
+\reveal{Około trzydziestu siedmiu. Sto to mniej więcej $2^{7} = 128$, więc
+błąd sto razy mniejszy potrzebuje mniej więcej siedmiu podwojeń więcej, żeby
+nadrobić różnicę.}
+Dwa razy więcej cyfr nie daje dwa razy dłuższej prognozy. Poniższy program
+sprawdza tę arytmetykę na tysiącu punktów startowych rozłożonych równo
+między $0$ a $1$, bo każdy pojedynczy punkt może mieć szczęście albo pecha:
+dla każdej wielkości błędu liczy kroki, zanim prognoza pomyli się o więcej
+niż \val{ch06.tol}, i uśrednia.
+
+\pyregion{code/ch06/worth.py}{worth}{Kroki, które przetrwa prognoza, uśrednione po tysiącu punktów startowych}{lst:ch06-worth}
+
+\transcript{ch06-worth}
+
+\noindent
+Każde dwa miejsca po przecinku dodają mniej więcej siedem kroków, więc
+każde jedno dodaje około \val{ch06.worth.per}, i to jest arytmetyka
+odwzorowania podwajającego: cyfra dziesiętna jest warta trochę więcej niż
+trzy dwójkowe. Przeczytaj tabelę w drugą stronę, a odpowie na pytanie, które
+zadaje każdy, kto prognozuje. Zmierz punkt startowy do dwóch miejsc po
+przecinku, a prognoza wytrzyma około \val{ch06.worth.two} kroków; do
+dziesięciu \dash{} około \val{ch06.worth.ten}; heroiczna dokładność,
+dwanaście miejsc, daje \val{ch06.worth.twelve}. Rozdział~\ref{ch:lyapunov}
+zamienia tę tabelę w jedną liczbę dla dowolnego układu chaotycznego i we
+wzór na to, jak daleko naprzód da się go przewidzieć. Tu wystarczy, że
+umiesz to zmierzyć.
+
+\section{Wydruk Lorenza}
+\label{sec:ch06-lorenz}
+\index{Lorenz, Edward}
+
+\noindent
+W 1961 roku meteorolog Edward Lorenz z Massachusetts Institute of
+Technology uruchamiał na komputerze mały model pogody. Chcąc jeszcze raz
+przyjrzeć się jednemu fragmentowi obliczeń, wznowił je od środka, wpisując
+liczby z wydruku wcześniejszego przebiegu. Wydruk pokazywał trzy miejsca po
+przecinku, \num{0.506}, podczas gdy maszyna przechowywała sześć,
+\num{0.506127}. Nowy przebieg przez jakiś czas szedł za starym, potem się od
+niego oddalił, aż obie prognozy przestały mieć ze sobą cokolwiek wspólnego.
+Różnica między punktami startowymi, mniej więcej jedna część na cztery
+tysiące, była błędem tego rodzaju, o którym zakładał, że nie ma znaczenia.
+
+Odwzorowanie logistyczne potrafi odtworzyć ten przypadek. Uruchom je z
+pełnej liczby, jeszcze raz z pełnej liczby i raz z liczby z wydruku.
+
+\begin{think}
+Przypuśćmy, że Lorenz wpisałby wszystkie sześć miejsc po przecinku,
+\num{0.506127}, dokładnie tę liczbę, którą przechowywała maszyna. Czy jego
+drugi przebieg zgodziłby się z pierwszym?
+\end{think}
+\reveal{Tak, cyfra po cyfrze i krok po kroku. W regule nie ma przypadku: ten
+sam punkt startowy zawsze daje tę samą przyszłość.}
+
+\pyregion{code/ch06/printout.py}{printout}{Wydruk Lorenza odtworzony na odwzorowaniu logistycznym}{lst:ch06-printout}
+
+\transcript{ch06-printout}
+
+\noindent
+Kolumna \code{again} to powtórzony pierwszy przebieg, a program porównuje
+każdą jej liczbę z pierwszym przebiegiem i wypisuje \code{True}. Kolumna
+\code{rounded} zaczyna \num{0.000127} dalej i różni się o więcej niż
+\val{ch06.tol} w kroku \val{ch06.lorenz.apart}, wcześniej niż bliźniaki, bo
+jej błąd był na starcie znacznie większy.
+
+\begin{trapbox}
+\textbf{\enquote{Jeśli uruchomię model chaotyczny jeszcze raz, dostanę coś
+innego.}} Nie z tego samego punktu startowego. Reguła chaotyczna to maszyna
+jak każda inna: to samo wejście daje to samo wyjście, co do cyfry, jak
+pokazuje kolumna \code{again}. Przyszłość zmienia zmieniony punkt startowy,
+choćby najmniej. Jeśli ponownie uruchamiasz model komputerowy i dostajesz
+inną odpowiedź, coś się zmieniło \dash{} punkt startowy, reguła albo
+arytmetyka \dash{} a rozdział~\ref{ch:computers} jest o tej ostatniej.
+\end{trapbox}
+
+\noindent
+W 1972 roku Lorenz wygłosił wykład, którego tytuł pytał, czy trzepot
+skrzydeł motyla w Brazylii może wywołać tornado w Teksasie. Sformułowanie
+się przyjęło i od tamtej pory wrażliwość na warunki początkowe nazywa się
+\emph{efektem motyla}. Jego własne równania i kształt, który rysują,
+należą do rozdziału~\ref{ch:lorenz}.
+
+\begin{think}
+Tornado uderza w Teksas. Przypuśćmy, że możesz uruchomić atmosferę jeszcze
+raz od chwili sprzed dwóch tygodni, usuwając jeden trzepot skrzydeł jednego
+motyla. Czy tornado by zniknęło?
+\end{think}
+\reveal{Może tak, może nie, i nikt nie potrafiłby powiedzieć tego z góry.
+Ponowny przebieg to inna atmosfera: może nie mieć tornada, mieć tornado
+gdzie indziej albo mimo wszystko mieć je w Teksasie.}
+
+\begin{trapbox}
+\textbf{\enquote{Motyl wywołuje tornado.}} Pytanie Lorenza dotyczyło
+przewidywania, nie siły. Energia burzy pochodzi z atmosfery, nie od owada.
+Usuń trzepot, a pogoda pójdzie inną ścieżką, na której tornado może być
+albo nie; każdy inny trzepot, podmuch i oddech robi to samo, więc żaden z
+nich z osobna nie jest przyczyną. W odtworzeniu powyżej trzy odrzucone
+cyfry nie sprawiły, że zaokrąglony przebieg stał się tym, czym się stał:
+sprawiła to reguła działająca na cały punkt startowy. Motyl pokazuje, że
+pogoda za dwa tygodnie zależy od szczegółów, których nikt nie potrafi
+zmierzyć.
+\end{trapbox}
+
+\section{Deterministyczny, a mimo to nieprzewidywalny}
+\label{sec:ch06-determinism}
+\index{determinizm}\index{przewidywalność}
+
+\noindent
+W tym rozdziale dwa słowa wykonywały dwie różne prace i trzeba je nazwać.
+Reguła jest \emph{deterministyczna}, gdy ten sam punkt startowy zawsze daje
+tę samą przyszłość: żadnych kości, żadnego przypadku. Układ jest
+\emph{przewidywalny} w pewnym zakresie, gdy punkt startowy, który naprawdę
+da się zmierzyć, wyznacza jego przyszłość w tym zakresie. Herbata jest i
+taka, i taka. Odwzorowanie logistyczne przy $r = 4$ jest deterministyczne
+\dash{} sprawdziliśmy to powyżej, cyfra po cyfrze \dash{} a mimo to
+nieprzewidywalne dalej niż na kilkadziesiąt kroków, bo żaden zmierzony punkt
+startowy nie ma dość cyfr.
+
+\begin{think}
+Odwzorowanie logistyczne przy $r = 4$ skacze bez żadnego wzoru, który oko
+mogłoby dostrzec, i nikt nie potrafi go długo przewidywać. Czy jego wyniki
+są losowe?
+\end{think}
+\reveal{Nie. Każda liczba wynika dokładnie z poprzedniej i możesz policzyć
+całą listę jeszcze raz, odzyskując każdą cyfrę. Nie da się zdobyć punktu
+startowego, a nie reguły.}
+
+\begin{trapbox}
+\textbf{\enquote{Chaos oznacza losowość.}} Chaos jest przeciwieństwem
+przypadku. Układ chaotyczny w każdym kroku dokładnie trzyma się swojej
+reguły; to, co wygląda na losowość, to reguła odczytująca, krok po kroku,
+cyfry punktu startowego, których nikt nie zna. Ciąg losowy w ogóle nie ma
+reguły. Ciąg chaotyczny ma regułę, której nie da się wyprzedzić. Jak
+odróżnić jedno od drugiego, gdy masz tylko dane, to pytanie
+rozdziału~\ref{ch:life}.
+\end{trapbox}
+
+\begin{worldbox}
+Rzut monetą rozstrzyga spory właśnie dlatego, że nikt nie potrafi go
+przewidzieć, a przecież wirująca moneta podlega prawom Newtona tak samo jak
+kamień. Statystyk Persi Diaconis i jego współpracownicy zlecili budowę
+maszyny, która za każdym razem wyrzuca monetę tak samo, i moneta za każdym
+razem upada tą samą stroną do góry. Kciuk nie potrafi powtórzyć rzutu aż
+tak dokładnie, więc wynik prawdziwego rzutu zależy od różnic zbyt małych,
+żeby nad nimi zapanować. Moneta jest deterministyczna, a w twojej dłoni
+\dash{} nieprzewidywalna.
+\end{worldbox}
+
+\noindent
+Demon Laplace'a z rozdziału~\ref{ch:models} potrzebował dokładnie znać
+regułę i teraźniejszość. Ten rozdział wycenił słowo \emph{dokładnie}. W
+przypadku odwzorowania logistycznego każdy krok naprzód kosztuje jedną cyfrę
+dwójkową teraźniejszości więcej, więc widzenie bez końca wymaga
+nieskończenie wielu cyfr, a przyrząd, który jest zaledwie znakomity, widzi
+na kilkadziesiąt kroków, a potem nic. Mechanizm zegara jest nietknięty. To
+tarczy zegara nie da się odczytać dość dokładnie.
+
+\begin{summarybox}
+\begin{itemize}
+\item Dwa przebiegi odwzorowania logistycznego przy $r = 4$, które startują
+  o jedną dziesięciomiliardową od siebie, zgadzają się co do jednej
+  milionowej przez \val{ch06.twins.million} kroków i różnią się o więcej niż
+  \val{ch06.tol} od kroku \val{ch06.twins.apart}: policzone dokładnie, tak
+  samo na każdym komputerze.
+\item Ich różnica w przybliżeniu \textbf{podwaja się w każdym kroku}, co
+  jest wykładniczym wzrostem błędu, aż osiągnie rozmiar całego przedziału. To
+  jest \textbf{wrażliwość na warunki początkowe}: w skali logarytmicznej
+  prosta w górę, a potem sufit.
+\item \textbf{Odwzorowanie podwajające} odczytuje cyfry dwójkowe swojego
+  punktu startowego, po jednej na krok, więc jego przyszłość jest zapisana w
+  cyfrach teraźniejszości, których nie ma żaden pomiar.
+\item Każda poprawna cyfra dziesiętna punktu startowego daje tylko około
+  \val{ch06.worth.per} kroku prognozy więcej: dwa razy więcej cyfr to nie
+  dwa razy dłuższa prognoza.
+\item Zaokrąglony restart Lorenza odtworzony na odwzorowaniu logistycznym:
+  pełny punkt startowy daje identyczny przebieg, zaokrąglony się rozchodzi.
+  \textbf{Efekt motyla} dotyczy przewidywania, nie przyczyn.
+\item Reguła może być \textbf{deterministyczna}, a mimo to
+  \textbf{nieprzewidywalna}: chaos to nie przypadek, a ponowne uruchomienie z
+  tego samego punktu startowego daje tę samą przyszłość.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Dwa przebiegi odwzorowania logistycznego przy $r = 4$ startują z
+  \num{0.2} i \num{0.2000000001}. Mniej więcej kiedy po raz pierwszy różnią
+  się o więcej niż \num{0.1}?
+  \answerto{W kroku \val{ch06.twins.apart}. Aż do kroku
+  \val{ch06.twins.million} różnią się o mniej niż jedną milionową.}
+\item Różnica równa jednej milionowej podwaja się w każdym kroku. Po ilu
+  krokach jest większa niż $1$?
+  \answerto{Po $20$ krokach: $2^{20}$ to trochę ponad milion, a $2^{19}$ to
+  tylko mniej więcej pół miliona.}
+\item Dlaczego różnica między dwoma przebiegami odwzorowania logistycznego
+  przestaje rosnąć?
+  \answerto{Bo każde $x$ leży między $0$ a $1$, więc dwie wartości nigdy nie
+  mogą być od siebie dalej niż o $1$. Gdy różnica osiągnie rozmiar całego
+  przedziału, błąka się, średnio wynosząc około \val{ch06.ceiling}.}
+\item Zapisz \num{0.75} w systemie dwójkowym i zapisz, w której połowie leży
+  przez trzy kroki odwzorowania podwajającego.
+  \answerto{$\tfrac12 + \tfrac14$, więc w systemie dwójkowym \num{0.11}.
+  Połowy to: górna, górna, dolna: \num{0.75}, potem \num{0.5}, potem $0$.
+  Odwzorowanie odczytuje cyfry 1, 1, 0.}
+\item Prognoza z punktu startowego znanego do dziesięciu miejsc po przecinku
+  wytrzymuje około \val{ch06.worth.ten} kroków. Mniej więcej ile przy
+  czternastu miejscach po przecinku?
+  \answerto{Około $44$ kroków. Każda cyfra dziesiętna dodaje trochę ponad
+  trzy kroki, więc cztery kolejne dodają mniej więcej trzynaście.}
+\item Lorenz wznowił obliczenia od \num{0.506} zamiast od \num{0.506127}. Co
+  zobaczyłby, gdyby wpisał wszystkie sześć cyfr, i dlaczego?
+  \answerto{Ponownie pierwszy przebieg, cyfra po cyfrze, bo reguła jest
+  deterministyczna: ten sam punkt startowy zawsze daje tę samą przyszłość.}
+\item Czy odwzorowanie logistyczne przy $r = 4$ jest losowe? Czym różni się
+  \enquote{deterministyczny} od \enquote{przewidywalnego}?
+  \answerto{Nie: każda wartość wynika dokładnie z poprzedniej. Jest
+  deterministyczne, bo ten sam punkt startowy daje tę samą przyszłość; nie
+  jest przewidywalne na długo, bo żaden zmierzony punkt startowy nie ma dość
+  cyfr, żeby reguła mogła z nich korzystać.}
+\end{checkpoint}

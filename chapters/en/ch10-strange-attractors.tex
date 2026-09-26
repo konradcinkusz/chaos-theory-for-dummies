@@ -132,9 +132,9 @@ The strip is one number. The Lorenz system of Chapter~\ref{ch:lorenz} has
 three, and its stretching and folding happen as a trajectory swings round a
 lobe, is pulled apart from its neighbours, and is thrown back into the
 middle. In 1976 Michel Hénon, an astronomer at the observatory in Nice,
-published the simplest rule he could find that does the same thing to a
-plane \dash{} simple enough that a computer could run it for millions of
-steps and the result could be looked at under a magnifying glass. His rule
+published a rule, about as simple as a rule can be, that does the same thing
+to a plane \dash{} so simple that a computer can run it for millions of
+steps, and the result can be looked at under a magnifying glass. His rule
 takes a point $(x, y)$, a state of two numbers, to a new point:
 \[ x_{n+1} = 1 - a\,x_n^{2} + y_n, \qquad y_{n+1} = b\,x_n, \]
 with $a = \val{ch10.a}$ and $b = \val{ch10.b}$. In words: the new $x$ is one,
@@ -164,8 +164,8 @@ $(-\num{0.4}, \num{0.3})$.}
 \noindent
 The listing carries on from where your hand stopped. The point jumps about
 the plane without settling and without repeating, and without running away
-either: $x$ stays between about $-\num{1.3}$ and $\num{1.3}$ however long you
-let it go. Because the rule uses only multiplication, addition and
+either: however long you let it go, $x$ stays between
+\val{ch10.attractor.left} and \val{ch10.attractor.right}. Because the rule uses only multiplication, addition and
 subtraction, every digit printed here is the same on every computer.
 
 \section{One shape for every start}
@@ -207,7 +207,7 @@ the simplest attractor, a single point; the butterfly of
 Chapter~\ref{ch:lorenz} is another. Every start that ends up on an attractor
 belongs to its \emph{basin}, just as every raindrop that ends up in a lake
 fell somewhere in the lake's basin. Hénon's attractor has a basin with an
-edge, and a start outside it runs off to infinity.
+edge, and starts outside it run off to infinity.
 
 \plotfig{ch10-attractor}{Hénon's attractor (blue) on its basin. Every start
 in the white region ends up on the attractor; every start in the grey region
@@ -441,8 +441,8 @@ any flow.
   $y_{n+1} = b x_n$, bends, squeezes and swaps a plane, and does to it what the
   Lorenz flow does between two passes.
 \item A cloud of starts ends up on one set, the \textbf{attractor}. The starts
-  that end up there form its \textbf{basin}; the rest of Hénon's plane runs off
-  to infinity.
+  that end up there form its \textbf{basin}; for Hénon's map, starts outside
+  the basin run off to infinity.
 \item Every step multiplies every area by $b$: the \textbf{determinant} of the
   step. The motion does not stop, because the map \textbf{squeezes} one way
   while it \textbf{stretches} the other; its Lyapunov exponent is positive.
