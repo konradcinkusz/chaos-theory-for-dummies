@@ -71,16 +71,16 @@ Prawa Newtona dają regułę zmiany dla tych czterech liczb: znając stan teraz,
 mówi ona, jak szybko zmienia się każda z nich. To mniej więcej piętnaście
 wierszy arytmetyki z sinusami i cosinusami i nie trzeba jej czytać, żeby jej
 używać; to \api{double\_pendulum} z biblioteki książki, \pkg{chaoslab}. RK4 z
-rozdziału~\ref{ch:motion} prowadzi ją krok po kroku, o tysięczną część sekundy
-naraz:
+rozdziału~\ref{ch:motion} stosuje ją krok po kroku, po tysięcznej części
+sekundy naraz:
 
 \pyregion{code/ch13/release.py}{setup}{Puszczenie: cztery liczby i długość jednego kroku}{lst:ch13-setup}
 
 \noindent
 \code{math.radians} zamienia stopnie na radiany, jednostkę, której oczekują
 sinus i cosinus w Pythonie. Pełny obrót to $2\pi$ radianów, nieco ponad sześć,
-więc jeden radian to około 57°. Potem listing prowadzi stan przez dziesięć
-sekund i wypisuje go co dwie:
+więc jeden radian to około 57°. Potem listing przesuwa stan naprzód przez
+dziesięć sekund i wypisuje go co dwie:
 
 \pyregion{code/ch13/release.py}{run}{Dziesięć sekund wahadła podwójnego, wypisane co dwie}{lst:ch13-run}
 
@@ -166,7 +166,7 @@ obserwator. Kilka sekund później robią już zupełnie co innego.}
 \code{7e-05} to w zapisie Pythona $7 \times 10^{-5}$, czyli siedem
 stutysięcznych. Różnica nie rośnie gładko: wznosi się i opada w rytm
 kołysania ramion. Ale tendencja jest nieubłagana. Od milionowej do
-dziesiątej części to pięć razy po dziesięć w mniej więcej dziesięć sekund,
+dziesiątej części to pięć mnożeń przez dziesięć w mniej więcej dziesięć sekund,
 więc średnio różnica mnoży się przez dziesięć co dwie sekundy: to efekt
 motyla z rozdziału~\ref{ch:butterfly}, w maszynie, którą dałoby się zbudować
 na stole warsztatowym.
@@ -270,9 +270,9 @@ następuje w przedziale kilku stopni.}{spokojne i dzikie puszczenia}
 \noindent
 Tak właśnie żyje chaos w układzie bez tarcia. Przy małej energii wahadło
 podwójne jest prawie dwoma prostymi kołysaniami, z ramionami poruszającymi
-się razem albo przeciwnie, i jego ruch jest regularny. Daj mu więcej
-energii, a pojawia się chaos; jeszcze więcej, a chaos przejmuje władzę, a
-ruch regularny przetrwa tylko w zakamarkach: chaotyczne morze z wyspami
+się razem albo przeciwnie, i jego ruch jest regularny. Puść je z większej
+wysokości, a pojawia się chaos; z jeszcze większej, a chaos przejmuje władzę,
+a ruch regularny przetrwa tylko w zakamarkach: chaotyczne morze z wyspami
 ruchu regularnego.
 
 \begin{rigourbox}
@@ -289,7 +289,7 @@ studiów, do znalezienia w książkach o mechanice takich układów.
 
 \noindent
 Jeszcze jedna różnica względem rozdziału~\ref{ch:lorenz}. Równania Lorenza
-zawierają tarcie, a tarcie ściska każdy start na jeden atraktor. Wahadło
+zawierają tarcie, a tarcie sprowadza każdy start na jeden atraktor. Wahadło
 podwójne nie ma tarcia: każdy start zachowuje swoją energię na zawsze i nie
 ma atraktora. Jest za to płot. Energia mówi, które stany w ogóle da się
 osiągnąć, a ruch, choćby najdzikszy, pozostaje w środku.
@@ -346,11 +346,11 @@ około pięciu milionów lat: błąd położenia planet mnoży się przez $e$, o
 
 \begin{think}
 Sto milionów lat to dwadzieścia takich czasów Lapunowa. Mniej więcej ile
-razy mnoży się błąd przez dwadzieścia z nich: sto razy, milion razy czy
-miliard razy?
+razy powiększy się błąd w ciągu dwudziestu takich okresów: sto razy, milion
+razy czy miliard razy?
 \end{think}
 \reveal{Około \val{ch13.solar.factor} razy: bliżej miliarda niż miliona.
-Błąd jednego metra w dzisiejszym położeniu Ziemi urósłby do
+W tym tempie błąd jednego metra w dzisiejszym położeniu Ziemi urósłby do
 \val{ch13.solar.km} kilometrów, więcej niż odległość do Księżyca.}
 
 \begin{trapbox}
@@ -393,7 +393,7 @@ chaosu opisanego w tym podrozdziale.
 \begin{itemize}
 \item Stan \textbf{wahadła podwójnego} to cztery liczby, dwa kąty i dwie
   prędkości ich zmian. Jego reguła pochodzi od Newtona, jest dokładna i nie
-  ma w niej przypadku, a RK4 prowadzi ją krok po kroku.
+  ma w niej przypadku, a RK4 stosuje ją krok po kroku.
 \item Bez tarcia \textbf{energia} nie może się zmienić, więc energia
   symulacji mierzy błąd kroków: przy kroku książki około jednej części na
   \val{ch13.energy.parts}.
