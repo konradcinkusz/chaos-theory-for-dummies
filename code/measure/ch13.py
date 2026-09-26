@@ -83,8 +83,9 @@ results = {dt: parting(dt) for dt in STEPS}
 times = {steady(t, ".2f") for t, _ in results.values()}
 assert len(times) == 1, f"the parting moves with the step: {results}"
 seconds, worst = results[DT]
-assert {steady(shaken_parting(DT, s), ".2f") for s in (SHAKE, -SHAKE)} \
-    == times
+for dt in STEPS:     # every row step_check.py prints, shaken both ways
+    assert {steady(shaken_parting(dt, s), ".2f")
+            for s in (SHAKE, -SHAKE)} == times, dt
 for _, w in results.values():
     steady(w, ".1e")           # the energy column of step_check.py
 v.num("apart.seconds", float(steady(seconds, ".1f")), ".1f")

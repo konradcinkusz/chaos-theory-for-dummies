@@ -23,15 +23,17 @@
 \index{wykładnik Lapunowa}\index{horyzont przewidywania}
 
 \noindent
-Rozdział~\ref{ch:butterfly} zakończył się regułą kciuka: przy $r = 4$ odstęp
-między dwoma przebiegami odwzorowania logistycznego mniej więcej podwaja się
-w każdym kroku. To dobra reguła kciuka i kiepski pomiar: \enquote{mniej
-więcej} kryje bardzo wiele, a pytanie, które za nią stoi, zadasz każdemu
-układowi w tej książce. Jak szybko rosną małe błędy i jak daleko naprzód
+Rozdział~\ref{ch:butterfly} policzył dwie rzeczy o odwzorowaniu logistycznym
+przy $r = 4$: odstęp między dwoma bliskimi przebiegami mniej więcej podwaja
+się w każdym kroku, a każde poprawne miejsce po przecinku stanu początkowego
+daje tylko kilka kroków prognozy więcej. Oba fakty znaleziono przez liczenie,
+dla jednego odwzorowania. Pytanie, które za nimi stoi, zadasz każdemu
+układowi w tej książce: jak szybko rosną małe błędy i jak daleko naprzód
 pozwala to widzieć?
 
-Ten rozdział zamienia regułę kciuka w jedną liczbę, wykładnik Lapunowa, a tę
-liczbę w horyzont: liczbę kroków, na które przewidywanie jest dobre. Podczas
+Ten rozdział zamienia liczenie w jedną liczbę, wykładnik Lapunowa, którą da
+się zmierzyć dla każdego układu, a tę liczbę w horyzont: liczbę kroków, na
+które przewidywanie jest dobre. Podczas
 lektury trzymaj się tego pytania: gdybyś zmierzył stan początkowy układu
 chaotycznego tysiąc razy dokładniej, o ile dalej mógłbyś go przewidywać?
 
@@ -53,12 +55,13 @@ chaotycznego tysiąc razy dokładniej, o ile dalej mógłbyś go przewidywać?
 \index{rozciągnięcie}
 
 \noindent
-Uruchom dwa przebiegi odwzorowania logistycznego przy $r = 4$, jeden od
-$x = \num{0.3}$, a drugi o $\num{1e-10}$ wyżej. Rozdział~\ref{ch:butterfly}
-obserwował, jak rośnie odstęp między nimi. Tym razem patrz, co robi z nim
-każdy pojedynczy krok: podziel odstęp po kroku przez odstęp przed nim. Ten
-iloraz nazwijmy \emph{rozciągnięciem} kroku. Jeśli odstęp mniej więcej się
-podwaja, rozciągnięcie wynosi mniej więcej $2$.
+Rozdział~\ref{ch:butterfly} zauważył, że odstęp między dwoma przebiegami
+rośnie nierówno: niektóre kroki prawie go czterokrotnie zwiększają, kilka go
+zmniejsza, a podwaja się dopiero średnio. Zacznij od tej nierówności.
+Uruchom odwzorowanie logistyczne przy $r = 4$ od $x = \num{0.3}$ i od
+wartości o $\num{1e-10}$ wyższej i patrz, co każdy pojedynczy krok robi z
+odstępem: podziel odstęp po kroku przez odstęp przed nim. Ten iloraz nazwijmy
+\emph{rozciągnięciem} kroku.
 
 \pyregion{code/ch07/stretch.py}{rule}{Odwzorowanie logistyczne i jego rozciągnięcie}{lst:ch07-rule}
 
@@ -255,9 +258,10 @@ zawsze i daje średnią $\ln 4$. Przebieg na komputerze może to twierdzenie
 zilustrować, jak robi to rysunek, ale nie może go dowieść. Druga: dlaczego
 $r = 4$ daje dokładnie $\ln 2$. Zapisz $x$ jako $\sin^{2}\theta$ dla pewnego
 kąta $\theta$, a jedna linijka szkolnej trygonometrii zamieni $4x(1 - x)$ w
-$\sin^{2}(2\theta)$: przy $r = 4$ odwzorowanie to przebrane podwajanie kąta.
-Podwajanie rozciąga każdy błąd kąta dokładnie $2$ razy, a zmiana przebrania
-nie zmienia średniego tempa.
+$\sin^{2}(2\theta)$: przy $r = 4$ odwzorowanie to przebrane podwajanie kąta,
+czyli odwzorowanie podwajające z rozdziału~\ref{ch:butterfly}, z kątem
+liczonym w półobrotach. Podwajanie rozciąga każdy błąd kąta dokładnie $2$
+razy, a zmiana przebrania nie zmienia średniego tempa.
 \end{rigourbox}
 
 \begin{lab}{l07_01_exponent}{Wykładnik z orbity}
@@ -296,23 +300,33 @@ wykładnik razem z błędem i tolerancją daje horyzont.}{rozciągnięcie,
 wykładnik, horyzont}
 
 \begin{think}
-Przy $r = 4$, z tolerancją $T = \num{0.1}$ i błędem stanu początkowego równym
-jednej milionowej, wzór daje mniej więcej \val{ch07.hz.million} kroków.
-Kupujesz przyrząd tysiąc razy lepszy, więc błąd to jedna miliardowa. Ile
-kroków teraz: tysiąc razy więcej, dwa razy więcej, czy coś innego?
+Załóżmy, że model prognozy ma czas Lapunowa równy dwóm dniom, a jego
+prognozy są dobre przez sześć. Nowa sieć przyrządów zmniejsza błąd jego
+stanu początkowego dziesięciokrotnie. Na jak długo prognozy są dobre teraz:
+na mniej więcej sześćdziesiąt dni, na mniej więcej dwanaście, czy krócej?
 \end{think}
-\reveal{Mniej więcej \val{ch07.hz.billion}: dziesięć więcej. Tysiąc razy
-lepszy pomiar daje $\ln 1000/\ln 2$ dodatkowych kroków, czyli mniej więcej
-\val{ch07.ln.thousand} podzielone przez \val{ch07.ln.two}, co daje
-\val{ch07.extra.thousand}, bez względu na to, jaki błąd był wcześniej.}
+\reveal{Mniej więcej $\num{10.6}$ dnia. Dziesięciokrotnie mniejszy błąd
+dodaje $\ln 10$ do $\ln(T/\delta)$, więc dodaje $\ln 10$ czasów Lapunowa:
+$2 \times \val{ch07.ln.ten}$, czyli mniej więcej $\num{4.6}$ dnia.}
+
+\begin{trapbox}
+\textbf{\enquote{Dziesięć razy lepsze dane dają dziesięć razy dłuższe
+prognozy.}} Dają stałą liczbę dodatkowych kroków, $\ln 10/\lambda$, bez
+względu na to, jaki był wcześniej błąd. Przy $r = 4$ to \val{ch07.per.ten},
+liczba, którą rozdział~\ref{ch:butterfly} policzył dla każdego miejsca po
+przecinku, teraz wyprowadzona i prawdziwa dla każdego układu chaotycznego z
+jego własnym $\lambda$. Horyzont rośnie z logarytmem twojej dokładności, a
+nie z samą dokładnością: dwudzieste poprawne miejsce po przecinku daje nie
+więcej niż pierwsze.
+\end{trapbox}
 
 \pyregion{code/ch07/horizon.py}{formula}{Wzór na horyzont}{lst:ch07-formula}
 
 \noindent
-Program zestawia ten wiersz z liczeniem. Funkcja \code{counts}, niżej w tym
-samym pliku, wykonuje pomiar z rozdziału~\ref{ch:butterfly} dla tysiąca
-startów: dwa przebiegi oddalone o $\delta$, śledzone, aż różnią się o więcej
-niż $T$. W wydruku \code{1e-03} to pythonowy zapis $10^{-3}$, czyli jednej
+Program zestawia ten wiersz z liczeniem, które wykonał
+rozdział~\ref{ch:butterfly}: funkcja \code{counts} śledzi z tysiąca startów
+dwa przebiegi oddalone o $\delta$, aż różnią się o więcej niż $T$. W
+wydruku \code{1e-03} to pythonowy zapis $10^{-3}$, czyli jednej
 tysięcznej.
 
 \pyregion{code/ch07/horizon.py}{table}{Wzór kontra liczenie, dla czterech błędów stanu początkowego}{lst:ch07-count}
@@ -326,21 +340,15 @@ a gdy przestaje być mały, rośnie wolniej. Dwie ostatnie kolumny są
 ostrzeżeniem: poszczególne starty się różnią, niektóre bardzo, bo horyzont,
 tak jak wykładnik, jest średnią. Ale spójrz w dół wierszy. Każda tysiąckrotna
 poprawa dodaje te same dziesięć kroków; w pomiarze wiersze dzieli średnio
-\val{ch07.hz.gained} kroku.
+\val{ch07.hz.gained} kroku, wobec $\ln 1000/\ln 2$ ze wzoru, czyli
+\val{ch07.ln.thousand} podzielone przez \val{ch07.ln.two}:
+\val{ch07.extra.thousand}.
 
 \plotfig{ch07-horizon-line}{Horyzont w zależności od błędu stanu
 początkowego, w skali logarytmicznej, z lepszymi pomiarami po prawej.
 Liczenie (kropki i pasmo, w którym mieści się większość startów) idzie
 wzdłuż prostej ze wzoru: każdy czynnik dziesięć w dokładności daje tę samą
 liczbę dodatkowych kroków.}{horyzont a błąd stanu początkowego}
-
-\begin{trapbox}
-\textbf{\enquote{Dziesięć razy lepsze dane dają dziesięć razy dłuższe
-prognozy.}} Dają stałą liczbę dodatkowych kroków, $\ln 10/\lambda$, co przy
-$r = 4$ wynosi \val{ch07.per.ten}. Horyzont rośnie z logarytmem twojej
-dokładności, a nie z samą dokładnością: każde kolejne poprawne miejsce po
-przecinku daje tych samych kilka kroków, dwudzieste nie więcej niż pierwsze.
-\end{trapbox}
 
 \begin{think}
 Komputer przechowuje liczbę z dokładnością do mniej więcej szesnastu cyfr

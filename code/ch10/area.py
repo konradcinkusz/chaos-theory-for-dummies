@@ -33,9 +33,11 @@ def area(points: list[Point]) -> float:
 
 def length(points: list[Point]) -> float:
     """The length of a closed outline: the sum of its little pieces."""
-    return sum(math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-               for (x1, y1), (x2, y2) in zip(points, points[1:] + points[:1],
-                                             strict=True))
+    total = 0.0
+    for (x1, y1), (x2, y2) in zip(points, points[1:] + points[:1],
+                                  strict=True):
+        total += math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+    return total
 
 
 def main() -> None:

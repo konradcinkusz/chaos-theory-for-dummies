@@ -248,8 +248,8 @@ forecasts, at every site on many different days, each two time units ahead.
 Of the \val{ch14.rel.low.n} occasions on which the ensemble gave rain a chance
 between $25$ and $35$ per cent, it rained on \val{ch14.rel.low} per cent. Of
 the \val{ch14.rel.high.n} on which it gave between $65$ and $75$ per cent, it
-rained on \val{ch14.rel.high} per cent. The percentages mean what they say,
-which is the most a probability can promise.
+rained on \val{ch14.rel.high} per cent. The percentages mean what they
+say.
 
 \begin{worldbox}
 Every day the European Centre for Medium-Range Weather Forecasts, based in
@@ -300,9 +300,10 @@ shade above the swing because twenty members are not infinitely many.
 \begin{lab}{l14_02_saturation}{When does the ensemble stop spreading?}
 Write \api{spread} for a whole ensemble, then \api{saturation\_lead}: the
 first lead at which the spread reaches nine tenths of the level where it
-settles. The test runs the chapter's forecast through your code. One
-forecast is one roll of the dice, so expect your answer to differ from the
-average over forty forecasts, \val{ch14.saturate} time units.
+settles, which averaged over forty forecasts is \val{ch14.sat.spread}. The
+test runs the chapter's forecast through your code. One forecast is one roll
+of the dice, so expect your lead to differ from the forty-forecast average,
+\val{ch14.saturate} time units.
 \end{lab}
 
 \begin{think}

@@ -108,7 +108,8 @@ widest = 0.0
 for _ in range(2000):
     x1, y1 = henon(x1, y1)
     x2, y2 = henon(x2, y2)
-    widest = max(widest, math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2))
+    dx, dy = x2 - x1, y2 - y1
+    widest = max(widest, math.sqrt(dx * dx + dy * dy))
 xs = []
 x, y = settle()
 for _ in range(200_000):

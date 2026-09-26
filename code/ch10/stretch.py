@@ -27,7 +27,8 @@ def gaps() -> None:
     x2, y2 = x1 + 1e-10, y1
     for step in range(81):
         if step % 10 == 0:
-            gap = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+            dx, dy = x2 - x1, y2 - y1
+            gap = math.sqrt(dx * dx + dy * dy)
             print(f"step {step:2d}: gap {gap:.1e}")
         x1, y1 = henon(x1, y1)
         x2, y2 = henon(x2, y2)
