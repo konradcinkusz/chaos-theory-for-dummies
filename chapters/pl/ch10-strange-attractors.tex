@@ -1,0 +1,38 @@
+%% ch10 --- Rozciągnij i złóż: dziwne atraktory
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
+%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
+%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
+%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
+%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
+%% już generowany.
+
+\chapter{Rozciągnij i złóż: dziwne atraktory}
+\label{ch:strange}
+
+\chapterstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: every chaotic system does two things over and over \dash{} it
+STRETCHES (nearby points separate, the positive Lyapunov exponent) and FOLDS
+(the stretched set is put back into a bounded region, or it would fly
+apart). A baker kneading dough is the picture, Smale's horseshoe is the
+mathematics in words, and the Henon map (1976, a = 1.4, b = 0.3) is a two-
+line rule that does it. Each step of the Henon map shrinks area by the
+factor |b|, computed as a determinant and checked by measuring, so the
+attractor has zero area \dash{} and yet stretching gives it infinite length.
+Zooming in repeatedly on the attractor shows the same layered structure at
+every scale, which is what makes it strange rather than merely odd, and
+hands the geometry to Chapter 11. Payoff: the reader can iterate the Henon
+map, show that a cloud of starting points collapses onto the same attractor,
+measure the area contraction and the Lyapunov exponent, and explain chaos as
+stretch plus fold. Traps to elicit: shrinking area means the motion dies
+out; a bounded system cannot be sensitive to its start; zooming in on a
+curve always ends with a straight line. Listings: the Henon map; a cloud of
+starts collapsing; area contraction measured. Labs: implement one Henon step
+and its area factor. Figures: the attractor; two successive zooms; a square
+stretched and folded after a few steps.
+
+\medskip
+\textbf{Budżet słów:} 3000.
+}

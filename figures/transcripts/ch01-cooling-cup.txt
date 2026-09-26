@@ -1,0 +1,7 @@
+minute  0:  90.0 C
+minute  5:  61.3 C
+minute 10:  44.4 C
+minute 15:  34.4 C
+minute 20:  28.5 C
+minute 25:  25.0 C
+minute 30:  23.0 C

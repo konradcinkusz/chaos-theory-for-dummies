@@ -1,0 +1,39 @@
+%% ch02 --- Reguła następnego kroku
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
+%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
+%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
+%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
+%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
+%% już generowany.
+
+\chapter{Reguła następnego kroku}
+\label{ch:iteration}
+
+\chapterstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: the most important idea in the book is iteration \dash{} a rule
+that turns today's state into tomorrow's, applied again and again:
+\code{x[n+1] = f(x[n])}. Savings at compound interest, a drug washing out of
+the blood, a cup cooling towards room temperature and a population with a
+fixed birth rate are all the same shape, \code{x[n+1] = a*x[n] + b}, and
+that shape has only three behaviours: grow without bound, shrink to nothing,
+or settle at a fixed point. Exponential growth and decay, doubling time and
+half-life, and the logarithm as the question how many steps until. Fixed
+points are where the rule leaves the state unchanged, and a fixed point is
+STABLE when a small nudge shrinks, which for this linear rule means the
+multiplier has size below one. The cobweb diagram is introduced here on a
+straight line, so that Chapter 5 can use it on a curve. Payoff: the reader
+can predict, without iterating, what a linear rule will do forever \dash{}
+which is exactly the certainty the rest of the book takes away. Traps to
+elicit: exponential growth means fast growth (it means proportional growth,
+and it can be slow); a fixed point is where the system ends up (only if it
+is stable). Listings: iterating a rule; the doubling-time table; the cobweb
+data. One or two labs: find a fixed point and decide its stability; compute
+a doubling time with a logarithm. Figures: three linear rules and their
+three fates; a cobweb on a line.
+
+\medskip
+\textbf{Budżet słów:} 3000.
+}

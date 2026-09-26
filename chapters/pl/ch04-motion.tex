@@ -1,0 +1,42 @@
+%% ch04 --- Ruch: reguły zmiany i mapa wszystkich stanów
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
+%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
+%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
+%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
+%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
+%% już generowany.
+
+\chapter{Ruch: reguły zmiany i mapa wszystkich stanów}
+\label{ch:motion}
+
+\chapterstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: when time flows rather than ticks, the rule tells you the VELOCITY
+of the state rather than its next value \dash{} a differential equation,
+read as a rule of change and never solved by hand here. Euler's method turns
+it back into iteration with a small step; the spring and the pendulum are
+the worked systems. The state of a pendulum is two numbers, angle and
+angular velocity, so its whole future is a curve through a plane of every
+possible state: the phase space, the one picture the rest of the book is
+drawn in. A frictionless pendulum draws closed loops (periodic, perfectly
+predictable); a damped one spirals into a fixed point (an attractor). Energy
+is the check: Euler's method visibly gains energy and spirals OUTWARD, a
+better method (Runge-Kutta, RK4, given as a recipe) holds it \dash{} so the
+reader learns early that a simulation is not the system. Newton's two bodies
+trace ellipses forever: the clockwork at its best. Plant the theorem of
+Poincaré and Bendixson in one sentence: a smooth system with a two-number
+state cannot be chaotic, so chaos in a flow needs at least three numbers
+\dash{} Chapter 9 cashes it. Payoff: the reader can turn a rule of change
+into a trajectory in code and read a phase portrait. Traps to elicit: a
+smaller step always makes a simulation right (it makes it right for longer);
+a pendulum is a simple system so its motion must be simple (true for one
+pendulum, false for two, Chapter 13). Listings: Euler and RK4 on a spring;
+the pendulum; energy drift. Labs: implement one RK4 step; measure energy
+drift. Figures: phase portrait of a pendulum; Euler spiralling out against
+RK4.
+
+\medskip
+\textbf{Budżet słów:} 3000.
+}

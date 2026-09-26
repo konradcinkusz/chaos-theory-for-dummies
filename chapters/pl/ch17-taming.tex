@@ -1,0 +1,41 @@
+%% ch17 --- Okiełznać chaos: sterowanie i synchronizacja
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
+%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
+%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
+%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
+%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
+%% już generowany.
+
+\chapter{Okiełznać chaos: sterowanie i synchronizacja}
+\label{ch:taming}
+
+\chapterstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: sensitivity cuts both ways. If a tiny disturbance changes the
+future a lot, then a tiny, well-timed push can steer it a lot \dash{} which
+is the idea of Ott, Grebogi and Yorke's 1990 paper Controlling Chaos. A
+chaotic attractor is full of unstable periodic orbits; wait until the state
+passes near one and nudge the parameter slightly, and the system can be held
+on an orbit it would never keep by itself. The reader stabilises the
+logistic map's unstable fixed point at r = 3.9 with parameter nudges of
+under one per cent, and measures how small the nudges are. Synchronisation:
+two identical chaotic systems, one driving the other through a single
+variable, lock together (Pecora and Carroll, 1990), shown on the Lorenz
+system \dash{} the idea behind proposals to hide a message in chaotic noise.
+The chapter keeps claims in proportion: control of chaos has been
+demonstrated in lasers, circuits and heart tissue in the laboratory; it is
+not a routine clinical or industrial technique, and the chapter says so.
+Payoff: the reader can implement a small-nudge controller, show it
+stabilising an unstable orbit, and synchronise two Lorenz systems through
+one coupling. Traps to elicit: chaos cannot be controlled; controlling a
+system means overpowering it; two chaotic systems can never agree. Listings:
+the uncontrolled and controlled logistic map; nudge sizes; drive-response
+Lorenz synchronisation error. Labs: implement the controller rule; measure
+synchronisation time. Figures: control switched on mid-run; synchronisation
+error falling to zero.
+
+\medskip
+\textbf{Budżet słów:} 3000.
+}

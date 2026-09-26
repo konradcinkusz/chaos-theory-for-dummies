@@ -1,0 +1,41 @@
+%% ch07 --- Liczba na chaos: wykładnik Lapunowa
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
+%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
+%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
+%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
+%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
+%% już generowany.
+
+\chapter{Liczba na chaos: wykładnik Lapunowa}
+\label{ch:lyapunov}
+
+\chapterstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: the average rate at which nearby starts separate is a single
+number, the Lyapunov exponent \dash{} the average of the logarithm of the
+stretching factor per step, \code{lambda = mean of log|f prime(x[n])|}
+\dash{} positive for chaos, negative for a system that forgets its
+disturbances. For the logistic map at r = 4 it is exactly the natural
+logarithm of 2, which the reader computes and checks. Its reciprocal is the
+Lyapunov time, and the prediction horizon follows: steps until an error of
+size e0 reaches a tolerance T is about \code{log(T/e0)/lambda}. The payoff
+is the cruel arithmetic of that formula: measuring the start a thousand
+times more precisely buys only \code{log(1000)/lambda} more steps \dash{}
+about ten at r = 4 \dash{} so better instruments and bigger computers buy
+forecasts that are LONGER BY A CONSTANT, not proportionally longer. The
+exponent plotted against r shows chaos coming and going, with negative dips
+at the periodic windows. Payoff: the reader can compute a Lyapunov exponent
+from a time series of the map, turn it into a horizon, and explain why
+weather forecasts improve by days per decade rather than by weeks. Traps to
+elicit: ten times better data gives ten times longer forecasts; a bigger
+computer will eventually make any system predictable. Listings: the exponent
+by averaging; the horizon table against initial error; the exponent across
+r. Labs: compute the exponent for a given r; compute a prediction horizon.
+Figures: lambda against r; horizon against the logarithm of initial error, a
+straight line.
+
+\medskip
+\textbf{Budżet słów:} 3000.
+}

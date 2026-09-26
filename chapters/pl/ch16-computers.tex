@@ -1,0 +1,49 @@
+%% ch16 --- Chaos wewnątrz komputera
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
+%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
+%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
+%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
+%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
+%% już generowany.
+
+\chapter{Chaos wewnątrz komputera}
+\label{ch:computers}
+
+\chapterstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: a computer simulating a chaotic system is itself a slightly
+different system, because every step rounds. Floating-point numbers are
+introduced from zero (a fixed number of significant binary digits), and the
+logistic map run in single and in double precision parts company after a
+predictable number of steps \dash{} the prediction horizon of Chapter 7 with
+the rounding error as the initial error. The doubling map \code{x -> 2x mod
+1} run on doubles collapses to exactly zero after about fifty-odd steps,
+because each step shifts out one binary digit and the machine has only
+fifty-three \dash{} a chaotic map that the computer cannot even represent.
+And yet simulations are not worthless: the shadowing idea says that for many
+chaotic systems a computed orbit stays close to SOME true orbit from a
+slightly different start, so statistics come out right even when the path is
+wrong \dash{} which is why Chapter 9's lobe fractions survive.
+Reproducibility: the same code on two machines can diverge when a single
+operation rounds differently, which is why this book's own numbers use only
+correctly rounded arithmetic and are checked in CI. Where this meets AI:
+training a network multiplies many Jacobians, and the growth rate of that
+product is a Lyapunov exponent \dash{} exploding and vanishing gradients are
+chaos and its opposite; random recurrent networks have a transition to chaos
+(Sompolinsky, Crisanti and Sommers, 1988); pseudo-random numbers are
+deliberately chaotic arithmetic. Payoff: the reader can predict when a
+float32 simulation will part from a float64 one, explain the doubling-map
+collapse, and say which results of a chaotic simulation can be trusted.
+Traps to elicit: a deterministic program always gives the same answer; more
+decimal places make a simulation exact; a chaotic map makes a good random-
+number generator. Listings: float32 against float64 logistic; the doubling
+map collapse; shadowing illustrated by statistics that agree; a product of
+random matrices growing. Labs: count steps until float32 and float64
+disagree; predict the doubling-map collapse step. Figures: two precisions
+parting company; the product of Jacobians growing or shrinking.
+
+\medskip
+\textbf{Budżet słów:} 3000.
+}

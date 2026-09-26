@@ -1,0 +1,41 @@
+%% ch09 --- Trzy równania na pogodę: atraktor Lorenza
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
+%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
+%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
+%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
+%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
+%% już generowany.
+
+\chapter{Trzy równania na pogodę: atraktor Lorenza}
+\label{ch:lorenz}
+
+\chapterstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: chaos is not a quirk of stepping rules; it lives in continuous
+time too, and Lorenz found it in 1963 in three equations cut down from a
+model of convection (sigma = 10, rho = 28, beta = 8/3), in his paper
+Deterministic Nonperiodic Flow. Integrated with Chapter 4's RK4, the state
+wanders round two lobes, switching unpredictably between them, and never
+repeats \dash{} three numbers is exactly what Chapter 4's theorem said chaos
+in a flow needs. Two starts a hair apart diverge, and the rate is a Lyapunov
+exponent of about 0.9 per time unit, measured here. And yet the trajectory
+never leaves a bounded butterfly-shaped set: the attractor. That is the
+chapter's hinge and the book's second big idea: the INDIVIDUAL future is
+unpredictable, but WHERE the system lives and HOW OFTEN it visits each
+region is perfectly predictable. Statistics of the attractor \dash{} the
+fraction of time on each lobe, the average height \dash{} are stable
+numbers, the same from almost any start. Payoff: the reader can integrate
+the Lorenz system, measure its divergence, and compute a statistic of the
+attractor that does not depend on the start. Traps to elicit: a chaotic
+system can go anywhere; if the path is unpredictable nothing about it is
+predictable; chaos needs many variables. Listings: RK4 on the Lorenz system;
+divergence of two runs; lobe statistics from different starts. Labs:
+implement the Lorenz derivative; measure a lobe fraction. Figures: the
+attractor in projection; two runs diverging; a histogram that does not care
+about the start.
+
+\medskip
+\textbf{Budżet słów:} 3000.
+}

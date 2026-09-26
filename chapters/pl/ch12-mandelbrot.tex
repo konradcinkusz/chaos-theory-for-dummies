@@ -1,0 +1,42 @@
+%% ch12 --- Iteracja na płaszczyźnie: Julia i Mandelbrot
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
+%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
+%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
+%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
+%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
+%% już generowany.
+
+\chapter{Iteracja na płaszczyźnie: Julia i Mandelbrot}
+\label{ch:mandelbrot}
+
+\chapterstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: iterate the simplest nonlinear rule, \code{z[n+1] = z[n]*z[n] +
+c}, on points of a plane instead of a line, and the question will this
+escape to infinity draws the most famous shapes in mathematics. Complex
+numbers are introduced from zero as points of the plane with a rule for
+multiplying them (lengths multiply, angles add) and Python's built-in
+complex type does the arithmetic. For a fixed c, the points that do not
+escape form a Julia set (Julia and Fatou, around 1918); the set of c for
+which the orbit of zero does not escape is the Mandelbrot set, drawn by
+computer from about 1980. The escape radius 2 is proved in one line. The
+payoff connects the book: the logistic map is the same rule in disguise (a
+change of variables turns \code{r*x*(1-x)} into \code{z*z + c} with \code{c
+= r/2 - r*r/4}), so the real axis of the Mandelbrot set IS Chapter 8's
+bifurcation diagram \dash{} the period-doubling points and the period-3
+window sit exactly where the conversion says, checked numerically. Payoff:
+the reader can compute escape times, draw a Julia set and the Mandelbrot set
+at low resolution, and convert between r and c. Traps to elicit: complex
+numbers are imaginary so they describe nothing real; the Mandelbrot set is a
+picture of chaos (its boundary is where chaos lives); infinite detail means
+infinite information. Listings: complex multiplication by hand and by
+Python; escape time; the r-to-c conversion checked against Chapter 8's
+numbers. Labs: implement escape time; convert Feigenbaum points to c.
+Figures: the Mandelbrot set; two Julia sets, one connected and one dust; the
+real axis against the bifurcation diagram.
+
+\medskip
+\textbf{Budżet słów:} 3000.
+}

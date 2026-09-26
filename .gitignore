@@ -1,0 +1,31 @@
+# LaTeX build output
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.idx
+*.ilg
+*.ind
+*.lab
+*.plt
+*.dgm
+*.pdf
+!docs/*.pdf
+_build/
+_site/
+
+# Rendered figures are build output; their sources are committed.
+figures/plots/
+figures/diagrams/
+figures/mermaid/.puppeteer.json
+figures/values/all.tex
+
+# Python
+code/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/

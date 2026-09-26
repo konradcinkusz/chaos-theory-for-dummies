@@ -1,0 +1,38 @@
+%% ch05 --- Jedna linijka algebry, każde możliwe zachowanie
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
+%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
+%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
+%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
+%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
+%% już generowany.
+
+\chapter{Jedna linijka algebry, każde możliwe zachowanie}
+\label{ch:logistic}
+
+\chapterstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: the discrete logistic rule \code{x[n+1] = r*x[n]*(1-x[n])} \dash{}
+one multiplication short of the linear rules of Chapter 2 \dash{} produces
+every behaviour the book is about as the single knob r is turned. r = 2.8
+settles to a fixed point; r = 3.2 alternates between two values for ever; r
+= 3.5 cycles through four; r = 3.9 never repeats and never settles, although
+every value is produced by the same exact rule. The cobweb diagram from
+Chapter 2, now on a parabola, shows why: the fixed point's slope passes
+minus one and the fixed point loses its grip. Robert May's 1976 paper in
+Nature, written for ecologists, is the historical anchor, and its plea that
+everyone should meet this map early is the chapter's reason to exist.
+Payoff: the reader can iterate the map, draw its cobweb, find the fixed
+point \code{1 - 1/r} and say for which r it is stable \dash{} and has seen
+irregular, never-repeating output come from a rule a child can compute.
+Traps to elicit: a simple rule gives simple behaviour; irregular output
+needs a random or complicated cause; if it has not repeated after a thousand
+steps it is about to. Listings: iterating the map at four values of r, in
+pure Python so every digit is reproducible; the cobweb data; period
+detection. Labs: detect the period of an orbit; find r where the fixed point
+loses stability. Figures: four time series; four cobwebs.
+
+\medskip
+\textbf{Budżet słów:} 3000.
+}
