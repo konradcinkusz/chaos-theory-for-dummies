@@ -36,6 +36,9 @@ v.num("n", N)
 for k in range(4):
     v.num(f"a.{k + 1}", shuf[k], ".4f")
     v.num(f"b.{k + 1}", rule[k], ".4f")
+# A's second value is not the rule applied to its first: 4 x 0.0169 x 0.9831
+v.num("a.next", 4.0 * shuf[0] * (1.0 - shuf[0]), ".2f")
+assert abs(4.0 * shuf[0] * (1.0 - shuf[0]) - shuf[1]) > 0.5
 # 4 x 0.2 x 0.8, which the reader checks by hand
 assert abs(rule[1] - 0.64) < 1e-12
 hist = histogram(rule)

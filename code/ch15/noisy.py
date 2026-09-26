@@ -44,14 +44,11 @@ def right_answers(n: int, size: float) -> tuple[int, int]:
 
 def main() -> None:
     rule = rule_series()
-    # --8<-- [start:whole]
     print("noise  squares  1-step error")
     for size in (0.0, 0.01, 0.05, 0.2):
         noisy = with_noise(rule, size)
         print(f"{size:5.2f}  {squares_touched(noisy):7d}  "
               f"{mean_error(noisy, 1):12.2g}")
-    # --8<-- [end:whole]
-    # --8<-- [start:short]
     print("right answers out of 100 short records:")
     print("length  forecast test    squares test")
     print("        clean  noisy    clean  noisy")
@@ -59,7 +56,6 @@ def main() -> None:
         f0, s0 = right_answers(n, 0.0)
         f1, s1 = right_answers(n, 0.2)
         print(f"{n:6d}  {f0:5d}  {f1:5d}    {s0:5d}  {s1:5d}")
-    # --8<-- [end:short]
 
 
 if __name__ == "__main__":

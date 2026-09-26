@@ -57,7 +57,6 @@ def yearly_cases(season: float, s: float = 0.06, i: float = 0.001,
 
 
 def main() -> None:
-    # --8<-- [start:run]
     print("season  cases per thousand people, eight years running")
     for season in SEASONS:
         years = yearly_cases(season)
@@ -66,7 +65,6 @@ def main() -> None:
     for season in (SEASONS[1], SEASONS[-1]):
         years = yearly_cases(season, s=0.06 + 1e-9)
         print(f"{season:6.1f}  " + " ".join(f"{c:4.0f}" for c in years))
-    # --8<-- [end:run]
 
 
 if __name__ == "__main__":

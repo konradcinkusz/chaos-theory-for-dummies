@@ -29,13 +29,11 @@ def squares_touched(xs: list[float], k: int = 10) -> int:
 
 def main() -> None:
     rule = rule_series()
-    # --8<-- [start:count]
     print("values  rule  shuffled   (of 100 squares)")
     for n in (100, 500, 2000):
         part = rule[:n]
         print(f"{n:6d}  {squares_touched(part):4d}  "
               f"{squares_touched(shuffled(part)):8d}")
-    # --8<-- [end:count]
 
 
 if __name__ == "__main__":

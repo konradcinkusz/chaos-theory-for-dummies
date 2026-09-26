@@ -33,12 +33,10 @@ def mean_error(xs: list[float], h: int, split: int = SPLIT) -> float:
 def main() -> None:
     rule = rule_series()
     shuf = shuffled(rule)
-    # --8<-- [start:table]
     print("steps ahead   rule    shuffled")
     for h in range(1, 13):
         print(f"{h:11d}  {mean_error(rule, h):7.2g}  "
               f"{mean_error(shuf, h):8.2g}")
-    # --8<-- [end:table]
 
 
 if __name__ == "__main__":

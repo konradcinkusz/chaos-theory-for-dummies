@@ -41,14 +41,12 @@ def histogram(xs: list[float], bins: int = 5) -> list[int]:
 def main() -> None:
     rule = rule_series()
     shuf = shuffled(rule)
-    # --8<-- [start:show]
     print("   rule  shuffled")
     for a, b in zip(rule[:5], shuf[:5], strict=True):
         print(f"{a:7.4f}  {b:7.4f}")
     print("counts in five slices of width 0.2:")
     print("rule    ", histogram(rule))
     print("shuffled", histogram(shuf))
-    # --8<-- [end:show]
 
 
 if __name__ == "__main__":
