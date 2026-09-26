@@ -23,7 +23,7 @@ def chance(members: list[State], site: int = 0) -> float:
 
 
 def main() -> None:
-    # --8<-- [start:table]
+# --8<-- [start:table]
     rng = random.Random(14)
     truth = spin_up()
     _, members = ensemble(truth, rng)
@@ -35,7 +35,7 @@ def main() -> None:
         rained = "yes" if truth[0] > RAIN else "no"
         print(f"{half * 10 * DT:5.1f}   {wet:7d} of {len(members)}"
               f"   {chance(members):6.0%}   {rained}")
-    # --8<-- [end:table]
+# --8<-- [end:table]
 
 
 if __name__ == "__main__":

@@ -42,13 +42,13 @@ def climate(forcing: float, nudge: float,
 
 
 def main() -> None:
-    # --8<-- [start:table]
+# --8<-- [start:table]
     print("forcing  nudge   average  swing   rain   last x[0]")
     for forcing, nudge in ((8.0, 0.01), (8.0, 1.0), (HOT, 0.01)):
         average, swing, rain, last = climate(forcing, nudge)
         print(f"{forcing:6.0f}  {nudge:5.2f}  {average:7.1f}  {swing:5.1f}"
               f"  {rain:5.0%}  {last:10.2f}")
-    # --8<-- [end:table]
+# --8<-- [end:table]
 
 
 if __name__ == "__main__":

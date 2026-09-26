@@ -96,14 +96,14 @@ def forecast(truth: State, rng: random.Random,
 
 
 def main() -> None:
-    # --8<-- [start:table]
+# --8<-- [start:table]
     rng = random.Random(14)
     truth = spin_up()
     print(" lead   spread   error of   error of")
     print("                 the mean    one run")
     for lead, sp, e_mean, e_one in forecast(truth, rng, range(0, 161, 20)):
         print(f"{lead:5.1f}  {sp:7.2f}  {e_mean:9.2f}  {e_one:9.2f}")
-    # --8<-- [end:table]
+# --8<-- [end:table]
 
 
 if __name__ == "__main__":
