@@ -55,6 +55,8 @@ z pokrętłem ustawionym na $r = 4$: jeśli $x_n$ to wartość w kroku $n$, to
 następna wynosi
 \[ x_{n+1} = 4\,x_n\,(1 - x_n), \]
 czyli cztery razy wartość razy jeden minus wartość. Drugi szereg jest losowy.
+Poniżej oba są wydrukowane z dokładnością do czterech miejsc po przecinku;
+program, który je zrobił, przechowuje około szesnastu cyfr znaczących.
 
 \begin{think}
 Szereg~A zaczyna się od \val{ch15.a.1}, \val{ch15.a.2}, \val{ch15.a.3},
@@ -263,6 +265,10 @@ stanie ze średnim chybieniem o krok naprzód, które wynosiło \val{ch15.fc.rul
 znajduje prognoza, sam jest przesunięty nawet o jedną setną, podobnie jak
 prognozowana wartość, i to zanim podwajanie reguły w ogóle się zacznie.}
 
+\plotfig{ch15-noisy}{Odwzorowania powrotu szeregu reguły oglądane przez szum
+pomiarowy trzech rozmiarów. Krzywa grubieje w pas, a przy największym
+rozmiarze pas prawie wypełnia kwadrat.}{krzywa grubiejąca w szumie}
+
 \transcript{ch15-noisy}
 
 \noindent
@@ -271,10 +277,6 @@ pas: przy szumie do \val{ch15.noise.big}, jednej piątej całego zakresu,
 zajmuje \val{ch15.noise.big.sq} kratki. Mimo to przy \val{ch15.n} wartościach
 prognoza wciąż jest lepsza od strzału na ślepo: \val{ch15.noise.big.err}
 wobec \val{ch15.fc.shuf}.
-
-\plotfig{ch15-noisy}{Odwzorowania powrotu szeregu reguły oglądane przez szum
-pomiarowy trzech rozmiarów. Krzywa grubieje w pas, a przy największym
-rozmiarze pas prawie wypełnia kwadrat.}{krzywa grubiejąca w szumie}
 
 Dolna tabela to część okrutna. Tnie zapis na krótkie kawałki i liczy, na sto
 kawałków, jak często każdy test uznaje kawałek reguły za mniej losowy od jego

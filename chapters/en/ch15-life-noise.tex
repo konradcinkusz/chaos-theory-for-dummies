@@ -58,6 +58,8 @@ and $1$. One was made by the logistic rule of Chapter~\ref{ch:logistic} with
 its knob at $r = 4$: if $x_n$ is the value at step $n$, the next one is
 \[ x_{n+1} = 4\,x_n\,(1 - x_n), \]
 four times the value times one minus the value. The other series is random.
+Both are printed below to four decimal places; the program that made them
+keeps about sixteen significant figures.
 
 \begin{think}
 Series~A begins \val{ch15.a.1}, \val{ch15.a.2}, \val{ch15.a.3},
@@ -262,6 +264,10 @@ average miss one step ahead, which was \val{ch15.fc.rule}?
 analogue the forecast finds is itself off by up to a hundredth, and so is the
 value being forecast, before the rule's doubling has even started.}
 
+\plotfig{ch15-noisy}{Return maps of the rule's series seen through
+measurement noise of three sizes. The curve thickens into a band, and at the
+largest size the band nearly fills the square.}{a curve thickening in noise}
+
 \transcript{ch15-noisy}
 
 \noindent
@@ -270,10 +276,6 @@ noise grows: with noise of up to \val{ch15.noise.big}, a fifth of the whole
 range, it touches \val{ch15.noise.big.sq} squares. Even so, with
 \val{ch15.n} values the forecast still beats a blind guess,
 \val{ch15.noise.big.err} against \val{ch15.fc.shuf}.
-
-\plotfig{ch15-noisy}{Return maps of the rule's series seen through
-measurement noise of three sizes. The curve thickens into a band, and at the
-largest size the band nearly fills the square.}{a curve thickening in noise}
 
 The lower table is the cruel part. It cuts the record into short pieces and
 counts, out of a hundred, how often each test says the rule's piece is less
