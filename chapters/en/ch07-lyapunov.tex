@@ -26,17 +26,15 @@
 \noindent
 Chapter~\ref{ch:butterfly} ended with a rule of thumb: at $r = 4$ the gap
 between two runs of the logistic map roughly doubles at every step. It is a
-good rule of thumb and a poor measurement. \enquote{Roughly} hides a great
-deal, and \enquote{doubles} is one answer to a question you will want to ask
-of every system in this book: how fast do small errors grow, on average, and
-how far ahead does that let you see?
+good rule of thumb and a poor measurement: \enquote{roughly} hides a great
+deal, and the question behind it is one you will ask of every system in this
+book. How fast do small errors grow, and how far ahead does that let you see?
 
 This chapter turns the rule of thumb into one number, the Lyapunov exponent,
-and then turns the number into the thing you actually want: a horizon, the
-number of steps a prediction is good for. The arithmetic that connects them
-has an unwelcome consequence. Hold on to this question while you read: if
-you measured the start of a chaotic system a thousand times more precisely,
-how much further ahead could you predict it?
+and the number into a horizon: how many steps a prediction is good for. Hold
+on to this question while you read: if you measured the start of a chaotic
+system a thousand times more precisely, how much further ahead could you
+predict it?
 
 \begin{outcomes}
 \outcome{find how much one step of a rule stretches a small error, and check
@@ -67,11 +65,10 @@ the gap after the step by the gap before. Call that ratio the step's
 \noindent
 The function \code{step} is the logistic map of Chapter~\ref{ch:logistic}.
 The function \code{stretch} is its slope, $r(1 - 2x)$. Chapter~\ref{ch:feedback}
-measured a slope by nudging $x$ a little and seeing how far the output
-moved; for this rule the answer can be written down exactly, and the first
-lab below checks the formula by nudging. The next part of the program
-measures the stretch of each of the first eight steps from the two runs,
-and prints it beside the slope at the point the first run is on:
+measured a slope by nudging $x$ and seeing how far the output moved; for this
+rule it can be written down exactly, and the first lab checks the formula by
+nudging. The rest of the program measures the stretch of the first eight
+steps from the two runs, beside the slope where the first run is:
 
 \pyregion{code/ch07/stretch.py}{table}{Measuring the stretch of eight steps}{lst:ch07-table}
 
@@ -79,17 +76,16 @@ and prints it beside the slope at the point the first run is on:
 
 \noindent
 The two right-hand columns agree. Over one step a tiny gap is multiplied by
-the slope of the rule at the place where you are, so the stretch can be read
-off the rule rather than measured with a second run. When the slope is
-negative the gap also flips to the other side, which does not change its
-size; the table prints sizes.
+the slope of the rule where you are, so the stretch can be read off the rule
+rather than measured with a second run. A negative slope also flips the gap
+to the other side, which does not change its size; the table prints sizes.
 
 And the stretches are nothing like a steady $2$. Step $3$ shrinks the gap to
 less than a third of itself, and steps $4$ and $5$ nearly quadruple it. At
 step $3$ the run is near $\num{0.5}$, where the parabola is flat at the top;
 at steps $4$ and $5$ it is near $1$ and near $0$, where the parabola is
-steep. Chaos does not stretch evenly. It stretches hard in one place,
-gently in another, and sometimes squeezes.
+steep. Chaos does not stretch evenly: hard in one place, gently in another,
+and sometimes it squeezes.
 
 \begin{think}
 Suppose one step multiplies a gap by $4$ and the next multiplies it by
@@ -139,15 +135,13 @@ $\val{ch07.ln.two} + \val{ch07.ln.two}$. That is the whole of what this
 chapter needs:
 \[ \ln(a \times b) = \ln a + \ln b. \]
 In words: the logarithm of a product is the sum of the logarithms, so
-multiplying two numbers becomes adding their logarithms. It follows that
-$\ln 1 = 0$, that numbers above $1$ have positive logarithms, and that
-numbers between $0$ and $1$ have negative ones: $\tfrac12 \times 2 = 1$, so
-$\ln\tfrac12$ and $\ln 2$ must add up to $0$. The last column holds the
-number that makes this logarithm natural, $e$, which is about
-\val{ch07.e}: it is the number whose natural logarithm is exactly $1$, and it
-plays the part that $10$ plays for the logarithm to base ten. In Python the
-natural logarithm is \code{math.log}, and \code{math.log(2)} starts
-\val{ch07.ln.two.long}.
+multiplying two numbers becomes adding their logarithms. Numbers above $1$
+have positive logarithms and numbers between $0$ and $1$ negative ones:
+$\tfrac12 \times 2 = 1$, so $\ln\tfrac12$ and $\ln 2$ add up to $\ln 1$,
+which is $0$. The last column holds $e$, about \val{ch07.e}, the number whose
+natural logarithm is exactly $1$; it plays the part that $10$ plays for the
+logarithm to base ten. In Python the natural logarithm is \code{math.log},
+and \code{math.log(2)} starts \val{ch07.ln.two.long}.
 
 \begin{think}
 Using only $\ln 2 \approx \val{ch07.ln.two}$, what is $\ln 8$? And what is
@@ -162,21 +156,19 @@ counted three times.
 This is how the logarithm fixes the average. If a gap is multiplied by $g$
 at a step, its logarithm goes up by $\ln g$: a \emph{factor} per step becomes
 a \emph{rate} per step, and rates add, so they can be averaged in the
-ordinary way. Try it on the question you have just answered. The rates of
-the two steps are $\ln 4$ and $\ln\tfrac14$, which add to $0$, so the average
-rate is $0$, and the factor whose logarithm is $0$ is $1$: the right answer,
-found by adding instead of guessing.
+ordinary way. For the two steps of the question, the rates $\ln 4$ and
+$\ln\tfrac14$ add to $0$, the average rate is $0$, and the factor whose
+logarithm is $0$ is $1$: the right answer, found by adding.
 
 To go back from a rate to a factor you need the number whose logarithm is
-that rate. It is written $e^{\lambda}$, \enquote{$e$ to the power $\lambda$},
-where $\lambda$ is the Greek letter lambda and stands for the rate. So
-$e^{0} = 1$, $e^{1} = e$, and $e^{\ln 2} = 2$. Now the table of eight steps.
-The logarithms of the eight stretches average \val{ch07.eight.rate}, and
-$e^{\val{ch07.eight.rate}}$ is about \val{ch07.eight.geo}. Over those eight
-steps the gap grew, on average, by a factor of about $2$ per step, and
-\val{ch07.eight.geo} multiplied by itself eight times is the
-\val{ch07.eight.product} the table produced. \enquote{Roughly doubles} has
-become a measurement.
+that rate, written $e^{\lambda}$, \enquote{$e$ to the power $\lambda$};
+$\lambda$ is the Greek letter lambda and stands for the rate. So $e^{0} = 1$,
+$e^{1} = e$, and $e^{\ln 2} = 2$. Now the eight steps of the table. The
+logarithms of their stretches average \val{ch07.eight.rate}, and
+$e^{\val{ch07.eight.rate}}$ is about \val{ch07.eight.geo}: on average the
+gap grew by a factor of about $2$ per step, and \val{ch07.eight.geo}
+multiplied by itself eight times is the \val{ch07.eight.product} the table
+produced. \enquote{Roughly doubles} has become a measurement.
 
 \section{The Lyapunov exponent}
 \label{sec:ch07-exponent}
@@ -226,12 +218,11 @@ It is negative: a nudge shrinks by a fifth at every step.}
 \pyregion{code/ch07/exponent.py}{exponent}{The Lyapunov exponent, by averaging}{lst:ch07-exponent}
 
 \noindent
-Read it from the top. The first loop runs the map for a thousand steps and
-throws them away, so that the orbit has settled onto wherever it is going
-before anything is averaged. The second loop adds up the logarithm of the
-size of the stretch at each point, then steps; the last line divides by the
-number of steps. That is the formula above, and nothing else. Run it at four
-settings of the knob $r$:
+The first loop runs the map for a thousand steps and throws them away, so
+the orbit has settled before anything is averaged. The second adds up the
+logarithm of the size of the stretch at each point, then steps; the last line
+divides. That is the formula above, and nothing else. Run it at four settings
+of the knob $r$:
 
 \pyregion{code/ch07/exponent.py}{run}{The exponent at four settings of r}{lst:ch07-run}
 
@@ -241,8 +232,8 @@ settings of the knob $r$:
 Both predictions hold. At $r = \num{2.8}$ the program finds
 \val{ch07.lam.twoeight}. At $r = 4$ it finds \val{ch07.lam.four}, and the
 exact value is $\ln 2 = \val{ch07.ln.two.long}$: an average of a hundred
-thousand wildly different logarithms, some large and positive, some large and
-negative, agrees with it to within $\num{0.001}$. At $r = \num{3.2}$, where
+thousand wildly different logarithms agrees with it to within $\num{0.001}$.
+At $r = \num{3.2}$, where
 the orbit alternates between two values, and at $r = \num{3.5}$, where it
 cycles through four, the exponent is negative too, \val{ch07.lam.threetwo}
 and \val{ch07.lam.threefive}. A cycle, like a fixed point, forgets its
@@ -257,9 +248,9 @@ settles}
 \begin{rigourbox}
 Two things are used here and not proved. The first is that the average
 settles on the same number from almost every start. That is a theorem, and
-\enquote{almost every} is part of it: a start of exactly $0$ stays at $0$ for
-ever and averages $\ln 4$ instead. A run on a computer can illustrate the
-theorem, as the figure does; it cannot prove it. The second is why $r = 4$
+\enquote{almost every} matters: a start of exactly $0$ stays at $0$ for ever
+and averages $\ln 4$. A computer run can illustrate the theorem, as the
+figure does, but not prove it. The second is why $r = 4$
 gives exactly $\ln 2$. Write $x$ as $\sin^{2}\theta$ for an angle $\theta$,
 and one line of school trigonometry turns $4x(1 - x)$ into
 $\sin^{2}(2\theta)$: at $r = 4$ the map is doubling an angle in disguise.
@@ -317,11 +308,10 @@ was before.}
 \pyregion{code/ch07/horizon.py}{formula}{The horizon formula}{lst:ch07-formula}
 
 \noindent
-The formula is one line. To see whether it is true, the program sets it
-beside a count. The function \code{counts}, further down the same file, makes
-the measurement of Chapter~\ref{ch:butterfly} from a thousand starts spread
-across the interval: two runs $\delta$ apart, followed until they differ by
-more than $T$. In its output, \code{1e-03} is Python's way of writing
+The program sets that line beside a count. The function \code{counts},
+further down the file, makes the measurement of Chapter~\ref{ch:butterfly}
+from a thousand starts: two runs $\delta$ apart, followed until they differ
+by more than $T$. In the output, \code{1e-03} is Python's way of writing
 $10^{-3}$, a thousandth.
 
 \pyregion{code/ch07/horizon.py}{table}{Formula against count, for four errors in the start}{lst:ch07-count}
@@ -329,13 +319,13 @@ $10^{-3}$, a thousandth.
 \transcript{ch07-horizon}
 
 \noindent
-The formula and the mean count agree to within a step. The count comes out
-a shade later, because the gap is checked only at whole steps and grows less
-steeply as it stops being small. The last two columns are a warning:
-individual starts differ, some by a lot, because the exponent is an average
-and so is the horizon. But look down the rows. Each thousandfold improvement
-adds the same ten steps; measured, the rows are \val{ch07.hz.gained} steps
-apart on average.
+The formula and the mean count agree to within a step; the count comes out
+a shade later, because the gap is checked only at whole steps and grows more
+slowly once it stops being small. The last two columns are a warning:
+individual starts differ, some by a lot, because the horizon, like the
+exponent, is an average. But look down the rows. Each thousandfold
+improvement adds the same ten steps; measured, the rows are
+\val{ch07.hz.gained} steps apart on average.
 
 \plotfig{ch07-horizon-line}{The horizon against the error in the start, on a
 logarithmic scale with better measurements to the right. The count (dots,
@@ -347,8 +337,8 @@ steps.}{horizon against the error in the start}
 \textbf{\enquote{Ten times better data gives ten times longer forecasts.}}
 It gives a fixed number of extra steps, $\ln 10/\lambda$, which at $r = 4$ is
 \val{ch07.per.ten}. The horizon grows with the logarithm of your precision,
-not with the precision itself. Every extra correct decimal place in the start
-buys the same few steps, and the twentieth buys no more than the first.
+not with the precision: every extra correct decimal place buys the same few
+steps, the twentieth no more than the first.
 \end{trapbox}
 
 \begin{think}
@@ -374,13 +364,13 @@ Chapter~\ref{ch:computers} measures what that costs.
 \end{trapbox}
 
 \noindent
-This is why weather forecasts improve slowly. Over the decades satellites,
-denser observations and faster computers have shrunk the error in the
-atmosphere's measured state many times over, and each factor bought the same
-fixed amount of lead time. The improvement usually quoted is about a day of
-useful forecast per decade. The atmosphere is not the logistic map, and
+This is why weather forecasts improve slowly. Satellites, denser
+observations and faster computers have shrunk the error in the atmosphere's
+measured state many times over, and each factor bought the same fixed amount
+of lead time; the improvement usually quoted is about a day of useful
+forecast per decade. The atmosphere is not the logistic map, and
 Chapter~\ref{ch:weather} says what is different about it, but the arithmetic
-of the logarithm applies to it all the same.
+of the logarithm applies all the same.
 
 \begin{worldbox}
 The Lyapunov time is how astronomers say how far ahead an orbit can be
@@ -392,7 +382,6 @@ horizon is the Lyapunov time multiplied by $\ln(T/\delta)$, and that
 logarithm is only about \val{ch07.ln.tenbillion} even when the error in the
 start is ten billion times smaller than the tolerance, so a horizon is a few
 dozen Lyapunov times at most.
-Weather scientists use the same idea as an error-doubling time.
 \end{worldbox}
 
 \begin{lab}{l07_02_horizon}{How far ahead, and at what price}
@@ -436,8 +425,7 @@ positive from $r = \num{3.60}$, so chaos arrives somewhere in between. After
 that it climbs towards $\ln 2$ at $r = 4$, except at $r = \num{3.84}$, where
 it is negative again: a narrow range of the knob, inside the chaos, where the
 orbit has found a cycle and forgets its disturbances once more. A table this
-coarse steps over most of these ranges; the figure takes the exponent at
-many more settings.
+coarse steps over most such ranges; the figure does not.
 
 \plotfig{ch07-exponent-r}{The Lyapunov exponent across the knob $r$. It is
 negative wherever the orbit settles, touches zero at each hand-over, is
@@ -448,11 +436,10 @@ exponent against $r$}
 \noindent
 Below the start of chaos the curve never rises above zero. It touches zero
 at $r = 3$ and again a little below $r = \num{3.5}$, each time a cycle hands
-over to one twice as long, and it plunges between the touches, where a cycle
-holds on hardest. Beyond, it is mostly positive and pierced by downward
-spikes: windows where order comes back. Where exactly chaos begins, why the
-hand-overs crowd together, and which window is the widest are
-Chapter~\ref{ch:bifurcations}'s questions. What this chapter adds is the
+over to one twice as long. Beyond, it is mostly positive, pierced by
+downward spikes: windows where order comes back. Where exactly chaos begins,
+why the hand-overs crowd together and which window is widest are
+Chapter~\ref{ch:bifurcations}'s questions. This chapter's answer is the
 measurement that tells order from chaos at any setting: one number, and its
 sign.
 
@@ -460,7 +447,7 @@ sign.
 \begin{itemize}
 \item One step multiplies a tiny error by the \textbf{stretch}, the slope of
   the rule where you are. Along a chaotic orbit the stretches vary wildly,
-  and the typical one is not their ordinary average.
+  and their ordinary average is the wrong summary.
 \item The \textbf{natural logarithm} turns multiplying into adding:
   $\ln(a \times b) = \ln a + \ln b$, $\ln 1 = 0$, $\ln 2 \approx
   \val{ch07.ln.two}$ and $\ln e = 1$. A growth factor $g$ per step becomes a

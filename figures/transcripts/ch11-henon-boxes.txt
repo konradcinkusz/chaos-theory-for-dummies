@@ -1,0 +1,7 @@
+boxes of side 1/4, 1/8, ... 1/1024 touched by the attractor
+   100000 points:    28    63   148   349   830  1917  4455 10081 22362
+   slope through all nine sizes:   1.214
+   through any five in a row:      1.190 to 1.234
+  1000000 points:    28    63   148   349   833  1930  4548 10551 25457
+   slope through all nine sizes:   1.230
+   through any five in a row:      1.226 to 1.237

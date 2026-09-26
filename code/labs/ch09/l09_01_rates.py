@@ -7,7 +7,7 @@ changing, by the chapter's three rules:
     y changes at  x * (rho - z) - y
     z changes at  x * y - beta * z
 
-`still_points` returns every state at which all three rates are zero: the
+`fixed_points` returns every state at which all three rates are zero: the
 pan at rest and, when the heating rho is above 1, the two steady rolls.
 """
 
@@ -22,7 +22,7 @@ def rates(state: State, sigma: float = SIGMA, rho: float = RHO,
     raise NotImplementedError("your turn: replace this line")
 
 
-def still_points(rho: float = RHO, beta: float = BETA) -> list[State]:
+def fixed_points(rho: float = RHO, beta: float = BETA) -> list[State]:
     """Every state at which nothing changes, rest state first.
 
     One state when rho is 1 or less. Above 1, also the two steady rolls,

@@ -14,7 +14,7 @@ def rates(state: State, sigma: float = SIGMA, rho: float = RHO,
     return (sigma * (y - x), x * (rho - z) - y, x * y - beta * z)
 
 
-def still_points(rho: float = RHO, beta: float = BETA) -> list[State]:
+def fixed_points(rho: float = RHO, beta: float = BETA) -> list[State]:
     """Every state at which nothing changes, rest state first."""
     points = [(0.0, 0.0, 0.0)]
     if rho > 1:

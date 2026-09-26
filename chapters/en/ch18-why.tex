@@ -29,7 +29,7 @@ gives a 70 per cent chance of rain on Saturday. A pension statement says
 what your savings will be worth in 2060. And a computer program answers a
 question about next year's interest rates without a flicker of doubt.
 
-Which of them would you trust, and how far? A year ago you might have said
+Which of them would you trust, and how far? Before this book you might have said
 that it depends on how clever the people and the computers are. You can now
 say something much sharper, with numbers you computed yourself. This
 chapter turns the book into a field guide: five questions to ask of any
@@ -102,7 +102,7 @@ A growing error usually grows by roughly the same factor each step, and
 Chapter~\ref{ch:lyapunov} turned that factor into one number: the Lyapunov
 exponent, written $\lambda$ (the Greek letter lambda), which is the natural
 logarithm $\ln$ of the average factor. A factor of $2$ is an exponent of
-$\ln 2$, about \num{0.693}. Suppose your start is wrong by $e_0$ and the
+$\ln 2$, about \val{ch18.ln.two}. Suppose your start is wrong by $e_0$ and the
 forecast is useless once the error passes a tolerance $T$. After $n$ steps
 the error is $e_0$ times the factor $n$ times over, so it reaches $T$ when
 \[ n \approx \frac{\ln(T / e_0)}{\lambda}. \]
@@ -117,8 +117,9 @@ Try it on the logistic map at $r = 4$, whose exponent this chapter measures
 as \val{ch18.lam.logistic} per step ($\ln 2$, as
 Chapter~\ref{ch:lyapunov} shows). Know the start to six decimal places, so
 $e_0$ is a millionth, and call the forecast useless when it is out by more
-than $T = \num{0.1}$. Then $n \approx \val{ch18.ln.six} /
-\val{ch18.lam.logistic} \approx \val{ch18.hor.six}$ steps.
+than $T = \num{0.1}$. Then $T / e_0 = 100\,000$, and $n \approx
+\val{ch18.ln.six} / \val{ch18.lam.logistic} \approx \val{ch18.hor.six}$
+steps.
 
 \begin{think}
 You buy an instrument a thousand times more precise and now know the start
@@ -166,10 +167,9 @@ steps.}{horizon against correct digits}
 
 \noindent
 The same arithmetic explains the eclipse. Jacques Laskar's 1989 computation
-of the solar system, quoted in Chapter~\ref{ch:mechanics}, found that errors
-in the inner planets' positions grow by the factor used in $\ln$ once every
-five million years or so: an exponent of about one fifth per million years.
-Suppose you knew the Earth's position to a metre, and call the forecast
+of the solar system, quoted in Chapter~\ref{ch:mechanics}, gave the inner
+planets an exponent of about one fifth per million years: a Lyapunov time,
+one over the exponent, of about five million years. Suppose you knew the Earth's position to a metre, and call the forecast
 useless when the error is the size of its orbit, 150 million kilometres.
 The horizon is about five million years times $\ln 150\,000\,000\,000
 \approx \val{ch18.planets.ln}$: some \val{ch18.planets.hor} million years.
@@ -183,7 +183,7 @@ correct digits into a horizon; \code{extra\_steps}, which says what a
 measurement some factor more precise buys; and \code{digits\_needed}, which
 runs the formula backwards. Then ask it how many correct digits a hundred
 steps of the logistic map would need, and compare the answer with the
-roughly sixteen that a computer's usual numbers carry
+roughly sixteen decimal digits that a computer's ordinary numbers carry
 (Chapter~\ref{ch:computers}).
 \end{lab}
 
@@ -304,8 +304,8 @@ news or good news for somebody who wants to control the system?
 why a tiny push, well timed, can move it a long way.}
 Edward Ott, Celso Grebogi and James Yorke made that the idea of their 1990
 paper on controlling chaos: wait until the system passes near one of the
-unstable cycles hidden in its attractor, then nudge it back, and it can be
-held there with pushes far smaller than the motion.
+unstable cycles hidden in its attractor, then nudge a parameter slightly,
+and it can be held on that cycle with pushes far smaller than the motion.
 Chapter~\ref{ch:taming} does it with nudges under one per cent, and also
 makes two chaotic systems keep in step, which Louis Pecora and Thomas
 Carroll showed in the same year. So chaos is not an excuse for fatalism. A
@@ -345,8 +345,8 @@ odds.}{the field guide in three moves}
 
 \noindent
 And here are some familiar forecasts sorted by horizon. Only one number in
-the table is worked out in this chapter; the others are labelled by where
-they come from, and an order of magnitude is all they claim.
+the table is worked out in this chapter. The others are orders of
+magnitude, some of them folklore, labelled by where they come from.
 
 \medskip
 \noindent
@@ -414,9 +414,9 @@ last month's long-range one failed is the same mistake turned round.
 \emph{It makes probabilities respectable.} Odds are what a correct forecast
 looks like beyond the horizon, not a failure of forecasting.
 
-\emph{It is beautiful, and it is universal.} Feigenbaum's constant, about
-\num{4.669}, comes out of a line of algebra and out of real fluids and
-circuits (Chapter~\ref{ch:bifurcations}); fractals give a coastline a
+\emph{It is beautiful, and it is universal.} Feigenbaum's constant comes
+out of a line of algebra and out of real fluids and circuits
+(Chapter~\ref{ch:bifurcations}); fractals give a coastline a
 dimension between one and two (Chapter~\ref{ch:fractals}); and the edge of
 the Mandelbrot set holds the whole road to chaos (Chapter~\ref{ch:mandelbrot}).
 
@@ -537,8 +537,8 @@ number.
 \item Explain to a colleague why eclipses can be predicted for thousands of
   years and the weather only for about a week.
   \answerto{The horizon is the logarithm of how many times too small the
-  error is, divided by the exponent. In the solar system errors grow by the
-  factor used in $\ln$ only once every few million years, so the horizon is
-  about a hundred million years; in the atmosphere they grow that much in
-  days. Better data only adds a fixed stretch to either.}
+  error is, divided by the exponent. The solar system's exponent is about
+  one fifth per million years, so its horizon is about a hundred million
+  years; the atmosphere's errors grow as much in days. Better data only adds
+  a fixed stretch to either.}
 \end{checkpoint}

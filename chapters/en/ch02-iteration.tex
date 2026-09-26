@@ -27,30 +27,27 @@
 \noindent
 Your doctor prescribes one tablet every morning. Each tablet puts 100
 milligrams of the drug into your blood, and by the next morning your body
-has cleared half of whatever was there. You take one a day for a month, then
-a year, then ten years. Does the amount in your blood keep climbing for as
-long as you keep taking them?
+has cleared half of whatever was there. Take one a day for a month, a year,
+ten years: does the amount in your blood keep climbing for as long as you
+take them?
 
-Hold on to your answer; this chapter settles it. The question is about a
-rule applied over and over \dash{} halve, add a tablet; halve, add a tablet
-\dash{} and that one kind of question covers savings accounts, cooling tea,
-growing populations, loans, and a hotel shower whose temperature you cannot
-get right. Chapter~\ref{ch:models} called the line
-\code{temp = next\_minute(temp)} the most important line in the book. This
-chapter is about what that line does when you run it for ever, and by the
-end of it you will be able to say what a whole family of rules will do in
-the long run without running them at all.
+Hold on to your answer. The question is about a rule applied over and over
+\dash{} halve, add a tablet; halve, add a tablet \dash{} and rules of the
+same kind run savings accounts, cooling tea, populations, loans and a hotel
+shower. Chapter~\ref{ch:models} called \code{temp = next\_minute(temp)} the
+most important line in the book. This chapter is about what that line does
+when you run it for ever, and it ends with you able to say what a whole
+family of rules will do in the long run without running them at all.
 
 \begin{outcomes}
 \outcome{write a rule of the next step in the book's notation and work out
-  the list of states it produces, by hand and in Python}
-\outcome{recognise the straight-line rule behind savings, medicine, cooling
-  and populations, and read its long-run behaviour from one number}
+  its orbit, by hand and in Python}
+\outcome{recognise the straight-line rule behind savings, medicine and
+  cooling, and read its long-run behaviour from one number}
 \outcome{answer a \enquote{how many steps until} question with a logarithm}
-\outcome{find the state where a rule stands still, and decide whether the
-  rule keeps it there when it is nudged}
-\outcome{measure the slope of a rule at a point, and draw and read a cobweb
-  diagram}
+\outcome{find where a rule stands still, and decide whether it stays there
+  when nudged}
+\outcome{measure the slope of a rule at a point, and read a cobweb diagram}
 \end{outcomes}
 
 \section{Today, tomorrow, the day after}
@@ -58,39 +55,34 @@ the long run without running them at all.
 \index{state}\index{orbit}
 
 \noindent
-Put 1000 pounds into a savings account that pays 5 per cent interest a
-year, and leave it alone. After one year the bank adds 5 per cent of 1000,
-which is 50, and you have 1050. After the second year it adds 5 per cent of
-1050, and you have \val{ch02.save.two}. After the third,
-\val{ch02.save.three}. Every year the same thing happens to whatever is
-there.
+Put 1000 pounds into an account that pays 5 per cent a year, and leave it
+alone. After one year the bank adds 50, which is 5 per cent of 1000, and
+you have 1050. After the second it adds 5 per cent of 1050 and you have
+\val{ch02.save.two}; after the third, \val{ch02.save.three}. Every year the
+same thing happens to whatever is there.
 
-That is a rule of the next step, and it needs a little notation, because
-you will meet a great many of them. Call the balance after $n$ years $x_n$,
-read \enquote{$x$ sub $n$}. The small $n$ is a label saying which year, not
-a number to multiply by: $x_0 = 1000$ is where you start, $x_1 = 1050$ is
-the balance a year later, and so on. The bank's rule is then
+Rules like this need a little notation. Call the balance after $n$ years
+$x_n$, read \enquote{$x$ sub $n$}: the small $n$ says which year and is not
+multiplied by anything. So $x_0 = 1000$ is where you start and $x_1 = 1050$
+is the balance a year later. The bank's rule is then
 \[ x_{n+1} = \num{1.05}\, x_n , \]
-which says in symbols what the sentence said in words: next year's balance
-is \num{1.05} times this year's. Because $n$ can be any whole number, this
-one line describes every year at once.
+next year's balance is \num{1.05} times this year's, for every year at
+once.
 
-Every stepping rule in this book has the same shape. There is a
-\emph{state}, a number $x$ that says where things are now; a \emph{rule},
-which the book calls $f$ and which stands for \enquote{whatever you do to
-the state to get the next one}; and the next state, which is $f$ applied to
-this one:
+Every stepping rule in this book has this shape. There is a \emph{state}, a
+number $x$ saying where things are now; a \emph{rule} $f$, which stands for
+\enquote{whatever you do to the state to get the next one}; and the next
+state, which is $f$ applied to this one:
 \[ x_{n+1} = f(x_n) . \]
-When the step number does not matter, the book writes the rule with an
-arrow, $x \mapsto \num{1.05}\,x$, read \enquote{$x$ goes to \num{1.05} times
-$x$}. Start from $x_0$ and apply the rule once, and you have $x_1$; apply it
-to $x_1$ and you have $x_2$. The whole list $x_0, x_1, x_2, \ldots$ is the
-\emph{orbit} of $x_0$, and producing it \dash{} feeding each answer back in
-as the next question \dash{} is \emph{iteration}.
+When the step number does not matter the rule is written with an arrow,
+$x \mapsto \num{1.05}\,x$, read \enquote{$x$ goes to \num{1.05} times $x$}.
+The list $x_0, x_1, x_2, \ldots$ is the \emph{orbit} of $x_0$, and
+producing it, by feeding each answer back in as the next question, is
+\emph{iteration}.
 
 \mermaidfig{ch02-feed-back}{Iteration. The rule turns the state now into
-the next state, and the next state becomes the state now; the same rule is
-used at every step.}{the loop of iteration}
+the next state, which becomes the state now; the same rule is used at every
+step.}{the loop of iteration}
 
 \begin{think}
 Take the rule $x \mapsto 2x + 1$: double, then add one. Starting from
@@ -98,21 +90,20 @@ $x_0 = 1$, what are $x_1$, $x_2$ and $x_3$?
 \end{think}
 \reveal{$3$, $7$ and $15$. Twice $1$ plus one is $3$; twice $3$ plus one
 is $7$; twice $7$ plus one is $15$.}
-There is no way to reach $x_3$ except through $x_1$ and $x_2$: each answer
-is the next question. To know where an orbit is after a hundred steps you
-take a hundred steps, which is tedious by hand and effortless for a
-machine.
+There is no way to reach $x_3$ except through $x_1$ and $x_2$. To know an
+orbit after a hundred steps you take a hundred steps, which is tedious by
+hand and effortless for a machine.
 
 \begin{projectbox}
-The book's library, \pkg{chaoslab}, has a function that takes the steps for
-you. It is the loop from Chapter~\ref{ch:models} with the bookkeeping done
-once:
+The book's library, \pkg{chaoslab}, takes the steps for you. Its
+\code{orbit} is the loop of Chapter~\ref{ch:models} with the bookkeeping
+done once:
 
 \pyregion{code/src/chaoslab/iterate.py}{orbit}{Apply a rule $n$ times and keep every state}{lst:ch02-orbit}
 
 \noindent
-Its partner \code{linear(a, b)} builds the rules this chapter is about: it
-hands back the rule $x \mapsto a\,x + b$, ready to give to \code{orbit}.
+Its partner \code{linear(a, b)} hands back the rule $x \mapsto a\,x + b$,
+ready to give to \code{orbit}.
 \end{projectbox}
 
 \section{One straight line, three fates}
@@ -120,63 +111,56 @@ hands back the rule $x \mapsto a\,x + b$, ready to give to \code{orbit}.
 \index{linear rule}\index{rule!linear}
 
 \noindent
-The savings rule only multiplies. Many rules multiply and then add a fixed
-amount, and you have met some of them already.
+The savings rule only multiplies. Many rules multiply and then add:
 
 \begin{itemize}
 \item \textbf{The tea} of Chapter~\ref{ch:models} loses a tenth of its gap
-  to a room at 20 degrees each minute. From $x$ degrees it goes to
+  to a room at 20 degrees each minute: from $x$ it goes to
   $x - \num{0.1}(x - 20)$, which tidies up to $\num{0.9}\,x + 2$.
-\item \textbf{The tablets} of this chapter's opening: halve, then add 100,
-  which is $x \mapsto \num{0.5}\,x + 100$.
+\item \textbf{The tablets}: halve, then add 100, or
+  $x \mapsto \num{0.5}\,x + 100$.
 \item \textbf{A population} in which births outnumber deaths by a fifth
-  each year, and nothing else changes: $x \mapsto \num{1.2}\,x$.
+  each year: $x \mapsto \num{1.2}\,x$.
 \item \textbf{A rumour} that everyone who knows it passes to one new person
-  a day: the number who know doubles, $x \mapsto 2x$.
+  a day: $x \mapsto 2x$.
 \end{itemize}
 
 \noindent
-All of them have one shape,
-\[ x \mapsto a\,x + b : \]
-multiply by a fixed number $a$, then add a fixed number $b$. Draw it as a
-graph, with the state now along the bottom and the next state up the side,
-and you get a straight line, which is why it is called a \emph{linear}
-rule. The straight line describes the rule, not what happens over time;
-what linear rules do over time is, as you are about to see, mostly curved.
-
-Start four of them from the same place and let them run:
+All of them have one shape, $x \mapsto a\,x + b$: multiply by a fixed
+number $a$, then add a fixed number $b$. Its graph, with the state now along
+the bottom and the next state up the side, is a straight line, so it is
+called a \emph{linear} rule \dash{} although, as you are about to see, what
+it does over time is mostly curved. Start four of them from the same place:
 
 \pyregion{code/ch02/fates.py}{rules}{Four linear rules, iterated side by side from the same start}{lst:ch02-fates}
 
 \transcript{ch02-fates}
 
 \noindent
-The first column doubles for ever. The second halves towards nothing. The
-third creeps up on $10$ from below and never passes it. The fourth also
-settles on $10$, but it gets there by jumping from one side to the other,
-each jump smaller than the last; look closely and it is the third column
-mirrored, the same distance from $10$ at every step, on alternating sides.
-Those are the three fates of a linear rule: grow without bound, shrink to
-nothing, or settle on one number. A negative multiplier adds a twist,
-alternation, but not a fourth fate.
+The first column doubles for ever and the second halves towards nothing.
+The third creeps up on $10$ from below. The fourth settles on $10$ too, but
+by jumping from side to side, each jump smaller than the last: it is the
+third column mirrored. Those are the three fates of a linear rule \dash{}
+grow without bound, shrink to nothing, or settle \dash{} and a negative
+multiplier adds alternation, but not a fourth fate.
 
 \plotfig{ch02-three-fates}{The three fates of a linear rule, from the same
 start. One grows without bound, one dies away, and two settle on the same
-number \dash{} one creeping up on it, one jumping from side to
+number, one creeping up on it and one jumping from side to
 side.}{three linear rules and their three fates}
 
 \begin{think}
-Back to the savings account. You want the balance after ten years, and you
-would rather not take ten steps. What single calculation gives it?
+Back to the savings account. You want the balance after ten years without
+taking ten steps. What single calculation gives it?
 \end{think}
 \reveal{Multiply 1000 by \num{1.05} ten times over: $x_{10} =
 \num{1.05}^{10} \times 1000$, which is \val{ch02.save.ten}.}
-The small raised $10$ is a \emph{power}: $\num{1.05}^{10}$ means \num{1.05}
+The small raised $10$ is a \emph{power}: $\num{1.05}^{10}$ is \num{1.05}
 multiplied by itself ten times. When a rule only multiplies, $x \mapsto
 a\,x$, its orbit has a formula, $x_n = a^n x_0$, and you can jump to any
-step you like. Growth of that kind, where every step multiplies by the same
-number, is called \emph{exponential}; its shrinking twin, with $a$ between
-$0$ and $1$, is \emph{exponential decay}.
+step. Growth in which every step multiplies by the same number is called
+\emph{exponential}; its shrinking twin, with $a$ between $0$ and $1$, is
+\emph{exponential decay}.
 
 \section{Slow explosions, and how many steps until}
 \label{sec:ch02-until}
@@ -192,23 +176,20 @@ Two savings accounts both start with 1000. Account A adds 50 every year.
 Account B grows by 2 per cent a year, which is exponential growth. Which is
 ahead after thirty years?
 \end{think}
-\reveal{Account A, with $1000 + 30 \times 50 = 2500$ against account B's
+\reveal{Account A, with $1000 + 30 \times 50 = 2500$ against B's
 \val{ch02.acc.grows.thirty}. B does not overtake until year
 \val{ch02.acc.cross}.}
-If you chose B, you were reasoning from the word rather than from the rule.
-Two per cent of 1000 is 20, less than A's 50, and B needs decades of
-growing on its own growth before its 2 per cent is worth more than A's flat
-50.
+If you chose B, you were reasoning from the word rather than the rule: 2
+per cent of 1000 is 20, less than A's 50, and B needs decades of growing on
+its own growth before its 2 per cent is worth more.
 
 \begin{trapbox}
 \textbf{\enquote{Exponential growth means fast growth.}} It means growth in
-proportion to what is already there: every step multiplies by the same
-number, and that number can be very close to one. At 1 per cent a year a
-sum takes about \val{ch02.dbl.one.log} years to double, which is
-exponential and slower than almost anything you would call fast. What
-exponential growth guarantees is not speed but inevitability: however
-small the rate, it overtakes any growth that adds a fixed amount,
-eventually \dash{} and eventually can be a lifetime.
+proportion to what is already there, and the multiplier can be very close
+to one. At 1 per cent a year a sum takes about \val{ch02.dbl.one.log}
+years to double. What exponential growth guarantees is not speed but
+inevitability: however small the rate, it overtakes any growth that adds a
+fixed amount \dash{} eventually, and eventually can be a lifetime.
 \end{trapbox}
 
 \plotfig{ch02-two-accounts}{Adding a fixed amount against growing by a fixed
@@ -216,10 +197,10 @@ fraction. The exponential account is behind for most of a century, and then
 it is not.}{linear against exponential growth}
 
 \noindent
-The useful question to ask of exponential growth is not \enquote{how fast?}
-but \enquote{how many steps until it doubles?}, because the answer does not
-depend on where you start. From 1000 or from \num{1000000}, a balance
-growing at 7 per cent a year doubles in the same number of years.
+The useful question to ask of exponential growth is \enquote{how many steps
+until it doubles?}, because the answer does not depend on the start: from
+1000 or from \num{1000000}, 7 per cent a year doubles a sum in the same
+time.
 
 \begin{think}
 At 7 per cent a year, roughly how many years does a sum take to double:
@@ -228,50 +209,47 @@ about 5, about 10, or about 14?
 \reveal{About 10. Counting whole years, 1000 first passes 2000 in year
 \val{ch02.dbl.seven.count}; the precise answer is \val{ch02.dbl.seven.log}
 years.}
-Counting works, and there is also a button for it. The question is: how
-many times must I multiply by \num{1.07} to reach 2? In symbols, for which
-$n$ is $\num{1.07}^n = 2$? A \emph{logarithm} answers exactly that kind of
+There is a button for this. The question is: for which $n$ is
+$\num{1.07}^n = 2$? A \emph{logarithm} answers exactly that kind of
 question. Your calculator has one marked \code{ln}, the natural logarithm,
 and the one thing you need to know about it is what it does to a power:
 \[ \ln (a^n) = n \ln a . \]
 It turns \enquote{multiply by $a$, $n$ times} into \enquote{add $\ln a$, $n$
-times}. Take the logarithm of both sides of $a^n = 2$ and you have $n \ln a
-= \ln 2$, so
-\[ n = \frac{\ln 2}{\ln a} . \]
-In words: the number of steps is the logarithm of how far you want to go,
-divided by the logarithm of one step. With $\ln 2 = \val{ch02.ln.two}$ and
+times}. Take the logarithm of both sides of $a^n = 2$ and you have
+$n \ln a = \ln 2$, so
+\[ n = \frac{\ln 2}{\ln a} : \]
+the number of steps is the logarithm of how far you want to go, divided by
+the logarithm of one step. With $\ln 2 = \val{ch02.ln.two}$ and
 $\ln \num{1.07} = \val{ch02.ln.seven}$, that is \val{ch02.dbl.seven.log}.
 
-\pyregion{code/ch02/doubling.py}{count}{Two ways to ask how long a balance takes to double}{lst:ch02-doubling}
+\pyregion{code/ch02/doubling.py}{count}{How long until a balance doubles, two ways}{lst:ch02-doubling}
 
 \pyregion{code/ch02/doubling.py}{table}{The doubling-time table}{lst:ch02-table}
 
 \transcript{ch02-doubling}
 
 \noindent
-The counted column is the logarithm's answer rounded up to a whole step. At
-2 per cent the logarithm says \val{ch02.dbl.two.log} and the count says
+The count is the logarithm rounded up to a whole step. At 2 per cent they
+disagree by a whole year, \val{ch02.dbl.two.log} against
 \val{ch02.dbl.two.count}: after 35 years the balance is
-\val{ch02.dbl.two.short} times what went in, a hair short of double, and
-the table has rounded the hair away. The last column is the banker's
-shortcut, the \emph{rule of 70}: divide 70 by the percentage. It works
-because for a small rate the logarithm of one step is close to the rate
-itself ($\ln \num{1.07}$ is nearly \num{0.07}), and $100 \times \ln 2$ is
-about 70.
+\val{ch02.dbl.two.short} times what went in, a hair short of double. The
+last column is the \emph{rule of 70}: divide 70 by the percentage. It works
+because for a small rate $\ln a$ is close to the rate itself
+($\ln \num{1.07}$ is nearly \num{0.07}), and $100 \times \ln 2$ is about
+70.
 
 Shrinking works the same way. A drug of which the body clears a fifth every
 hour keeps \num{0.8} of itself each hour, and the time until half is left,
 its \emph{half-life}, is $\ln \num{0.5} / \ln \num{0.8}$, about
-\val{ch02.half.fifth} hours. The tablets of the opening, halved every day,
-have a half-life of exactly one day.
+\val{ch02.half.fifth} hours. The tablets, halved daily, have a half-life of
+one day.
 
 \begin{lab}{l02_01_until}{How many steps until?}
 Write \code{steps\_until}, which counts the steps of $x \mapsto a\,x$ from
 $1$ until $x$ reaches a target, and \code{time\_until}, which asks the
-logarithm the same question; the test checks that the count is always the
+logarithm the same question; the test checks that the count is the
 logarithm rounded up, for growth and for decay. Then write
-\code{half\_life} for a drug that loses a fixed fraction every step.
-Python's natural logarithm is \code{math.log}.
+\code{half\_life}. Python's natural logarithm is \code{math.log}.
 \end{lab}
 
 \section{Where the rule stands still}
@@ -279,10 +257,9 @@ Python's natural logarithm is \code{math.log}.
 \index{fixed point}
 
 \noindent
-Now the opening question. The state is the amount of drug in your blood
-just after the morning tablet, in milligrams. Overnight half of it goes,
-and the next tablet adds 100, so the rule is $x \mapsto \num{0.5}\,x + 100$,
-starting from $x_0 = 100$.
+Now the opening question. The state is the drug in your blood just after
+the morning tablet, in milligrams: $x \mapsto \num{0.5}\,x + 100$, starting
+from $x_0 = 100$.
 
 \begin{think}
 Work out the first few mornings: $100$, then half of that plus $100$, and
@@ -290,42 +267,38 @@ so on. Does the amount keep climbing for as long as you take the tablets?
 \end{think}
 \reveal{No. It goes $100$, $150$, $175$, \num{187.5}, \num{193.75}, and on,
 closing in on $200$ without ever reaching it.}
-Why $200$? Because $200$ is the amount the rule leaves alone: half of $200$
-is $100$, and the tablet puts the $100$ straight back. A state that the rule
-does not change is called a \emph{fixed point}, and you find one by asking
-which $x$ satisfies
+Why $200$? Because the rule leaves $200$ alone: half of $200$ is $100$, and
+the tablet puts the $100$ straight back. A state the rule does not change is
+a \emph{fixed point}, and you find it by asking which $x$ satisfies
 \[ x = f(x) . \]
-For the tablets that is $x = \num{0.5}\,x + 100$. Take $\num{0.5}\,x$ from
-both sides and $\num{0.5}\,x = 100$, so $x = 200$. For any linear rule the
-same two lines give
+For the tablets, $x = \num{0.5}\,x + 100$; take $\num{0.5}\,x$ from both
+sides and $\num{0.5}\,x = 100$, so $x = 200$. For any linear rule the same
+steps give
 \[ x^{*} = \frac{b}{1 - a} , \]
-where the star marks the fixed point and $a$ must not be exactly $1$ (the
-rule $x \mapsto x + b$ keeps adding and stands still nowhere). The tea's
-rule, $x \mapsto \num{0.9}\,x + 2$, has its fixed point at
-$2 / \num{0.1} = 20$ degrees: the temperature of the room, as it should.
+the star marking the fixed point. (If $a$ is exactly $1$ the rule only
+keeps adding, and stands still nowhere.) The tea's rule has its fixed point
+at $2 / \num{0.1} = 20$ degrees: the temperature of the room.
 
 \pyregion{code/ch02/drug.py}{tablets}{One tablet a morning, and the gap to the fixed point}{lst:ch02-drug}
 
 \transcript{ch02-drug}
 
 \noindent
-Read the right-hand column. The shortfall is $100$, then $50$, then $25$: it
-halves every morning, because every night the body halves whatever is
-there, and the tablet adds the same $100$ however much that is. After
-\val{ch02.drug.within} days you are within one milligram of $200$, and you
-will never be exactly there. The amount in your blood does not climb for
-ever. It levels off, and where it levels off is a fixed point.
+Read the right-hand column. The shortfall is $100$, then $50$, then $25$:
+it halves every morning, because the body halves whatever is there and the
+tablet adds the same $100$ regardless. After \val{ch02.drug.within} days you
+are within one milligram of $200$, and you will never be exactly there. The
+amount does not climb for ever; it levels off at a fixed point.
 
 \begin{worldbox}
 Pharmacologists call this fixed point the \emph{steady state}, and the rule
 of thumb taught to doctors and pharmacists is that a medicine taken at
-regular intervals reaches it after four or five half-lives. The arithmetic
-is the table above: after four half-lives the shortfall has halved four
-times, leaving the level at \val{ch02.drug.four} per cent of the steady
-state, and after five at \val{ch02.drug.five}. When a medicine is needed at
-full strength straight away, a doctor may give a larger first dose, a
-\emph{loading dose}, which starts the orbit on the fixed point rather than
-below it.
+regular intervals reaches it after four or five half-lives. That is the
+table above: after four half-lives the shortfall has halved four times,
+leaving the level at \val{ch02.drug.four} per cent of the steady state, and
+after five at \val{ch02.drug.five}. When a medicine is needed at full
+strength at once, a doctor may give a larger first dose, a \emph{loading
+dose}, which starts the orbit on the fixed point instead of below it.
 \end{worldbox}
 
 \section{Staying put, and running away}
@@ -334,60 +307,53 @@ below it.
 
 \noindent
 Here is a fixed point of a different character. You owe \num{10000} on a
-loan that charges 1 per cent interest a month, and you repay 100 a month,
-so each month the balance goes to $\num{1.01}\,x - 100$.
+loan charging 1 per cent a month, and you repay 100 a month, so the balance
+goes to $\num{1.01}\,x - 100$ each month.
 
 \begin{think}
-What happens to the balance over the years? And what happens if you owe
+What happens to the balance over the years? And what if you owe
 \num{11000} instead, with the same interest and the same repayment?
 \end{think}
 \reveal{At \num{10000}, nothing, ever: the interest is exactly 100 and your
 100 cancels it. At \num{11000} the interest is 110, your 100 does not cover
 it, and after ten years you owe \val{ch02.loan.up}.}
-Both balances obey the same rule, and \num{10000} is its fixed point:
-$\num{1.01} \times \num{10000} - 100 = \num{10000}$. But the rule does not
-pull you towards it. Start a thousand above it and the debt runs away
-upwards; start a thousand below, at \num{9000}, and it runs away downwards,
-to zero, paid off after \val{ch02.loan.payoff} months, about
-\val{ch02.loan.years} years.
+\num{10000} is the rule's fixed point, but the rule does not pull you
+towards it. Start a thousand above and the debt runs away upwards; start a
+thousand below, at \num{9000}, and it runs away downwards, to zero, paid off
+after \val{ch02.loan.payoff} months, about \val{ch02.loan.years} years.
 
 \begin{trapbox}
 \textbf{\enquote{A fixed point is where the system ends up.}} It is where
 the system stays if it is exactly there. Whether a system near it moves
-towards it or away from it is a separate question, and the loan's fixed
-point pushes every other balance away. A fixed point that draws nearby
-states in is \emph{stable}; one that pushes them out is \emph{unstable}.
-Finding a fixed point tells you where to look. Only its stability tells you
-whether anything will be found there.
+towards it or away is a separate question, and the loan's fixed point
+pushes every other balance away. A fixed point that draws nearby states in
+is \emph{stable}; one that pushes them out is \emph{unstable}. Finding a
+fixed point tells you where to look; only its stability tells you whether
+anything will be there.
 \end{trapbox}
 
 \noindent
-The difference between the tablets and the loan is one number. Take any
-linear rule with a fixed point $x^{*}$ and follow the gap between a state
-$x$ and $x^{*}$ through one step:
+The difference is one number. Follow the gap between a state $x$ and the
+fixed point $x^{*}$ through one step:
 \[ f(x) - x^{*} = (a\,x + b) - (a\,x^{*} + b) = a\,(x - x^{*}) . \]
-The first equals sign uses the fact that $x^{*}$ is fixed, so that
-$a\,x^{*} + b$ is $x^{*}$ itself. The $b$ cancels, and what is left says:
-\textbf{each step multiplies the gap by $a$}. For the tablets $a =
-\num{0.5}$ and the gap halves; for the loan $a = \num{1.01}$ and the gap
-grows by 1 per cent a month; for the tea $a = \num{0.9}$, which is why the
-two cups of Chapter~\ref{ch:models} drew closer by a tenth every minute.
+The first equals sign uses the fact that $x^{*}$ is fixed, so $a\,x^{*} +
+b$ is $x^{*}$ itself. The $b$ cancels, and what is left says: \textbf{each
+step multiplies the gap by $a$}. The tablets halve it; the loan grows it by
+1 per cent a month; the tea, with $a = \num{0.9}$, is why the two cups of
+Chapter~\ref{ch:models} drew closer by a tenth every minute.
 
 What matters is the size of $a$, written $\abs{a}$, which ignores its sign:
 $\abs{\num{-0.5}} = \num{0.5}$. If $\abs{a}$ is below 1 the gap shrinks and
-the fixed point is stable; if it is above 1 the gap grows and the fixed
-point is unstable. The sign says only whether the gap keeps its side or
-flips.
+the fixed point is stable; above 1 it grows and the fixed point is
+unstable. The sign says only whether the gap keeps its side or flips.
 
 You have felt a negative $a$ in a hotel shower. You want 38 degrees, the
-water is at 30, and the tap responds slowly, so you overdo it: each turn of
-the tap moves the temperature by one and a half times the error, in the
-opposite direction. The rule is $x \mapsto x - \num{1.5}(x - 38)$, which is
-$x \mapsto \num{-0.5}\,x + 57$. From 30 you go to 42, then 36, then 39, then
-\num{37.5}: too hot, too cold, too hot, each miss half the last. Jerk the
-tap harder, by two and a half times the error, and $a = \num{-1.5}$: from
-30 to 50, then 20, then 65, scalding and freezing by turns and worse every
-time. Here is the whole story in one table.
+water is at 30, and the tap is slow, so you overdo it: each turn moves the
+temperature by one and a half times the error, the other way. The rule is
+$x \mapsto x - \num{1.5}(x - 38)$, which is $x \mapsto \num{-0.5}\,x + 57$.
+From 30 you go to 42, 36, 39, \num{37.5}: too hot, too cold, too hot, each
+miss half the last. Jerk the tap by two and a half times the error and $a =
+\num{-1.5}$: 30, 50, 20, 65, worse every time.
 
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}lXX@{}}
@@ -396,20 +362,18 @@ the multiplier $a$ & a nudge away from $x^{*}$ & the orbit \\
 \midrule
 above $1$ & grows & runs away, on one side \\
 between $0$ and $1$ & shrinks & creeps in, from one side \\
-between $-1$ and $0$ & shrinks, flipping side & settles, overshooting every
-time \\
+between $-1$ and $0$ & shrinks, flipping side & settles, overshooting \\
 below $-1$ & grows, flipping side & runs away, swinging wider \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
 \begin{lab}{l02_02_fixed}{Where does it stop, and does it stay?}
-For the rule $x \mapsto a\,x + b$, write \code{fixed\_point}, which solves
-$x = a\,x + b$; \code{is\_stable}, which decides whether a nudge away from
-the fixed point shrinks (you may decide it by experiment: start a little
-off, take one step, compare the gaps); and \code{steps\_to\_settle}, which
-counts the steps until an orbit is within a tolerance of its fixed point.
-The tests use the tablets, the tea, the loan and the shower.
+For the rule $x \mapsto a\,x + b$, write \code{fixed\_point};
+\code{is\_stable}, which decides whether a nudge away from the fixed point
+shrinks (by experiment, if you like: start a little off, take one step,
+compare the gaps); and \code{steps\_to\_settle}. The tests use the tablets,
+the tea, the loan and the shower.
 \end{lab}
 
 \section{The slope: how much a nudge is multiplied}
@@ -417,57 +381,50 @@ The tests use the tablets, the tea, the loan and the shower.
 \index{slope}
 
 \noindent
-The multiplier $a$ has a second name, and it is the one the rest of the
-book uses. Draw the rule as a graph: the state now along the bottom, the
-next state up the side. For the tablets that is the straight line
-$y = \num{0.5}\,x + 100$, where $y$ is the height of the line above $x$.
-Move along the bottom from 150 to 151, one unit, and the line rises from
-175 to \num{175.5}, half a unit. The \emph{slope} of a graph at a point is
-exactly this: \textbf{how far the output moves for each unit the input
-moves}. A straight line has the same slope everywhere, and for
-$x \mapsto a\,x + b$ that slope is $a$.
-
-So the stability rule of the last section can be said in the words the rest
-of the book uses: \emph{a small error is multiplied by the slope at every
-step}. A slope smaller than 1 in size and errors die; larger, and they
-grow.
+The multiplier $a$ has a second name, which the rest of the book uses. Draw
+the tablets' rule as a graph, the state now along the bottom and the next
+state up the side: the straight line $y = \num{0.5}\,x + 100$. Move along
+the bottom from 150 to 151, one unit, and the line rises from 175 to
+\num{175.5}, half a unit. The \emph{slope} of a graph at a point is exactly
+this: \textbf{how far the output moves for each unit the input moves}. A
+straight line has the same slope everywhere, and for $x \mapsto a\,x + b$
+that slope is $a$. So the last section's finding, in the words the rest of
+the book uses, is that \emph{a small error is multiplied by the slope at
+every step}.
 
 A curve has a slope too, but it differs from point to point, as a hill is
-steep in one place and nearly flat in another. You can still measure it at
-a point, by nudging. Move the input a tiny amount $h$ to either side of
-$x$, see how far the output moves, and divide:
-\[ \text{slope at } x \approx \frac{f(x + h) - f(x - h)}{2h} . \]
-The sign $\approx$ means \enquote{very nearly equal}, and in
-\pkg{chaoslab}'s function \code{slope} the nudge $h$ is one millionth.
-Nothing new is hidden in it: it is the rise divided by the run, for a run
-so short that the curve has no room to bend.
+steep in one place and nearly flat in another. You measure it at a point by
+nudging: move the input a tiny amount $h$ either side of $x$, see how far
+the output moves, and divide,
+\[ \text{slope at } x \approx \frac{f(x + h) - f(x - h)}{2h} , \]
+where $\approx$ means \enquote{very nearly equal}. In \pkg{chaoslab}'s
+\code{slope} the nudge $h$ is one millionth: rise over run, for a run too
+short for the curve to bend.
 
-\pyregion{code/ch02/slope.py}{measure}{Measuring the slope by nudging, on a straight line and on a curve}{lst:ch02-slope}
+\pyregion{code/ch02/slope.py}{measure}{The slope measured by nudging, on a line and on a curve}{lst:ch02-slope}
 
 \transcript{ch02-slope}
 
 \noindent
-The line's slope is \num{0.5} wherever you measure it. The curved rule
-$x \mapsto x \times x$ is steeper the further right you go.
+The line's slope is \num{0.5} wherever you measure it; the curved rule
+$x \mapsto x \times x$ gets steeper the further right you go.
 
 \begin{think}
-The square rule has slope $3$ at \num{1.5}. Suppose you meant to feed it
-\num{1.5} but fed it \num{1.501}, an error of \num{0.001}. Roughly how wrong
-is the output?
+The square rule has slope $3$ at \num{1.5}. You meant to feed it \num{1.5}
+but fed it \num{1.501}, an error of \num{0.001}. Roughly how wrong is the
+output?
 \end{think}
 \reveal{By about \num{0.003}: the error is multiplied by the slope.
 Exactly, $\num{1.501} \times \num{1.501} - \num{2.25} =
 \val{ch02.nudge.exact}$.}
-That is the fact behind the two cups and behind every gap in this chapter,
-now on a curve: an error is multiplied by the slope at the place where it
-happens to be. On a straight line the factor never changes, which is why
-this whole chapter could be foreseen without iterating. On the square rule
-it does: between $0$ and \num{0.5} the slope is below 1 and errors shrink,
-beyond \num{0.5} it is above 1 and they grow. So here is a question this
-chapter cannot answer. What does an orbit do if its rule is curved, so
-that it keeps passing from places that shrink errors to places that
-stretch them? A straight line never does that, and nothing you have learned
-so far says. Chapter~\ref{ch:feedback} bends the line, and
+That is the fact behind every gap in this chapter, now on a curve: an error
+is multiplied by the slope where it happens to be. On a line that factor
+never changes, which is why this chapter can foresee everything. On the
+square rule it does: between $0$ and \num{0.5} the slope is below 1 and
+errors shrink, beyond \num{0.5} it is above 1 and they grow. So here is a
+question this chapter cannot answer. What does an orbit do if its rule is
+curved, so that it keeps passing from places that shrink errors to places
+that stretch them? Chapter~\ref{ch:feedback} bends the line, and
 Chapter~\ref{ch:logistic} follows an orbit that does exactly this.
 
 \section{Seeing it: the cobweb diagram}
@@ -475,93 +432,84 @@ Chapter~\ref{ch:logistic} follows an orbit that does exactly this.
 \index{cobweb diagram}
 
 \noindent
-There is a way to watch iteration happen on the rule's own graph, with a
-pencil and no arithmetic. Draw the rule's line, and draw the diagonal
-$y = x$, whose height is always equal to its position along the bottom.
-Then:
+You can watch iteration happen on the rule's own graph, with a pencil and
+no arithmetic. Draw the rule's line and the diagonal $y = x$, whose height
+always equals its position along the bottom. Then:
 
 \begin{enumerate}
-\item Start at $x_0$ on the bottom axis and go straight up, or down, to the
-  rule's line. The height you reach is $x_1$.
-\item To use $x_1$ as the next input you need it back along the bottom. Go
-  straight across to the diagonal: there, position equals height, so you
-  are now standing above $x_1$.
-\item Go up or down to the line again, and the height is $x_2$. Across to
-  the diagonal, to the line, and so on.
+\item From $x_0$ on the bottom axis, go up or down to the rule's line. The
+  height you reach is $x_1$.
+\item Go straight across to the diagonal. There height equals position, so
+  you are now standing above $x_1$, ready to use it as the next input.
+\item Up or down to the line again gives $x_2$; across, and so on.
 \end{enumerate}
 
 \noindent
-The corners of the path are the orbit, drawn. The function \code{cobweb}
-in \pkg{chaoslab} lists them, and for the tablets, starting from nothing in
-the blood, the first few are these:
+The corners of the path are the orbit, drawn. \pkg{chaoslab}'s
+\code{cobweb} lists them; for the tablets, starting from an empty
+bloodstream:
 
 \pyregion{code/ch02/cobweb_steps.py}{corners}{The corners of the cobweb for the tablets}{lst:ch02-cobweb}
 
 \transcript{ch02-cobweb}
 
 \noindent
-Every corner on the diagonal has the same number twice, and those numbers
-are the orbit: $0$, $100$, $150$, $175$. The path can come to rest only
-where the rule's line crosses the diagonal, because there the height of the
-line equals its position, $x = f(x)$: the crossing is the fixed point, seen.
+Each corner on the diagonal carries one number of the orbit, twice: $0$,
+$100$, $150$, $175$. The path can come to rest only where the line crosses
+the diagonal, because there $x = f(x)$: the crossing is the fixed point,
+seen.
 
 \begin{think}
 The loan's line, $y = \num{1.01}\,x - 100$, is steeper than the diagonal.
 Starting a little to one side of the crossing, does the path climb into the
 crossing or away from it?
 \end{think}
-\reveal{Away. The rule multiplies the gap to the crossing by \num{1.01}, so
-each step lands a little further out than the last, on whichever side it
+\reveal{Away. Each step multiplies the gap to the crossing by \num{1.01}, so
+the path lands a little further out every time, on whichever side it
 started.}
 
-\plotfig{ch02-cobweb}{Cobwebs on three lines that all cross the diagonal at
-$200$. A slope below one in size draws a path into the crossing \dash{} a
-staircase if the slope is positive, a web if it is negative \dash{} and a
+\plotfig{ch02-cobweb}{Cobwebs on three lines that cross the diagonal at
+$200$. A slope below one in size draws the path into the crossing \dash{}
+a staircase if the slope is positive, a web if it is negative \dash{} and a
 slope above one draws it out.}{a cobweb on a line}
 
 \noindent
-When the slope is negative the path winds round the crossing, and it is
-that web which gives the diagram its name. The three panels are the table
-of the last section, drawn.
+When the slope is negative the path winds round the crossing, and that web
+gives the diagram its name. The three panels are the last section's table,
+drawn.
 
-Put the chapter together and you have something rare in this book:
-complete foresight. Given any rule of the form $x \mapsto a\,x + b$ and a
-start, you can now say, without taking a single step, what it will do for
-ever. Its fixed point is $b/(1 - a)$. The gap to that point is multiplied
-by $a$ every step, so it shrinks if $\abs{a} < 1$ and grows if
-$\abs{a} > 1$, keeping its side if $a$ is positive and flipping if $a$ is
-negative, and a logarithm says how many steps any change will take. Run a
-straight-line rule a million times and nothing in the orbit is a surprise.
-That certainty is what the rest of the book takes away. Bend the line, so
-that the slope differs from place to place, and a rule one line long can do
-things no formula in this chapter foresees. Chapter~\ref{ch:feedback} makes
-the first bend.
+So you have something rare in this book: complete foresight. Given
+$x \mapsto a\,x + b$ and a start, you can say without taking a step what it
+will do for ever: settle at $b/(1 - a)$ if $\abs{a} < 1$, run away if
+$\abs{a} > 1$, alternate if $a$ is negative, and a logarithm says how long
+any change will take. That certainty is what the rest of the book takes
+away. Bend the line, so that the slope differs from place to place, and a
+rule one line long can do things no formula here foresees.
+Chapter~\ref{ch:feedback} makes the first bend.
 
 \begin{summarybox}
 \begin{itemize}
-\item A \textbf{rule of the next step} turns the state now into the next
-  state, $x_{n+1} = f(x_n)$. Applying it again and again is
-  \textbf{iteration}, and the list of states it produces is the
-  \textbf{orbit}.
-\item Savings, cooling, dosing and simple populations all follow a
-  \textbf{linear rule}, $x \mapsto a\,x + b$, whose three fates are to grow
-  without bound, shrink to nothing, or settle; a negative $a$ makes the
-  orbit \textbf{alternate}.
-\item Growth by a fixed fraction is \textbf{exponential}: proportional, and
-  not necessarily fast. The \textbf{logarithm} answers \enquote{how many
-  steps until}: changing by a factor $r$ takes $\ln r / \ln a$ steps, which
-  gives the doubling time and the half-life.
-\item A \textbf{fixed point} is a state the rule leaves unchanged; solve
-  $x = f(x)$. For a linear rule it is $b/(1 - a)$.
-\item Each step multiplies the gap to the fixed point by $a$. The fixed
-  point is \textbf{stable} if $\abs{a} < 1$ and \textbf{unstable} if
-  $\abs{a} > 1$, and nothing ends up at an unstable one.
+\item A \textbf{rule of the next step} turns the state now into the next,
+  $x_{n+1} = f(x_n)$. Repeating it is \textbf{iteration}; the list of
+  states is the \textbf{orbit}.
+\item Savings, cooling, dosing and simple populations follow a
+  \textbf{linear rule}, $x \mapsto a\,x + b$: it grows without bound,
+  shrinks to nothing, or settles, and a negative $a$ makes it
+  \textbf{alternate}.
+\item \textbf{Exponential} growth is proportional, not necessarily fast.
+  The \textbf{logarithm} says how many steps a change by a factor $r$
+  takes, $\ln r / \ln a$: the doubling time and the half-life.
+\item A \textbf{fixed point} is a state the rule leaves unchanged: solve
+  $x = f(x)$, which for a linear rule gives $b/(1 - a)$.
+\item Each step multiplies the gap to the fixed point by $a$: it is
+  \textbf{stable} if $\abs{a} < 1$ and \textbf{unstable} if $\abs{a} > 1$,
+  and nothing ends up at an unstable one.
 \item The \textbf{slope} is how far the output moves per unit the input
-  moves, and it is the factor a small error is multiplied by in one step. A
-  line has one slope everywhere; a curve has a different one at each point.
-\item The \textbf{cobweb diagram} draws an orbit on the rule's own graph.
-  On a line it closes in on the crossing with the diagonal when the slope
-  is below one in size, and leaves it when the slope is above.
+  moves: the factor a small error is multiplied by in one step. A line has
+  one slope; a curve, a different one at each point.
+\item The \textbf{cobweb diagram} draws an orbit on the rule's graph; on a
+  line it closes in on the crossing with the diagonal when the slope is
+  below one in size.
 \end{itemize}
 \end{summarybox}
 
@@ -570,34 +518,24 @@ the first bend.
 \begin{checkpoint}
 \item For the rule $x \mapsto 3x - 2$, starting from $x_0 = 2$, what are
   $x_1$, $x_2$ and $x_3$?
-  \answerto{$4$, $10$ and $28$: three times $2$ less two is $4$, three
-  times $4$ less two is $10$, and three times $10$ less two is $28$.}
+  \answerto{$4$, $10$ and $28$.}
 \item Tea loses a fifth of its gap to a room at 20 degrees every minute.
   Write its rule in the form $x \mapsto a\,x + b$.
   \answerto{$x \mapsto x - \num{0.2}(x - 20)$, which is
-  $\num{0.8}\,x + 4$: so $a = \num{0.8}$ and $b = 4$.}
-\item A town grows by 3 per cent a year. Use the rule of 70 to estimate how
-  long its population takes to double, and say what counting whole years
-  gives.
-  \answerto{About $70 / 3$, which is 23 years. Counting whole years, the
-  population first passes double in year \val{ch02.dbl.three.count}; the
-  logarithm says \val{ch02.dbl.three.log}.}
+  $\num{0.8}\,x + 4$.}
+\item A town grows by 3 per cent a year. Estimate its doubling time with
+  the rule of 70, then say what counting whole years gives.
+  \answerto{About $70 / 3$, which is 23 years. Counting, it first passes
+  double in year \val{ch02.dbl.three.count}; the logarithm says
+  \val{ch02.dbl.three.log}.}
 \item Find the fixed point of $x \mapsto \num{0.8}\,x + 4$. Is it stable?
-  \answerto{$x = \num{0.8}\,x + 4$ gives $\num{0.2}\,x = 4$, so $x = 20$,
-  the room's temperature. It is stable, because $\abs{\num{0.8}} < 1$.}
-\item The rule $x \mapsto 3x - 2$ has a fixed point at $1$. Is it stable,
-  and what does the first question show you?
-  \answerto{Unstable: $a = 3$, so every step triples the gap. The orbit
-  from $2$ starts one away from the fixed point and is then $3$, $9$ and
-  $27$ away: $4$, $10$, $28$.}
+  \answerto{$\num{0.2}\,x = 4$, so $x = 20$, the room's temperature; stable,
+  because $\abs{\num{0.8}} < 1$.}
+\item The rule $x \mapsto 3x - 2$ has a fixed point at $1$. Is it stable?
+  What does the first question show?
+  \answerto{Unstable: every step triples the gap. The orbit from $2$ is one
+  away, then $3$, $9$ and $27$ away: $4$, $10$, $28$.}
 \item The shower rule $x \mapsto \num{-0.5}\,x + 57$ has slope \num{-0.5}.
-  You are 2 degrees too cold. How far off are you after one turn of the
-  tap, and on which side?
-  \answerto{1 degree too hot: the error is multiplied by \num{-0.5}, which
-  halves it and flips its side.}
-\item In a cobweb diagram, what shape does the path make when the rule's
-  slope is between $-1$ and $0$, and where does it end up?
-  \answerto{It winds round the point where the line crosses the diagonal,
-  in a shrinking spiral of corners, and closes in on that crossing, which
-  is the fixed point.}
+  You are 2 degrees too cold. Where are you after one turn of the tap?
+  \answerto{1 degree too hot: the error is halved and flipped.}
 \end{checkpoint}

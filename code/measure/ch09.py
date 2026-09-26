@@ -1,4 +1,4 @@
-"""Chapter 9's numbers: Lorenz's still points, the butterfly, two runs a
+"""Chapter 9's numbers: Lorenz's fixed points, the butterfly, two runs a
 hair apart, the exponent of the flow, and two statistics of the attractor.
 
 Every run here uses only +, -, * and / (and one sqrt per distance), so the
@@ -35,13 +35,13 @@ def away_from_rounding(x: float, digits: int) -> None:
     assert abs(scaled - math.floor(scaled) - 0.5) > 1e-6, x
 
 
-# The still points. The rest state and two steady rolls, x = y = +-sqrt(72),
+# The fixed points. The rest state and two steady rolls, x = y = +-sqrt(72),
 # z = 27: every rate is exactly zero there (8/3 * 27 = 72).
 xy = math.sqrt(BETA * (RHO - 1))
 field = lorenz()
 for s in [(0.0, 0.0, 0.0), (xy, xy, RHO - 1), (-xy, -xy, RHO - 1)]:
     assert all(abs(r) < 1e-12 for r in field(s)), s
-v.num("still.xy", xy, ".2f")
+v.num("fixed.xy", xy, ".2f")
 
 # The run from (1, 1, 1): how many loops on the left wing before the first
 # flip to the right (the first letter is the start's own rise, skipped).

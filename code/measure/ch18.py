@@ -36,6 +36,8 @@ lam_henon = henon_exponent()
 lam_lorenz = lorenz_exponent()
 assert abs(lam - math.log(2)) < 0.005, "the logistic map at r = 4: ln 2"
 v.num("lam.logistic", lam, ".3f")
+v.num("ln.two", math.log(2), ".3f")
+assert format(math.log(2), ".3f") == format(lam, ".3f")
 v.num("lam.henon", lam_henon, ".3f")
 v.num("lam.lorenz", lam_lorenz, ".3f")
 

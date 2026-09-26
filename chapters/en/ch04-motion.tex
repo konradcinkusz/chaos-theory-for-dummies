@@ -256,7 +256,7 @@ to predict it first.
 \index{phase space}\index{phase portrait}\index{pendulum}
 
 \noindent
-The left half of that figure is a new kind of picture. It plots nothing
+The left half of Figure~\ref{fig:ch04-euler-rk4} is a new kind of picture. It plots nothing
 against time. Each point in it is a whole state of the spring, a position and
 a velocity together, and the motion is a path from point to point. A plane of
 every possible state is called a \emph{phase space}, and a drawing of the
@@ -340,7 +340,7 @@ down, at rest.}
 A state that nearby paths all run into is an \emph{attractor}. The damped
 pendulum's resting point is the simplest kind. There is a second kind: a loop
 that paths run into. The Dutch engineer Balthasar van der Pol wrote down the
-classic example in the 1920s, for circuits built with radio valves. Its rule
+classic example about a century ago, for circuits built with radio valves. Its rule
 is the spring's with an extra push:
 \[ x \text{ changes at the rate } v, \qquad
    v \text{ changes at the rate } -x + (1 - x \times x)\, v. \]
@@ -349,7 +349,8 @@ them it brakes it. Start near the middle, at \val{ch04.vdp.start.in}, and the
 swing grows; start far out, at \val{ch04.vdp.start.out}, and it shrinks. After
 \val{ch04.vdp.time} seconds both are swinging out to \val{ch04.vdp.reach.in}
 and \val{ch04.vdp.reach.out}: the same loop, reached from inside and from
-outside. A pendulum clock is one of these: its mechanism gives the pendulum a
+outside. A loop that attracts is a \emph{limit cycle}. A pendulum clock is
+one: its mechanism gives the pendulum a
 small kick every swing, friction takes energy away, and the swing settles to
 one size however hard you started it.
 
@@ -387,7 +388,7 @@ under itself, and nothing fences it in.
 \noindent
 So chaos in continuous time needs at least three numbers of state. That is
 why the weather model of Chapter~\ref{ch:lorenz}, which Edward Lorenz cut
-down in 1963 from a larger model of the atmosphere, has three numbers and not
+down in 1963 from a larger model of convection, has three numbers and not
 two: with two it could not do what it does.
 
 \begin{think}
@@ -463,7 +464,7 @@ change followed in small steps has made a prediction and been right.
 \noindent
 That is the clockwork at its best: a rule of change, a computer taking small
 steps, and a prediction that comes back on schedule to every digit it prints.
-Part~II asks what happens when the rule is just as exact and the future is
+Part~II asks what happens when the rule is every bit as exact and the future is
 not.
 
 \begin{summarybox}
