@@ -49,7 +49,6 @@ rs = forks()
 assert rs[0] < 3.0, "watching settles too slowly: the first fork reads early"
 v.num("fork.one", rs[0], ".4f")
 v.num("fork.two", rs[1], ".4f")
-v.num("fork.three", rs[2], ".4f")
 v.num("fork.four", rs[3], ".4f")
 # The ratios of the gaps AS PRINTED, so a reader who divides the printed
 # gaps gets the printed ratio.
@@ -84,7 +83,6 @@ assert found[0] == 2.0 or abs(found[0] - 2.0) < 1e-15
 assert abs(from_top(logistic(2.0), 1)) == 0.0
 assert abs(found[1] - (1 + math.sqrt(5))) < 1e-12   # where 4 + 2r - r*r = 0
 v.num("super.two", found[1], ".4f")
-v.num("super.four", found[2], ".4f")
 v.num("landmark.count", len(found))
 delta = ratios(found)[-1]
 assert abs(delta - 4.6692016) < 1e-5
@@ -107,14 +105,14 @@ assert abs(sine_ratios[-1] - delta) < 1e-3
 v.num("sine.first", sine_ratios[0], ".2f")
 v.num("sine.delta", sine_ratios[-1], ".2f")
 sine_end = sine[-1] + (sine[-1] - sine[-2]) / (sine_ratios[-1] - 1)
-clear_of_boundary(sine_end, 3)
-v.num("sine.end", sine_end, ".3f")
+clear_of_boundary(sine_end, 4)
+v.num("sine.end", sine_end, ".4f")
 
 # --- the period-three window -----------------------------------------------
 opens = 1 + math.sqrt(8)
 assert settled_period(opens - 1e-4) is None
 assert settled_period(opens + 1e-4) == 3
-v.num("window.open", opens, ".4f")
+v.num("window.open", opens, ".5f")
 window = landmarks(logistic, (3.82, 3.84), (3.84, 3.848), 9, base=3)
 v.num("super.three", window[0], ".4f")
 v.num("window.delta", ratios(window)[-1], ".3f")

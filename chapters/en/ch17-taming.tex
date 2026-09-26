@@ -182,7 +182,7 @@ per cent, and prints the state now and then.
 Once the orbit is caught, how big must the nudges be to keep it there: as big
 as the first one, bigger because the chaos keeps pushing back, or smaller?
 \end{think}
-\reveal{Smaller, and then almost nothing. \val{ch17.settle} steps after the
+\reveal{Smaller, and then almost nothing. Within \val{ch17.settle} steps of the
 catch every nudge is below a billionth of $r$, and all the nudges of the run,
 added together, come to \val{ch17.total}.}
 
@@ -421,7 +421,7 @@ for living with both.
   Where does one uncontrolled step put it, and what change of $r$ cancels the
   miss?
   \answerto{About \num{0.0038} above it. Lower $r$ by about
-  $\num{0.0038} / \num{0.19}$, that is by \num{0.02}, for that one step.}
+  $\num{0.0038} / \val{ch17.lever}$, that is by \num{0.02}, for that one step.}
 \item Why can a controller steer a chaotic system when nobody can forecast
   it far ahead?
   \answerto{Because the controller needs to predict only one step ahead, and

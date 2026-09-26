@@ -1,0 +1,4 @@
+r = 1.5: at x = 0.0000 the slope is  1.500
+r = 1.5: at x = 0.3333 the slope is  0.500
+r = 2.0: at x = 0.0000 the slope is  2.000
+r = 2.0: at x = 0.5000 the slope is  0.000

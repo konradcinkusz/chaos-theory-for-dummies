@@ -1,0 +1,6 @@
+released at   one swing out and back
+     5 deg       2.007 s
+    10 deg       2.010 s
+    45 deg       2.086 s
+    90 deg       2.368 s
+   170 deg       4.894 s

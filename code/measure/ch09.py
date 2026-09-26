@@ -49,8 +49,6 @@ seq = loops(path[100:])
 first_run = len(seq) - len(seq.lstrip("L"))
 assert seq[first_run] == "R" and first_run > 10
 v.num("loops.left", first_run)
-v.num("loops.total", len(seq))
-v.num("loops.time", len(path[100:]) // 100)
 
 # Turn the heating down to 20 and the same start settles on a steady roll.
 rest = integrate(lorenz(rho=20.0), (1.0, 1.0, 1.0), DT, 10_000)[-1]
@@ -85,17 +83,19 @@ for lam in lams:
 v.num("lambda.lo", min(lams), ".2f")
 v.num("lambda.hi", max(lams), ".2f")
 v.num("lambda", 0.9, ".1f")
+# The page divides the printed ln(10^8) by the printed 0.9, so the horizon
+# is committed at a precision that division reproduces.
+v.num("ln.eight", math.log(1e8), ".1f")
+v.num("stretch", math.exp(0.9), ".1f")
 hor = horizon(0.9, 1e-8, 1.0)
-v.num("horizon", hor, ".1f")
+assert round(hor) == round(round(math.log(1e8), 1) / 0.9)
+v.num("horizon", hor, ".0f")
 assert min(times) < hor < max(times)
 v.num("gain.thousand", horizon(0.9, 1e-3, 1.0), ".0f")
 
 # The cloud: eight far-away corners, all living in the same room.
+# (Checked against the long run's room further down.)
 rooms = [room(c) for c in corners]
-v.num("cloud.x", max(r[0] for r in rooms), ".0f")
-v.num("cloud.zlo", min(r[1] for r in rooms), ".0f")
-v.num("cloud.zhi", max(r[2] for r in rooms), ".0f")
-assert max(r[0] for r in rooms) < 20 and min(r[1] for r in rooms) > 0
 
 # Statistics that do not care about the start: 500 time units from each of
 # the listing's five starts, and then 2000 to show the spread shrinking.
@@ -119,6 +119,13 @@ assert max(heights) - min(heights) < 0.2
 long = integrate(field, (1.0, 1.0, 1.0), DT, 2_001_000)[1000:-1]
 right = [1 if p[0] > 0 else 0 for p in long]
 v.num("long.time", len(right) // 100)
+# The room the long run lives in, rounded outwards.
+v.num("long.x", math.ceil(max(abs(p[0]) for p in long)))
+v.num("long.zlo", math.floor(min(p[2] for p in long)))
+v.num("long.zhi", math.ceil(max(p[2] for p in long)))
+assert max(r[0] for r in rooms) < max(abs(p[0]) for p in long)
+assert min(r[1] for r in rooms) > min(p[2] for p in long)
+assert max(r[2] for r in rooms) < max(p[2] for p in long)
 v.num("long.frac", sum(right) / len(right), ".2f")
 
 

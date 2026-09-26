@@ -38,8 +38,9 @@ def control(lang: str):
     top.plot(steps, xs, "o", ms=1.6, color=BLUE)
     for ax in (top, bottom):
         ax.axvline(ON, color=RED, lw=0.7)
-    top.text(ON + 4, 0.08, T(lang, "controller on", "sterowanie włączone"),
-             color=RED, fontsize=8)
+    bottom.text(ON + 4, 0.45, T(lang, "controller on",
+                                "sterowanie włączone"),
+                color=RED, fontsize=8)
     top.set_ylabel("x")
     top.set_ylim(0, 1)
     bottom.plot(steps, pct, "-", color=RED, lw=0.8)

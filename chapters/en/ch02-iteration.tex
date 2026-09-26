@@ -218,9 +218,7 @@ the number of steps is the logarithm of how far you want to go, divided by
 the logarithm of one step. With $\ln 2 = \val{ch02.ln.two}$ and
 $\ln \num{1.07} = \val{ch02.ln.seven}$, that is \val{ch02.dbl.seven.log}.
 
-\pyregion{code/ch02/doubling.py}{count}{How long until a balance doubles, two ways}{lst:ch02-doubling}
-
-\pyregion{code/ch02/doubling.py}{table}{The doubling-time table}{lst:ch02-table}
+\pyregion{code/ch02/doubling.py}{count}{How long until a balance doubles, counted and by the logarithm}{lst:ch02-doubling}
 
 \transcript{ch02-doubling}
 
@@ -229,9 +227,9 @@ The count is the logarithm rounded up. At 2 per cent that is
 \val{ch02.dbl.two.log} against \val{ch02.dbl.two.count}: after 35 years
 the balance is \val{ch02.dbl.two.short} times what went in, a hair short of
 double. The last column, the \emph{rule of 70}, divides 70 by the
-percentage; it works because $\ln a$ is close to a small rate itself
-($\ln \num{1.07}$ is nearly \num{0.07}) and $100 \times \ln 2$ is about
-70.
+percentage; it works because the logarithm of one step is close to a
+small rate itself ($\ln \num{1.07}$ is nearly \num{0.07}) and
+$100 \times \ln 2$ is about 70.
 
 Shrinking works the same way. A drug of which the body clears a fifth every
 hour keeps \num{0.8} each hour, and the time until half is left, its

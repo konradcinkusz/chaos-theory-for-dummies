@@ -1,0 +1,7 @@
+start            (  0.0,   0.0)
+to the line      (  0.0, 100.0)
+to the diagonal  (100.0, 100.0)
+to the line      (100.0, 150.0)
+to the diagonal  (150.0, 150.0)
+to the line      (150.0, 175.0)
+to the diagonal  (175.0, 175.0)

@@ -1,0 +1,4 @@
+r = 3.9: 100001 values, 100001 different
+         same start again, same list: True
+r = 4.0: 100001 values, 100001 different
+         same start again, same list: True

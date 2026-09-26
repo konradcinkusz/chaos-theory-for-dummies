@@ -59,7 +59,7 @@ def _window(box: tuple[float, float, float, float], orbits: int,
 
 @plot("ch10-square-folds")
 def square_folds(lang: str):
-    fig, axes = new(height=4.4, ncols=3, nrows=2, sharex=True, sharey=True)
+    fig, axes = new(height=3.5, ncols=3, nrows=2, sharex=True, sharey=True)
     g = np.linspace(-0.6, 0.6, 260)
     x, y = np.meshgrid(g, g)
     x, y = x.ravel(), y.ravel()

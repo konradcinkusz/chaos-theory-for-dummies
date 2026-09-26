@@ -1,0 +1,38 @@
+[
+  {
+    "n": 51,
+    "label": "sec:ch05-knob",
+    "en": {
+      "habit": "A simple rule gives simple behaviour.",
+      "truth": "One line of arithmetic, $x_{n+1} = r\\,x_n\\,(1 - x_n)$, gives a steady state, cycles and orbits that never repeat as the single knob $r$ is turned. How complicated behaviour looks says very little about how complicated its rule is."
+    },
+    "pl": {
+      "habit": "Prosta reguła daje proste zachowanie.",
+      "truth": "Jedna linijka arytmetyki, $x_{n+1} = r\\,x_n\\,(1 - x_n)$, daje stan ustalony, cykle i orbity, które nigdy się nie powtarzają, gdy kręci się jedynym pokrętłem $r$. To, jak skomplikowane wydaje się zachowanie, mało mówi o tym, jak skomplikowana jest reguła."
+    }
+  },
+  {
+    "n": 52,
+    "label": "sec:ch05-period",
+    "en": {
+      "habit": "If it has not repeated after a thousand steps, it is about to.",
+      "truth": "At $r = \\num{3.9}$ no cycle pulls the orbit in: in a hundred thousand steps of the logistic map not one value comes back, and a longer run only produces more values never seen before."
+    },
+    "pl": {
+      "habit": "Skoro nie powtórzyło się po tysiącu kroków, to zaraz się powtórzy.",
+      "truth": "Przy $r = \\num{3.9}$ żaden cykl nie przyciąga orbity: w stu tysiącach kroków odwzorowania logistycznego nie wraca ani jedna wartość, a dłuższy przebieg daje tylko więcej wartości, których wcześniej nie było."
+    }
+  },
+  {
+    "n": 53,
+    "label": "sec:ch05-may",
+    "en": {
+      "habit": "Irregular output needs a random or complicated cause.",
+      "truth": "A simple deterministic rule with no randomness in it can produce output as irregular as chance. The output alone does not say which of the two made it; that was May's 1976 warning to ecologists."
+    },
+    "pl": {
+      "habit": "Nieregularny wynik wymaga przypadkowej albo skomplikowanej przyczyny.",
+      "truth": "Prosta reguła deterministyczna bez żadnej losowości może dawać wynik równie nieregularny jak przypadek. Sam wynik nie mówi, co go wytworzyło; to była przestroga, którą May w 1976 roku skierował do ekologów."
+    }
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "n": 41,
+    "label": "sec:ch04-euler",
+    "en": {
+      "habit": "A smaller step makes a simulation right.",
+      "truth": "It makes it right for longer. A stepping method's error is made fresh at every step and piles up: Euler with steps ten times smaller gains the same energy on a spring, ten times later."
+    },
+    "pl": {
+      "habit": "Mniejszy krok sprawia, że symulacja jest poprawna.",
+      "truth": "Sprawia, że jest poprawna dłużej. Błąd metody krokowej powstaje przy każdym kroku i się piętrzy: Euler z krokami dziesięć razy mniejszymi zyskuje na sprężynie tyle samo energii, tylko dziesięć razy później."
+    }
+  },
+  {
+    "n": 42,
+    "label": "sec:ch04-settle",
+    "en": {
+      "habit": "A pendulum is a simple system, so its motion must be simple.",
+      "truth": "One pendulum has two numbers of state, and a smooth rule in a plane can only settle, cycle or run off. Hang a second from it and the state has four numbers, and the motion can be chaotic."
+    },
+    "pl": {
+      "habit": "Wahadło to prosty układ, więc jego ruch musi być prosty.",
+      "truth": "Jedno wahadło ma dwie liczby stanu, a gładka reguła na płaszczyźnie może się tylko zatrzymać, krążyć albo uciec. Zawieś na nim drugie, a stan ma cztery liczby i ruch może być chaotyczny."
+    }
+  },
+  {
+    "n": 43,
+    "label": "sec:ch04-phase",
+    "en": {
+      "habit": "A pendulum's swing takes the same time however far it swings.",
+      "truth": "Only for small swings. A one-metre pendulum released at 90 degrees takes about 18 per cent longer than one released at 10, and near the upside-down position the swing time grows without limit."
+    },
+    "pl": {
+      "habit": "Wahnięcie wahadła trwa tyle samo, niezależnie od wychylenia.",
+      "truth": "Tylko przy małych wychyleniach. Wahadło o długości metra puszczone z 90 stopni wychyla się o około 18 procent dłużej niż puszczone z 10, a blisko położenia do góry nogami czas wahnięcia rośnie bez ograniczeń."
+    }
+  }
+]

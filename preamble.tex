@@ -653,7 +653,10 @@
 %  longer matches its script. \val applies the edition's decimal marker, which
 %  is how the Polish edition gets its comma without anybody remembering.
 % ============================================================
-\newcommand{\bookdecimalmarker}{\ifpl{,}{.}}
+% The comma is BRACED: siunitx sets numbers in maths mode, where a bare comma
+% is punctuation and gets a thin space after it ("9, 81"). {,} is an ordinary
+% symbol, which is what a decimal marker is.
+\newcommand{\bookdecimalmarker}{\ifpl{{,}}{.}}
 \IfFileExists{siunitx.sty}{%
   \usepackage{siunitx}%
   \sisetup{

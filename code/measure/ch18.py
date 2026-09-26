@@ -63,6 +63,7 @@ v.num("per.digit", math.log(10) / lam, ".1f")
 assert format(printed(math.log(10), ".3f") / printed(lam, ".3f"),
               ".1f") == format(math.log(10) / lam, ".1f")
 v.num("per.digit.henon", math.log(10) / lam_henon, ".1f")
+v.num("per.digit.lorenz", math.log(10) / lam_lorenz, ".1f")
 assert lam_henon < lam, "the Henon map's errors grow more slowly"
 
 # The same question answered the long way, on the map itself.

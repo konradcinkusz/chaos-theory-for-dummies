@@ -1,0 +1,3 @@
+start right to 6 digits: 17 steps
+start right to 9 digits: 27 steps
+a thousandfold better measurement bought 10 steps

@@ -1,0 +1,5 @@
+  r   fixed point   slope there   a nudge
+2.8         0.643         -0.80   shrinks
+3.2         0.688         -1.20   grows
+3.5         0.714         -1.50   grows
+3.9         0.744         -1.90   grows

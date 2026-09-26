@@ -27,9 +27,9 @@
 
 \noindent
 In a warm dish with plenty of food, the bacterium \emph{E.~coli} divides in
-two about every twenty minutes. Start with one. Each of the two new cells
-does the same, and so does each of theirs. If nothing got in the way, how
-long would it take for the colony to weigh more than the Earth?
+two about every twenty minutes. Start with one; each new cell does the
+same, and so does each of theirs. If nothing got in the way, how long would
+it take for the colony to weigh more than the Earth?
 
 Nothing like that happens, and this chapter is about why not. Something
 always pushes back: the food runs short, the space fills, the waste builds
@@ -56,10 +56,9 @@ population that runs out of room does not always come to a gentle stop.
 \index{doubling}\index{bacteria}
 
 \noindent
-Doubling is the simplest growth there is. At every step each one of
-whatever you have becomes two, so the amount is multiplied by the same
-factor every time. Chapter~\ref{ch:iteration} called this exponential
-growth: growth in proportion to what is already there.
+Doubling is the simplest growth there is: at every step, each one of
+whatever you have becomes two. Chapter~\ref{ch:iteration} called growth like
+this, in proportion to what is already there, exponential.
 
 \begin{think}
 Back to the bacterium, doubling every twenty minutes. Roughly how long until
@@ -69,8 +68,8 @@ days?
 \reveal{Under two days: \val{ch03.earth.doublings} doublings, which is
 \val{ch03.earth.hours} hours. One cell weighs about a million-millionth of a
 gram.}
-Most people guess a year or more. The listing counts the doublings with
-whole numbers, so nothing is rounded along the way:
+Most people guess a year or more. The listing counts in whole numbers, so
+nothing is rounded along the way:
 
 \pyregion{code/ch03/doubling.py}{grow}{Counting doublings until the colony outweighs the Earth}{lst:ch03-grow}
 
@@ -83,24 +82,22 @@ of the program prints the colony every eight hours:
 \transcript{ch03-doubling}
 
 \noindent
-Python writes very large and very small numbers in a shorthand:
-\code{4.7e+09} means \num{4.7} with the decimal point moved nine places to
-the right, about five billion, and \code{1.0e-12} means the point moved
-twelve places to the left. So after one day the colony would weigh about
-\val{ch03.day.tonnes} tonnes, and less than a day later, more than the
-planet.
+In Python's shorthand for very large and very small numbers,
+\code{4.7e+09} is \num{4.7} with the decimal point moved nine places to the
+right, and \code{1.0e-12} is the point moved twelve places to the left. After
+one day the colony would weigh about \val{ch03.day.tonnes} tonnes; less than
+a day later, more than the planet.
 
 Doubling fools the eye because each step adds more than all the steps before
-it put together. The old story of rice on a chessboard makes the point: one
-grain on the first square, two on the second, four on the third, doubling
-each time. The first four squares hold $1 + 2 + 4 + 8 = 15$ grains and the
-fifth holds $16$ on its own, and so it goes to the end: the last square
-holds more than the other sixty-three together.
+it together. Put one grain of rice on the first square of a chessboard, two
+on the second, four on the third, and so on: the first four squares hold
+$1 + 2 + 4 + 8 = 15$ grains and the fifth holds $16$ on its own, and at the
+end the last square holds more than the other sixty-three together.
 
 Nothing grows like that for long. A flask of broth stops its bacteria at a
 few billion cells in every millilitre, when the food is gone and the waste
 has built up. Growth that feeds on something runs into the limit of that
-something, and what happens at the limit is the subject of this chapter.
+something.
 
 \section{Feedback}
 \label{sec:ch03-feedback}
@@ -114,11 +111,10 @@ is under \emph{feedback}: its effect comes back round and acts on itself.
 
 Feedback comes in two kinds. \emph{Positive feedback} pushes further in the
 direction things are already going. Hold a microphone near the loudspeaker
-it feeds and a faint sound goes round the loop \dash{} picked up, amplified,
-played, picked up again \dash{} louder every time, until the howl is as loud
-as the amplifier can make it. \emph{Negative feedback} pushes back. A
-thermostat switches the heating off when the room is too warm and on when it
-is too cold, and holds the temperature near its setting. Crowding is
+it feeds and a faint sound goes round and round the loop, louder every
+time, until the howl is as loud as the amplifier can make it.
+\emph{Negative feedback} pushes back. A thermostat switches the heating off
+when the room is too warm and on when it is too cold. Crowding is
 negative feedback too: the more animals there are, the less food each one
 gets and the fewer young the next generation has. Predators and prey make a
 double loop: more rabbits feed more foxes, more foxes eat more rabbits, and
@@ -135,13 +131,10 @@ is it positive or negative feedback?
 \end{think}
 \reveal{Positive. Each withdrawal leaves the bank weaker, which makes the
 next customer more likely to withdraw too. The run feeds on itself.}
-When customers queued outside the branches of Northern Rock in September
-2007, in the first run on a British bank for well over a century, the queues
-went away only when the government promised to guarantee the deposits:
-negative feedback, added from outside, to stop the positive kind. That is how
-positive feedback ends. It runs until it hits a limit or something pushes
-back \dash{} the amplifier's loudest, the bank's last pound, the food in the
-flask \dash{} and the limit is where the interesting mathematics starts.
+The run on Northern Rock in September 2007, the first on a British bank for
+well over a century, ended only when the government guaranteed the deposits:
+negative feedback, added from outside. Positive feedback ends like that, or
+at a limit, and the limit is where the interesting mathematics starts.
 
 \section{Growth slows as room runs out}
 \label{sec:ch03-logistic}
@@ -162,11 +155,10 @@ the share of the room that is still free:
 In words: the next generation is what this one would breed with room to
 spare, scaled down by the room that is left. While $x$ is tiny, $1 - x$ is
 nearly $1$ and the rule is nearly the doubling rule. As $x$ grows the brake
-grows with it, and at $x = 1$ the next generation is nothing. Thomas Malthus
-had argued in 1798 that a population left to itself keeps doubling while its
-food does not; in 1838 the Belgian mathematician Pierre-François Verhulst
-proposed a law of growth that slows as the limit nears, and the rule above
-is that idea taken one generation at a time.
+grows with it, and at $x = 1$ the next generation is nothing. The Belgian
+mathematician Pierre-François Verhulst proposed a law of growth that slows
+in this way in 1838; the rule above is his idea taken one generation at a
+time.
 
 \pyregion{code/ch03/crowding.py}{rule}{The crowding rule, one generation at a time}{lst:ch03-rule}
 
@@ -195,11 +187,10 @@ when it is nearly there?
 \val{ch03.fast.gain} of the room while passing \val{ch03.fast.level}, half
 the level of \num{0.5} it settles at.}
 Small, the population has few animals to breed; nearly full, it has no room
-to breed into. Half-way is where there is plenty of both. Checking every
-level from $0$ to $1$ in steps of a hundred-thousandth confirms that the
-growth in one generation is largest at exactly half the settled level.
-Plotted, the crowded column makes the S-shaped curve of growth that meets a
-limit.
+to breed into. Checking every level from $0$ to $1$ in steps of a
+hundred-thousandth confirms that the growth in one generation is largest at
+exactly half the settled level. Plotted, the crowded column makes the
+S-shaped curve of growth that meets a limit.
 
 \plotfig{ch03-s-curve}{Doubling against doubling with the room running out,
 both from a thousandth of the room. They agree while the place is nearly
@@ -208,14 +199,12 @@ against logistic growth}
 
 \begin{worldbox}
 Fisheries science has used growth curves of this shape since the middle of
-the twentieth century. A fish stock left alone settles at some level; fished
-down, it grows back, and fastest when it is about half its unfished size.
-The largest catch that can be taken year after year without shrinking the
-stock, the \emph{maximum sustainable yield}, is the catch that holds the
-stock near that half, and the idea is written into the 1982 United Nations
-Convention on the Law of the Sea. It is a model, with everything
-Chapter~\ref{ch:models} said about models: real stocks have collapsed under
-quotas that looked safe on paper.
+the twentieth century. A fished-down stock grows back fastest when it is
+about half its unfished size, so the largest catch that can be taken year
+after year without shrinking it, the \emph{maximum sustainable yield}, is
+the one that holds the stock near that half. The idea is written into the
+1982 United Nations Convention on the Law of the Sea. It is still a model,
+and real stocks have collapsed under quotas that looked safe on paper.
 \end{worldbox}
 
 \section{Two pushes that do not add up}
@@ -259,9 +248,7 @@ on where you already are. That is what it means for a rule to be
 for a straight-line rule. On a curved one the effect of a push depends on
 where the system already stands and on whatever else is pushing it, so two
 causes that each do a little can together do much more, much less, or the
-opposite. Every rule with feedback in it is curved, which is why taking a
-problem to pieces and adding up the answers stops working exactly where
-things get interesting.
+opposite. Every rule with feedback in it is curved.
 \end{trapbox}
 
 \section{Where it settles, and the slope}
@@ -285,7 +272,7 @@ With $r = \num{1.5}$, where does the population settle?
 \end{think}
 \reveal{At one third: $1/\num{1.5}$ is two thirds, and $1 - \tfrac{2}{3} =
 \tfrac{1}{3}$.}
-A fixed point is only half the answer. The other half is whether a
+A fixed point is only half the answer; the other half is whether a
 population near it is drawn in or pushed away. For a straight-line rule
 $x \to a x + b$ that was decided by the multiplier $a$: a nudge away from
 the fixed point is multiplied by $a$ at every step, so it shrinks when $a$ is
@@ -300,8 +287,8 @@ a straight line, and the steepness of that line decides what happens to a
 small nudge.}{zooming in until a curve looks straight}
 
 \noindent
-So measure the slope there: nudge the population a millionth up and a
-millionth down, and see how far apart the next generations land.
+So measure the slope: nudge the population a millionth up and a millionth
+down, and see how far apart the next generations land.
 
 \pyregion{code/ch03/settle.py}{slope}{How much one generation multiplies a tiny nudge}{lst:ch03-slope}
 
@@ -320,35 +307,28 @@ the hump, where a nudge is all but wiped out in a single generation, which is
 why the crowded column snapped onto \num{0.5} so fast.
 
 This is the idea the rest of the book leans on: \textbf{on a curve, the
-slope at a point is the multiplier of a tiny nudge there}, and it is found as
-the listing finds it, by nudging and looking.
+slope at a point is the multiplier of a tiny nudge there}, found by nudging
+and looking.
 
 \begin{rigourbox}
-Two things are taken on trust here. The first is that the slope decides for
-a curve what the multiplier decided for a line. It is true for nudges small
-enough that the curve still looks straight, which the zoom shows but does not
-prove; the proof is a standard result about fixed points of smooth rules, in
-any first course on dynamical systems. A large push is another matter and can
-land the population somewhere the straight-line picture says nothing about.
-The second is the measurement: what the listing computes is an estimate of
-what calculus calls the \emph{derivative}. For this rule the estimate is
-exact to every digit printed, and this book never needs the calculus.
+Taken on trust here: that the slope decides for a curve what the
+multiplier decided for a line. It holds for nudges small enough that the
+curve looks straight, which the zoom shows but does not prove; the proof is
+in any first course on dynamical systems. The measurement estimates what
+calculus calls the \emph{derivative}, exactly here to every digit printed.
 \end{rigourbox}
 
 \begin{lab}{l03_01_slope}{Measure a slope, and judge a fixed point}
-The listing measures the slope of one rule. Write \code{slope}, which
-measures it for any rule you hand it; \code{fixed\_points}, which gives both
-fixed points of the crowding rule for a growth rate $r$; and
-\code{is\_stable}, which uses the slope to say whether a fixed point holds.
-The tests try your code on straight lines, on curves, and on the cosine
-button of a calculator pressed over and over.
+Write \code{slope}, which measures the slope of any rule you hand it;
+\code{fixed\_points}, which gives both fixed points of the crowding rule;
+and \code{is\_stable}, which uses the slope to say whether a fixed point
+holds. The tests include the cosine button of a calculator, pressed over and
+over.
 \end{lab}
 
 \begin{projectbox}
-The library the book's listings share, \pkg{chaoslab}, carries this
-measurement for any rule as \api{slope}, the same nudge-and-look as your lab.
-Later chapters call it whenever they need to know how much one step
-stretches a small difference.
+The book's shared library, \pkg{chaoslab}, has this measurement for any
+rule as \api{slope}, and later chapters call it.
 \end{projectbox}
 
 \section{Overshoot}
@@ -372,9 +352,8 @@ back and forth, each swing smaller than the last, before it settles.}
 \textbf{\enquote{A limit to growth means growth stops smoothly.}} It can,
 and with a gentle growth rate it does. With a strong one the population
 overshoots the level its surroundings can sustain, crashes below it, and
-oscillates. The limit is still there, but the approach to it is not a glide;
-it is a series of swings, and turned up further, as you are about to see,
-the swings need not die away at all.
+oscillates. The limit is still there, but the approach to it is a series of
+swings, and turned up further the swings need not die away at all.
 \end{trapbox}
 
 \noindent
@@ -385,20 +364,18 @@ is sent a little below it, then a little above again. A negative slope is
 overshoot built into the rule, and settling with swings that shrink is
 called a \emph{damped oscillation}.
 
-What puts the overshoot into the rule is delay. The rule works out a whole
-generation's change from how crowded the place is now, and only looks again a
+What puts the overshoot there is delay. The rule works out a whole
+generation's change from how crowded the place is now, and looks again only a
 generation later. At \val{ch03.over.before}, below its level, the population
 sees plenty of room and breeds a big next generation; by the time those
 young arrive the room has gone, and the population is past the level. You
-have met this in an unfamiliar shower: you turn the tap towards hot, nothing
-happens for a few seconds, so you turn it further \dash{} and then it scalds
-you.
+have met this in an unfamiliar shower: turn the tap towards hot, nothing
+happens, so you turn it further \dash{} and then it scalds you.
 
-The test of that explanation is to take the delay away. Keep exactly the
-same law of change, but let the population look at its crowding ten times a
-generation instead of once: split each generation's change into ten
-instalments, each worked out from the population as it stands after the one
-before.
+To test that explanation, take the delay away. Keep the same law of change,
+but let the population look at its crowding ten times a generation: split
+each generation's change into ten instalments, each worked out from the
+population as it stands after the one before.
 
 \pyregion{code/ch03/overshoot.py}{instalments}{The same law of change, paid in ten instalments}{lst:ch03-instalments}
 
@@ -407,14 +384,13 @@ before.
 \transcript{ch03-overshoot}
 
 \noindent
-Both columns head for the same level, because the law of change is the same
-and is zero at the same place. Only the once-a-generation population
-overshoots. The one paid in instalments even grows faster at first, because
-its young start breeding within the generation, the way interest paid monthly
-earns interest on its interest, and it still slides into its level without
-passing it. What makes the overshoot is not the speed of the growth but how
-late the brakes act. Verhulst's own law is what the instalments become as
-they are made ever smaller, and it never overshoots.
+Both head for the same level, because the law of change is the same and is
+zero at the same place, but only the once-a-generation population
+overshoots. The one paid in instalments even grows faster at first, as its
+young start breeding within the generation, and still slides into its level
+without passing it. What makes the overshoot is not the speed of the growth
+but how late the brakes act. Verhulst's own law is what the instalments
+become as they are made ever smaller, and it never overshoots.
 
 \plotfig{ch03-overshoot}{The same law of growth with $r = \num{2.8}$. Worked
 out once a generation it overshoots its level and swings; worked out ten
@@ -423,10 +399,8 @@ same law without delay}
 
 \begin{lab}{l03_02_instalments}{Late brakes and early brakes}
 Write the crowding rule, the same rule paid in \code{k} instalments, a
-function that runs either of them for many generations, and one that says
-whether a population ever passes its settled level. The tests check that one
-instalment is the chapter's rule, that both versions settle at the same
-level, and that only the late one overshoots. Then try growth rates of your
+function that runs either for many generations, and one that says whether a
+population ever passes its settled level. Then try growth rates of your
 own.
 \end{lab}
 
@@ -455,8 +429,8 @@ the population.}
 \transcript{ch03-two-cycle}
 
 \noindent
-The nudge grows, changing sides every generation, and where the population
-ends up is not the settled level at all. It swings between two values,
+The nudge grows, changing sides every generation, and the population ends
+up nowhere near the settled level. It swings between two values,
 \val{ch03.two.low} and \val{ch03.two.high}, low one generation and high the
 next, for ever. Nothing random has come in; the rule is the same single line.
 The settling has stopped, and in its place is a cycle that repeats every two
@@ -465,38 +439,33 @@ generations. The population paid in instalments still settles at
 
 Somewhere between $r = \num{2.8}$ and $r = \num{3.1}$ the settled level lost
 its grip. Where exactly, and what the rule does as the growth rate is turned
-up further still, is the subject of Chapter~\ref{ch:logistic}. It is worth
-the wait. The rule in this chapter is one line long, a child could work it
-with a pencil, and it has not finished surprising you.
+up further still, is the subject of Chapter~\ref{ch:logistic}. The rule is
+one line long, a child could work it with a pencil, and it has not finished
+surprising you.
 
 \begin{summarybox}
 \begin{itemize}
-\item \textbf{Exponential growth}, growth in proportion to what is already
-  there, adds more at each step than at all the steps before. A colony of
-  bacteria doubling freely would outweigh the Earth in under two days;
-  nothing real grows that way for long.
+\item \textbf{Exponential growth}, in proportion to what is already there,
+  adds more at each step than at all the steps before, and nothing real grows
+  that way for long.
 \item \textbf{Feedback} is a quantity changing its own rate of change.
-  \textbf{Positive feedback} pushes further the way things are going (a
-  howl, a bank run) until it meets a limit; \textbf{negative feedback} pushes
-  back (a thermostat, crowding).
-\item Crowding written into doubling gives the rule $x \to r x (1 - x)$, with
-  $x$ the fraction of the room in use. It follows doubling while the place is
-  nearly empty and bends into an \textbf{S-curve}, growing fastest at half its
-  settled level.
+  \textbf{Positive feedback} pushes on (a howl, a bank run) until it meets a
+  limit; \textbf{negative feedback} pushes back (a thermostat, crowding).
+\item Crowding written into doubling gives $x \to r x (1 - x)$, with $x$ the
+  fraction of the room in use: an \textbf{S-curve}, growing fastest at half
+  its settled level.
 \item For a straight-line rule the effects of pushes add up
-  (\textbf{superposition}). For a curved, \textbf{nonlinear} rule they do
-  not, and the same push can help or hurt depending on where the system
-  already stands.
+  (\textbf{superposition}); for a curved, \textbf{nonlinear} rule they do
+  not, and a push can help or hurt depending on where the system stands.
 \item The rule settles where each animal is exactly replaced, at the
   \textbf{fixed point} $1 - 1/r$. The \textbf{slope} there, measured by
-  nudging, is the multiplier of a small nudge, and a size below one makes the
-  fixed point stable.
-\item A negative slope means \textbf{overshoot}: the population swings past
-  its level in a \textbf{damped oscillation}. The cause is delay; the same law
-  applied in small instalments does not overshoot.
-\item Turned up further, the size of the slope passes one, the settled level
-  stops holding, and the population swings between two values for ever
-  \dash{} the doorway to Chapter~\ref{ch:logistic}.
+  nudging, multiplies a small nudge; a size below one makes it stable.
+\item A negative slope means \textbf{overshoot} and a \textbf{damped
+  oscillation}. The cause is delay: the same law in small instalments does
+  not overshoot.
+\item Turned up further, the slope's size passes one and the population
+  swings between two values for ever \dash{} the doorway to
+  Chapter~\ref{ch:logistic}.
 \end{itemize}
 \end{summarybox}
 
@@ -511,18 +480,10 @@ with a pencil, and it has not finished surprising you.
   as more people join in; a price that rises when a product is scarce, so
   that fewer people buy it?
   \answerto{Negative, positive, negative.}
-\item With $r = 2$, what does the crowding rule make of a population of
-  \num{0.3}? And plain doubling?
-  \answerto{\num{0.42}, from $2 \times \num{0.3} \times \num{0.7}$, against
-  \num{0.6} for doubling.}
-\item For the rule $x \to 3x + 1$ a push of \num{0.1} raises the next value
-  by \num{0.3}. What does a push of \num{0.2} do? And for the crowding rule
-  with $r = 2$, starting at \num{0.5}, what do pushes of \num{0.1} and
-  \num{0.2} do?
-  \answerto{It raises the next value by \num{0.6}: the effects add. For the
-  crowding rule the next generation goes from \num{0.5} to \num{0.48} and to
-  \num{0.42}: it falls by \num{0.02} and by \num{0.08}, so twice the push
-  does four times the harm.}
+\item For the crowding rule with $r = 2$, starting at \num{0.5}, what do
+  pushes of \num{0.1} and of \num{0.2} do to the next generation?
+  \answerto{It goes from \num{0.5} to \num{0.48} and to \num{0.42}: down by
+  \num{0.02} and by \num{0.08}. Twice the push does four times the harm.}
 \item Where does the population settle with $r = \num{2.5}$? And with
   $r = \num{1.25}$?
   \answerto{At \num{0.6} and at \num{0.2}: $1 - 1/\num{2.5}$ and
@@ -533,7 +494,6 @@ with a pencil, and it has not finished surprising you.
   settles, overshooting, with each swing half the one before.}
 \item Why does a population that looks at its crowding ten times a
   generation not overshoot, when one that looks once a generation does?
-  \answerto{Because it reacts to the crowding as it builds up rather than a
-  generation late. The overshoot comes from the delay, not from the speed of
-  growth.}
+  \answerto{It reacts to the crowding as it builds up, not a generation late:
+  the overshoot comes from the delay, not the speed of growth.}
 \end{checkpoint}

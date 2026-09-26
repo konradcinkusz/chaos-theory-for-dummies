@@ -1,0 +1,15 @@
+gen 0: +0.00100 from the settled level
+gen 1: -0.00110 from the settled level
+gen 2: +0.00121 from the settled level
+gen 3: -0.00134 from the settled level
+gen 4: +0.00146 from the settled level
+gen 5: -0.00162 from the settled level
+
+r = 3.1, settled level 0.6774
+gen    once  in ten
+ 60  0.5580  0.6774
+ 61  0.7646  0.6774
+ 62  0.5580  0.6774
+ 63  0.7646  0.6774
+ 64  0.5580  0.6774
+ 65  0.7646  0.6774
