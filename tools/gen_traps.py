@@ -16,6 +16,7 @@ Appendix B is therefore generated, never typed, and `check_structure.py
 """
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -125,7 +126,15 @@ def catalogue(data: list[tuple[dict, list[dict]]]) -> str:
 
 
 def main() -> int:
-    check = "--check" in sys.argv
+    # argparse rather than a bare `"--check" in sys.argv`: with the bare test,
+    # `--help` (or any typo) fell through to WRITE mode and regenerated the
+    # shared files, which one chapter writer did by accident while asking
+    # for help.
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--check", action="store_true",
+                    help="fail if any generated file is stale; write nothing")
+    check = ap.parse_args().check
     _, data = load()
     targets = {ROOT / "notes" / "02-traps.md": catalogue(data)}
     for lang in ("en", "pl"):

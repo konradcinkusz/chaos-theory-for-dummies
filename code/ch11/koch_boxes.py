@@ -31,7 +31,7 @@ def dimension(sizes: list[float], ns: list[int]) -> float:
 
 
 def main() -> None:
-    # --8<-- [start:count]
+# --8<-- [start:count]
     ns = counts(POINTS, SIZES)
     print("  box side     boxes   times as many as the row above")
     for k, (s, n) in enumerate(zip(SIZES, ns, strict=True)):

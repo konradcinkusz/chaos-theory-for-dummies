@@ -36,7 +36,7 @@ def rounds(n: int) -> list[list[Point]]:
 
 
 def main() -> None:
-    # --8<-- [start:table]
+# --8<-- [start:table]
     print(" steps    ruler    measured length")
     for pts in rounds(8):
         steps = len(pts) - 1

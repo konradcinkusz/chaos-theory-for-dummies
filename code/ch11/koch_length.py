@@ -31,7 +31,7 @@ def area(points: list[Point]) -> float:
 
 
 def main() -> None:
-    # --8<-- [start:table]
+# --8<-- [start:table]
     print("round  pieces    ruler   length   height     area")
     for n in range(7):
         pts = koch(n)

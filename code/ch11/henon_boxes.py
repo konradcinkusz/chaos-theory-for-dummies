@@ -33,7 +33,7 @@ SIZES = [1 / 2**k for k in range(2, 11)]
 
 
 def main() -> None:
-    # --8<-- [start:count]
+# --8<-- [start:count]
     print("boxes of side 1/4, 1/8, ... 1/1024 touched by the attractor")
     for n in (100_000, 1_000_000):
         ns = counts(attractor(n), SIZES)
