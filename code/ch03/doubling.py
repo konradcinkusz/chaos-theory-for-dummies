@@ -24,7 +24,7 @@ def doublings_to_outweigh(target: float) -> int:
 
 
 def main() -> None:
-    # --8<-- [start:table]
+# --8<-- [start:table]
     print("hours      cells      grams")
     for hours in range(0, 48, 8):
         cells = 2 ** (hours * 60 // MINUTES)
@@ -32,7 +32,7 @@ def main() -> None:
     n = doublings_to_outweigh(EARTH)
     print(f"heavier than the Earth after {n} doublings,"
           f" {n * MINUTES / 60:.1f} hours")
-    # --8<-- [end:table]
+# --8<-- [end:table]
 
 
 if __name__ == "__main__":

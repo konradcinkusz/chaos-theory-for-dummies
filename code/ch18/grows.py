@@ -20,7 +20,7 @@ RULES = [("cooling tea", tea, 90.0),
 
 
 def main() -> None:
-    # --8<-- [start:twice]
+# --8<-- [start:twice]
     print("gap after step:      0        10        20        30        40")
     for name, rule, start in RULES:
         a, b = start, start + 1e-9      # two starts a billionth apart
@@ -30,7 +30,7 @@ def main() -> None:
                 gaps.append(f"{abs(b - a):8.1e}")
             a, b = rule(a), rule(b)
         print(f"{name:18s}" + "  ".join(gaps))
-    # --8<-- [end:twice]
+# --8<-- [end:twice]
 
 
 if __name__ == "__main__":

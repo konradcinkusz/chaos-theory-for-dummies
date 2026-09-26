@@ -11,18 +11,18 @@ from overshoot import compare
 
 
 def main() -> None:
-    # --8<-- [start:nudge]
+# --8<-- [start:nudge]
     r = 3.1
     level = 1 - 1 / r
     x = level + 0.001
     for gen in range(6):
         print(f"gen {gen}: {x - level:+.5f} from the settled level")
         x = next_gen(x, r)
-    # --8<-- [end:nudge]
+# --8<-- [end:nudge]
     print()
-    # --8<-- [start:run]
+# --8<-- [start:run]
     compare(3.1, range(60, 66))
-    # --8<-- [end:run]
+# --8<-- [end:run]
 
 
 if __name__ == "__main__":

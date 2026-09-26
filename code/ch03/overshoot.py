@@ -23,7 +23,7 @@ def in_instalments(x: float, r: float, k: int = 10) -> float:
 def compare(r: float, generations: range) -> None:
     """Both populations from the same small start; print the generations
     asked for."""
-    # --8<-- [start:compare]
+# --8<-- [start:compare]
     once = paid = 0.01
     print(f"r = {r}, settled level {1 - 1 / r:.4f}")
     print("gen    once  in ten")
@@ -32,7 +32,7 @@ def compare(r: float, generations: range) -> None:
             print(f"{gen:3d}  {once:.4f}  {paid:.4f}")
         once = next_gen(once, r)
         paid = in_instalments(paid, r)
-    # --8<-- [end:compare]
+# --8<-- [end:compare]
 
 
 def main() -> None:

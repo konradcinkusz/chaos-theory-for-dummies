@@ -18,14 +18,14 @@ def exact_doubling(x: Fraction) -> Fraction:
 
 
 def main() -> None:
-    # --8<-- [start:race]
+# --8<-- [start:race]
     x = 0.1                   # what the computer stores for one tenth
     t = Fraction(1, 10)       # one tenth itself
     for n in range(61):
         if n <= 5 or n in (40, 45, 50, 53, 54, 55, 60):
             print(f"step {n:2d}:  computer {x:.6f}   truth {float(t):.6f}")
         x, t = doubling(x), exact_doubling(t)
-    # --8<-- [end:race]
+# --8<-- [end:race]
 
 
 if __name__ == "__main__":

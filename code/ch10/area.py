@@ -41,7 +41,7 @@ def length(points: list[Point]) -> float:
 
 
 def main() -> None:
-    # --8<-- [start:area]
+# --8<-- [start:area]
     edge = outline(0.1, 4000)            # a square a tenth on a side
     area0, length0 = area(edge), length(edge)
     print("step   area / start   0.3 ** step   outline / start")
@@ -49,7 +49,7 @@ def main() -> None:
         edge = [henon(x, y) for x, y in edge]
         print(f"{step:4d}  {area(edge) / area0:13.5f}  "
               f"{B ** step:12.5f}  {length(edge) / length0:16.2f}")
-    # --8<-- [end:area]
+# --8<-- [end:area]
 
 
 if __name__ == "__main__":

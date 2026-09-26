@@ -24,7 +24,7 @@ def forecast_length(exponent: float, digits: int,
 
 
 def main() -> None:
-    # --8<-- [start:table]
+# --8<-- [start:table]
     systems = [("logistic map", logistic_exponent(), "steps"),
                ("Henon map", henon_exponent(), "steps"),
                ("Lorenz system", lorenz_exponent(), "time units")]
@@ -33,7 +33,7 @@ def main() -> None:
     for name, lam, unit in systems:
         row = "".join(f"{forecast_length(lam, d):10.1f}" for d in (3, 6, 9))
         print(f"{name:14s}{lam:10.3f}{row}  {unit}")
-    # --8<-- [end:table]
+# --8<-- [end:table]
 
 
 if __name__ == "__main__":

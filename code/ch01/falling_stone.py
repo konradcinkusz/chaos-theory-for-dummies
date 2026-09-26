@@ -16,11 +16,11 @@ def distance(t: float) -> float:
 
 
 def main() -> None:
-    # --8<-- [start:table]
+# --8<-- [start:table]
     print(" t (s)   fallen (m)")
     for t in range(6):
         print(f"{t:5d}   {distance(t):10.2f}")
-    # --8<-- [end:table]
+# --8<-- [end:table]
 
 
 if __name__ == "__main__":

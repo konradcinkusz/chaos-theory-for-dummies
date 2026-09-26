@@ -33,7 +33,7 @@ def truth(steps: int, digits: int = 100) -> list[Decimal]:
 
 
 def main() -> None:
-    # --8<-- [start:race]
+# --8<-- [start:race]
     a = b = 0.1
     true = truth(70)
     print("step    4x(1-x)    4x-4xx      truth")
@@ -41,7 +41,7 @@ def main() -> None:
         if n % 10 == 0 or n in (45, 55):
             print(f"{n:4d} {a:10.6f} {b:10.6f} {float(true[n]):10.6f}")
         a, b = rule_a(a), rule_b(b)
-    # --8<-- [end:race]
+# --8<-- [end:race]
 
 
 if __name__ == "__main__":

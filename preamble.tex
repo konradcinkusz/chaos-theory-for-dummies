@@ -324,6 +324,7 @@
 \tcbset{
   cfz tinted/.style={
     enhanced, breakable, sharp corners,
+    lines before break=4,
     colback=mlight, boxrule=0pt, leftrule=3pt,
     left=8pt, right=8pt, top=6pt, bottom=6pt,
     before skip=13pt, after skip=13pt,
@@ -333,6 +334,9 @@
   },
   cfz outlined/.style={
     enhanced, breakable, sharp corners,
+    % A box broken straight after its title is a heading stranded at the foot
+    % of a page with its question overleaf. Four lines is title plus three.
+    lines before break=4,
     colback=white, boxrule=0.6pt,
     left=8pt, right=8pt, top=6pt, bottom=6pt,
     before skip=13pt, after skip=13pt,

@@ -30,7 +30,7 @@ def main() -> None:
     print(f"start right to 6 digits: {six:.0f} steps")
     print(f"start right to 9 digits: {nine:.0f} steps")
     print(f"a thousandfold better measurement bought {nine - six:.0f} steps")
-    # --8<-- [end:measure]
+# --8<-- [end:measure]
 
 
 if __name__ == "__main__":

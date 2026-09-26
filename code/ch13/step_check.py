@@ -31,12 +31,12 @@ STEPS = (0.004, 0.002, 0.001, 0.0005)
 
 
 def main() -> None:
-    # --8<-- [start:run]
+# --8<-- [start:run]
     for dt in STEPS:
         seconds, worst = parting(dt)
         print(f"step {dt:6.4f} s   apart after {seconds:5.2f} s"
               f"   energy moved {worst:.1e} J")
-    # --8<-- [end:run]
+# --8<-- [end:run]
 
 
 if __name__ == "__main__":

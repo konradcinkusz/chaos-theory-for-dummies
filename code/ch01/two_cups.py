@@ -9,13 +9,13 @@ from cooling_cup import next_minute
 
 
 def main() -> None:
-    # --8<-- [start:gap]
+# --8<-- [start:gap]
     a, b = 90.0, 91.0
     for minute in range(31):
         if minute % 10 == 0:
             print(f"minute {minute:2d}: gap {b - a:.4f} C")
         a, b = next_minute(a), next_minute(b)
-    # --8<-- [end:gap]
+# --8<-- [end:gap]
 
 
 if __name__ == "__main__":

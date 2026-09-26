@@ -33,7 +33,7 @@ def step(x: float, change: float) -> float:
 
 
 def main() -> None:
-    # --8<-- [start:run]
+# --8<-- [start:run]
     largest = 0.01 * R0          # never more than one per cent of r
     x, biggest = 0.2, 0.0
     print("step  x             change to r")
@@ -44,7 +44,7 @@ def main() -> None:
         biggest = max(biggest, abs(change))
         x = step(x, change)
     print(f"largest change: {100 * biggest / R0:.2f} per cent of r")
-    # --8<-- [end:run]
+# --8<-- [end:run]
 
 
 if __name__ == "__main__":

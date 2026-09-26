@@ -12,12 +12,12 @@ STARTS = [(1.0, 1.0, 1.0), (-5.0, 3.0, 20.0), (10.0, -10.0, 30.0)]
 
 
 def main() -> None:
-    # --8<-- [start:exponent]
+# --8<-- [start:exponent]
     field = lorenz()
     for start in STARTS:
         lam = lyapunov_flow(field, start, 0.01, 50_000)  # 500 time units
         print(f"from {start}: {lam:.2f} per time unit")
-    # --8<-- [end:exponent]
+# --8<-- [end:exponent]
 
 
 if __name__ == "__main__":

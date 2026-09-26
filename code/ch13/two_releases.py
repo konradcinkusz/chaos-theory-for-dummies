@@ -24,7 +24,7 @@ def gap(a: tuple[float, ...], b: tuple[float, ...]) -> float:
 
 
 def main() -> None:
-    # --8<-- [start:run]
+# --8<-- [start:run]
     a = release(120, 120)
     b = (a[0] + NUDGE, a[1], a[2], a[3])
     step = 0
@@ -34,7 +34,7 @@ def main() -> None:
         a, b = rk4_step(RULE, a, DT), rk4_step(RULE, b, DT)
         step += 1
     print(f"more than {APART} rad apart after {step * DT:.1f} s")
-    # --8<-- [end:run]
+# --8<-- [end:run]
 
 
 if __name__ == "__main__":

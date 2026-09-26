@@ -28,7 +28,7 @@ def release(upper: float, lower: float) -> tuple[float, ...]:
 
 
 def main() -> None:
-    # --8<-- [start:run]
+# --8<-- [start:run]
     state = release(120, 120)
     print(" t (s)   upper arm   lower arm    energy (J)")
     for step in range(10_001):
@@ -39,7 +39,7 @@ def main() -> None:
             print(f"{step * DT:5.1f} {upper:9.1f} deg {lower:7.1f} deg"
                   f" {energy:13.8f}")
         state = rk4_step(RULE, state, DT)
-    # --8<-- [end:run]
+# --8<-- [end:run]
 
 
 if __name__ == "__main__":

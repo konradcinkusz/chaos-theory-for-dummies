@@ -27,12 +27,12 @@ def both_periods(r: float, x0: float = 0.3) -> tuple[int | None, ...]:
 
 
 def main() -> None:
-    # --8<-- [start:table]
+# --8<-- [start:table]
     print("   r         c    cycle of x    cycle of z")
     for r in (2.8, 3.2, 3.5, 3.56, 3.83, 3.9):
         px, pz = (str(p or "none") for p in both_periods(r))
         print(f"{r:4.2f}  {r_to_c(r):8.4f}  {px:>12}  {pz:>12}")
-    # --8<-- [end:table]
+# --8<-- [end:table]
 
 
 if __name__ == "__main__":

@@ -28,12 +28,12 @@ def show(z: complex) -> str:
 
 
 def main() -> None:
-    # --8<-- [start:table]
+# --8<-- [start:table]
     for label, c in [("1", 1), ("-1", -1), ("0.25", 0.25),
                      ("-2", -2), ("i", 1j)]:
         zs = orbit_of_zero(c, 5)
         print(f"c = {label:>4}: " + "".join(f"{show(z):>9}" for z in zs))
-    # --8<-- [end:table]
+# --8<-- [end:table]
 
 
 if __name__ == "__main__":

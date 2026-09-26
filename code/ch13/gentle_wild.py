@@ -32,14 +32,14 @@ def fate(angle: float) -> tuple[float | None, float]:
 
 
 def main() -> None:
-    # --8<-- [start:run]
+# --8<-- [start:run]
     for angle in range(10, 180, 20):
         seconds, largest = fate(angle)
         if seconds is None:
             print(f"{angle:4d} deg   together; largest gap {largest:.0e} rad")
         else:
             print(f"{angle:4d} deg   apart after {seconds:4.1f} s")
-    # --8<-- [end:run]
+# --8<-- [end:run]
 
 
 if __name__ == "__main__":

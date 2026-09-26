@@ -22,7 +22,7 @@ def degrees(z: complex) -> float:
 
 
 def main() -> None:
-    # --8<-- [start:check]
+# --8<-- [start:check]
     print("i times i, by hand:  ", times(0, 1, 0, 1))
     print("i times i, by Python:", 1j * 1j)
     z = 3 + 4j
@@ -30,7 +30,7 @@ def main() -> None:
     print("(3+4i)^2, by Python: ", z * z)
     print(f"lengths: {abs(z)} and {abs(z * z)}")
     print(f"angles:  {degrees(z):.2f} and {degrees(z * z):.2f} degrees")
-    # --8<-- [end:check]
+# --8<-- [end:check]
 
 
 if __name__ == "__main__":

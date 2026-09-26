@@ -31,13 +31,13 @@ def right_for(digits: int, truth: list[Decimal]) -> int:
 
 
 def main() -> None:
-    # --8<-- [start:exact]
+# --8<-- [start:exact]
     x = Fraction(1, 10)
     for n in range(13):
         if n % 2 == 0:
             print(f"step {n:2d}: {len(str(x.denominator)):5d} digits")
         x = 4 * x * (1 - x)
-    # --8<-- [end:exact]
+# --8<-- [end:exact]
     truth = orbit(1000, 600)
     for digits in (16, 32, 64, 128):
         print(f"{digits:4d} digits kept: right for "

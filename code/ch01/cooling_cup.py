@@ -17,13 +17,13 @@ def next_minute(temp: float) -> float:
 
 
 def main() -> None:
-    # --8<-- [start:run]
+# --8<-- [start:run]
     temp = 90.0
     for minute in range(31):
         if minute % 5 == 0:
             print(f"minute {minute:2d}: {temp:5.1f} C")
         temp = next_minute(temp)
-    # --8<-- [end:run]
+# --8<-- [end:run]
 
 
 if __name__ == "__main__":

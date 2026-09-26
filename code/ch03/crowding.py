@@ -17,7 +17,7 @@ def next_gen(x: float, r: float) -> float:
 
 
 def main() -> None:
-    # --8<-- [start:run]
+# --8<-- [start:run]
     r = 2.0
     free = crowded = 0.001
     print("gen  doubling  crowded")
@@ -25,7 +25,7 @@ def main() -> None:
         print(f"{gen:3d}  {free:8.4f}  {crowded:7.4f}")
         free = r * free
         crowded = next_gen(crowded, r)
-    # --8<-- [end:run]
+# --8<-- [end:run]
 
 
 if __name__ == "__main__":

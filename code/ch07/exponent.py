@@ -29,13 +29,13 @@ def exponent(r: float, x0: float = 0.3, steps: int = 100_000,
 
 
 def main() -> None:
-    # --8<-- [start:run]
+# --8<-- [start:run]
     for r in (2.8, 3.2, 3.5, 4.0):
         lam = exponent(r)
         verdict = "errors grow" if lam > 0 else "errors shrink"
         print(f"r = {r}:  exponent {lam:+.2f}   {verdict}")
     print(f"exact value at r = 4:  ln 2 = {math.log(2):.4f}")
-    # --8<-- [end:run]
+# --8<-- [end:run]
 
 
 if __name__ == "__main__":
