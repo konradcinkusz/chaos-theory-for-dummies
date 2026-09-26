@@ -46,8 +46,8 @@ def running_average(lang: str):
     ax.set_ylim(-0.6, 1.3)
     ax.set_xlabel(T(lang, "steps averaged (three starts each)",
                     "liczba uśrednionych kroków (po trzy starty)"))
-    ax.set_ylabel(T(lang, r"average of $\ln|$slope$|$",
-                    r"średnia z $\ln|$nachylenia$|$"))
+    ax.set_ylabel(T(lang, r"average of $\ln|$stretch$|$",
+                    r"średnia z $\ln|$rozciągnięcia$|$"))
     fig.tight_layout()
     return fig
 

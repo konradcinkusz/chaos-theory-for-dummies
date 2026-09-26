@@ -11,10 +11,10 @@ numbers come from code/measure/ch12.py.
 from __future__ import annotations
 
 import numpy as np
+from _style import BLUE, RED, T, main, new, num, plot
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import Rectangle
 
-from _style import BLUE, RED, T, main, new, num, plot
 from chaoslab import r_to_c
 
 # White far outside, the book's blue near the edge; the set itself is ink.

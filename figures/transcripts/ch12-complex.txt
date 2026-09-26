@@ -1,0 +1,6 @@
+i times i, by hand:   (-1, 0)
+i times i, by Python: (-1+0j)
+(3+4i)^2, by hand:    (-7, 24)
+(3+4i)^2, by Python:  (-7+24j)
+lengths: 5.0 and 25.0
+angles:  53.13 and 106.26 degrees

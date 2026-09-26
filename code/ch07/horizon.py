@@ -29,12 +29,12 @@ def counts(r: float, delta: float, tol: float) -> list[int]:
 def main() -> None:
     # --8<-- [start:table]
     lam, tol = math.log(2), 0.1
-    print("  error    formula   counted:  mean   fastest  slowest")
+    print("  error   formula   counted: mean   fastest   slowest")
     for delta in (1e-3, 1e-6, 1e-9, 1e-12):
         c = counts(4.0, delta, tol)
         mean = sum(c) / len(c)
-        print(f"{delta:7.0e}   {horizon(lam, delta, tol):6.1f}"
-              f"            {mean:5.1f}    {min(c):4d}     {max(c):4d}")
+        print(f"{delta:7.0e}{horizon(lam, delta, tol):10.1f}"
+              f"{mean:16.1f}{min(c):10d}{max(c):10d}")
     # --8<-- [end:table]
 
 

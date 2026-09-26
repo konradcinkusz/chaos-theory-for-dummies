@@ -24,18 +24,17 @@
 
 \noindent
 The tea of Chapter~\ref{ch:models} lived in whole minutes: its rule jumped
-from one minute to the next. A swinging pendulum does not jump. At every
-instant it is somewhere and going somewhere, and between one instant and the
-next there is always another. Newton's laws of motion, published in 1687, do
-not say where a planet will be next Tuesday. They say how fast its velocity
-is changing right now. How do you get a future out of a rule like that?
+from one minute to the next. A swinging pendulum does not jump; at every
+instant it is somewhere and going somewhere. Newton's laws of motion,
+published in 1687, do not say where a planet will be next Tuesday. They say
+how fast its velocity is changing right now. How do you get a future out of
+a rule like that?
 
-This chapter answers with a trick you already know from
-Chapter~\ref{ch:iteration}: take small steps. It then draws the one picture
-the rest of the book is drawn in \dash{} a map on which every possible state
-of a system is a point, and its whole future is a path \dash{} and ends with
-a theorem that says why the weather model of Chapter~\ref{ch:lorenz} needs
-three numbers.
+This chapter answers with a trick from Chapter~\ref{ch:iteration}: take small
+steps. It then draws the picture the rest of the book is drawn in, a map on
+which every possible state is a point and every future is a path, and ends
+with a theorem that says why the weather model of Chapter~\ref{ch:lorenz}
+needs three numbers.
 
 \begin{outcomes}
 \outcome{read a rule of change as a statement about how fast each number of
@@ -55,41 +54,36 @@ three numbers.
 
 \noindent
 A car's speedometer is a rule of change. It does not tell you where you are;
-it tells you how fast where you are is changing, right now.
+it tells you how fast where you are is changing.
 
 \begin{think}
 The speedometer reads $60$ kilometres an hour. Roughly where will the car be
 in one minute? And in one hour?
 \end{think}
-\reveal{About one kilometre further on in a minute, because $60$ kilometres
-an hour is a kilometre a minute. In an hour you cannot say: the speed will
-have changed many times, and the reading was only true at one instant.}
-That is the whole difficulty, and the whole way out. Over a short enough
-time, how fast something is changing tells you how far it goes: distance is
-speed times time. Over a long time it tells you little, because the speed
-changes. So you go a short way, look at the speedometer again, and go on.
+\reveal{About a kilometre further on in a minute: $60$ kilometres an hour is a
+kilometre a minute. In an hour you cannot say, because the speed will have
+changed many times.}
+Over a short time, how fast something is changing tells you how far it goes;
+over a long time it tells you little. So you go a short way, read the
+speedometer again, and go on.
 
 Here is the first worked system. A weight hangs on a spring; you pull it one
 metre from where it rests and let go. Its state is two numbers: its
-\emph{position} $x$, how far it is from rest in metres, and its
-\emph{velocity} $v$, how fast $x$ is changing in metres per second. The rule
-says how fast each of them is changing:
+\emph{position} $x$, how far it is from rest, and its \emph{velocity} $v$, how
+fast $x$ is changing. The rule says how fast each of them changes:
 \begin{itemize}
-\item the position changes at the rate $v$ \dash{} that is what a velocity
-  is;
+\item the position changes at the rate $v$, which is what a velocity is;
 \item the velocity changes at the rate $-k\,x$: the spring pulls back towards
   the middle, harder the further it is stretched. The number $k$ is how stiff
-  the spring is; take $k = 1$. The minus sign says the pull is backwards:
-  stretched to the right, the spring pulls left.
+  the spring is; take $k = 1$. The minus sign says the pull is backwards.
 \end{itemize}
-In other books you will meet the same rule written as
+Other books write the same rule as
 \[ \frac{\mathrm{d}x}{\mathrm{d}t} = v, \qquad
    \frac{\mathrm{d}v}{\mathrm{d}t} = -k\,x, \]
-where $\tfrac{\mathrm{d}x}{\mathrm{d}t}$ is read \enquote{how fast $x$ is
-changing}. A rule of this kind is a \emph{differential equation}.
-Mathematicians spend whole courses solving them by hand. This book never
-does. It follows them in small steps, which is also how a computer
-forecasting the weather or steering a spacecraft does it.
+reading $\tfrac{\mathrm{d}x}{\mathrm{d}t}$ as \enquote{how fast $x$ is
+changing}. A rule of this kind is a \emph{differential equation}. This book
+never solves one by hand. It follows them in small steps, which is how a
+computer forecasting the weather does it too.
 
 \section{Small steps}
 \label{sec:ch04-euler}
@@ -102,8 +96,7 @@ who described it in the eighteenth century. Pick a short length of time, the
 \[ \text{new } x = x + \text{step} \times v, \qquad
    \text{new } v = v + \text{step} \times (-k\,x). \]
 Then ask the rule again at the new state, and repeat. A rule of change has
-become a rule of the next step, and the iteration of
-Chapter~\ref{ch:iteration} takes over.
+become a rule of the next step, and iteration takes over.
 
 \mermaidfig{ch04-step-loop}{Euler's method. The rule gives the rates at this
 instant; a small step moves as if they stayed the same; at the new state the
@@ -112,35 +105,31 @@ rule is asked again.}{a rule of change, followed in steps}
 \pyregion{code/ch04/spring.py}{euler}{A spring, followed with Euler's method}{lst:ch04-euler}
 
 \noindent
-The function \code{rates} is the rule; \code{euler\_step} is Euler's method,
-two lines; \code{energy} adds the energy of motion, half of $v \times v$, to
-the energy stored in the spring, half of $k \times x \times x$. The program
-starts the weight at $x = 1$, at rest, takes steps of \val{ch04.euler.dt}
-seconds and prints every two seconds.
+\code{rates} is the rule and \code{euler\_step} is Euler's method, two lines.
+\code{energy} adds the energy of motion, half of $v \times v$, to the energy
+stored in the spring, half of $k \times x \times x$. The weight starts at
+$x = 1$, at rest, and the steps are \val{ch04.euler.dt} seconds long.
 
 \begin{think}
-A real spring with no friction swings back and forth for ever, reaching the
-same distance each time, because nothing takes energy out and nothing puts
-energy in. What should the energy column show, line after line?
+A real spring with no friction swings for ever, reaching the same distance
+each time: nothing takes energy out and nothing puts it in. What should the
+energy column show, line after line?
 \end{think}
-\reveal{The same number every time: \num{0.5}, half of $1 \times 1$, which is
-what it was at the start.}
+\reveal{The same number every time: \num{0.5}, half of $1 \times 1$.}
 
 \transcript{ch04-spring-euler}
 
 \noindent
-It does not. The weight swings further each time and the energy climbs,
-from \num{0.5} to \val{ch04.euler.energy.ten} in ten seconds. Nothing in the
-rule put that energy in. The simulation did.
+It does not. The swings grow and the energy climbs from \num{0.5} to
+\val{ch04.euler.energy.ten} in ten seconds. Nothing in the rule put that
+energy in. The simulation did.
 
 The reason is a picture. Plot the state as a point, position across and
 velocity up. With $k = 1$ the energy is half the square of the point's
-distance from the centre, so the real spring, whose energy never changes,
-goes round and round a circle. An Euler step moves along the straight line
-the rule points along at that instant, and a straight line that touches a
-circle leaves it on the outside. Every step lands a little outside, and the
-next starts from there. The step is at right angles to the line from the
-centre, so Pythagoras makes it exact: each step multiplies the energy by
+distance from the centre, so the real spring goes round a circle. An Euler
+step moves along the straight line the rule points along, and a straight line
+that touches a circle leaves it on the outside. Every step lands a little
+outside, and by Pythagoras exactly so: each step multiplies the energy by
 $1 + \text{step} \times \text{step}$, which is \val{ch04.euler.factor} for a
 step of \val{ch04.euler.dt}. One per cent a step, \val{ch04.euler.steps}
 times in ten seconds.
@@ -149,24 +138,21 @@ times in ten seconds.
 Take steps ten times smaller, \val{ch04.small.dt} seconds. Is the simulation
 now right?
 \end{think}
-\reveal{It is right for longer, not right. Over the same ten seconds the
-energy gains \val{ch04.small.gain.ten} per cent instead of
-\val{ch04.euler.gain.ten}, but the gain never stops: after a hundred seconds
-it has gained \val{ch04.small.gain.hundred} per cent, about what the larger
-step gained in ten.}
-Each small step gains a hundred times less than a large one, and there are
-ten times as many of them in every second, so the damage per second is ten
-times smaller. Ten times smaller steps bought ten times as long, for ten
-times the work.
+\reveal{Right for longer, not right. Over ten seconds the energy gains
+\val{ch04.small.gain.ten} per cent instead of \val{ch04.euler.gain.ten}; after
+a hundred seconds it has gained \val{ch04.small.gain.hundred} per cent, about
+what the larger step gained in ten.}
+Each small step gains a hundred times less, and there are ten times as many
+of them each second. Ten times smaller steps bought ten times as long, for
+ten times the work.
 
 \begin{trapbox}
 \textbf{\enquote{A smaller step makes the simulation right.}} It makes it
-right for longer. The error of a stepping method is not a fixed amount that a
-small enough step removes; it is made fresh at every step and it piles up,
-so a smaller step buys time before the pile grows too large. Every
-simulation has such a horizon, and the honest question to ask of one is not
-how small its step was but how long it has been checked for. Part~II of this
-book meets a second, harsher horizon, one that no step size can move.
+right for longer. The error of a stepping method is made fresh at every step
+and piles up, so a smaller step buys time before the pile grows too large.
+The honest question to ask of a simulation is not how small its step was but
+how long it has been checked for. Part~II meets a harsher horizon, one that
+no step size can move.
 \end{trapbox}
 
 \section{Look ahead, and average}
@@ -174,69 +160,55 @@ book meets a second, harsher horizon, one that no step size can move.
 \index{Runge--Kutta method}\index{RK4}
 
 \noindent
-Euler's trouble is that it asks the rule once, at the start of the step, and
-trusts the answer for the whole step. The rates change during the step, and
-Euler never finds out. A better stepper asks more than once. The one this
-book uses was worked out by Carl Runge and Martin Kutta at the turn of the
-twentieth century and is known as RK4. It is a recipe of four samples:
+Euler asks the rule once, at the start of the step, and trusts the answer for
+the whole step. The rates change during the step, and Euler never finds out.
+The stepper this book uses, worked out by Carl Runge and Martin Kutta at the
+turn of the twentieth century and known as RK4, asks four times:
 \begin{enumerate}
-\item ask the rule for the rates at the start;
-\item take half a step at those rates, and ask again;
-\item go back, take half a step at the second rates, and ask again;
-\item go back, take a whole step at the third rates, and ask a fourth time.
+\item the rates at the start;
+\item the rates half a step ahead, going at the first rates;
+\item the rates half a step ahead, going at the second rates;
+\item the rates a whole step ahead, going at the third.
 \end{enumerate}
-Then take the real step at an average of the four, counting the two middle
-samples twice. That is the whole method:
+It then takes the real step at an average of the four, counting the middle
+two twice.
 
 \pyregion{code/src/chaoslab/flows.py}{rk4}{The RK4 recipe, from the book's library}{lst:ch04-rk4}
 
 \noindent
-\code{field} is the rule of change and \code{k1} to \code{k4} are the four
-samples; \code{\_add(state, k1, dt / 2)} means \enquote{where you would be
-after half a step at the rates \code{k1}}. The weights $1$, $2$, $2$, $1$
-are not a guess: they are chosen so that the errors of the four samples
-cancel as far as they can, which is a page of algebra this book skips.
-
-\begin{projectbox}
-\code{chaoslab}'s \code{flows.py} holds three functions:
-\api{euler\_step}, \api{rk4\_step} and \api{integrate}, which calls a stepper
-over and over and keeps every state. A rule of change is any function that
-takes the state as a tuple of numbers and returns their rates. The same three
-functions carry the three-number weather model of Chapter~\ref{ch:lorenz}
-and the two pendulums of Chapter~\ref{ch:mechanics}.
-\end{projectbox}
+\code{field} is the rule of change, \code{k1} to \code{k4} are the four
+samples, and \code{\_add} works out where you would be after moving for a
+while at given rates. The weights $1$, $2$, $2$, $1$ are chosen so that the
+errors of the samples cancel as far as they can; the algebra is skipped here.
+The same function, with \api{euler\_step} and \api{integrate} beside it,
+carries the weather model of Chapter~\ref{ch:lorenz}.
 
 \begin{lab}{l04_01_rk4}{One step of RK4}
-Write \code{rk4\_step} from the recipe, without looking at the listing if you
-can. The test checks it against the library on a spring and on a pendulum,
-and on the rule \enquote{$x$ grows at a rate equal to $x$}: one step of
-length $1$ from $1$ must land on $1 + 1 + \tfrac{1}{2} + \tfrac{1}{6} +
-\tfrac{1}{24}$, close to the true answer, the number $e \approx
+Write \code{rk4\_step} from the recipe. The test checks it against the library
+on a spring and a pendulum, and on the rule \enquote{$x$ grows at a rate equal
+to $x$}: one step of length $1$ from $1$ must land on $1 + 1 + \tfrac{1}{2} +
+\tfrac{1}{6} + \tfrac{1}{24}$, close to the true answer $e \approx
 \num{2.718}$.
 \end{lab}
 
 \begin{think}
-RK4 asks the rule four times a step and Euler once, so for the same work
-Euler can take steps four times smaller. Which would you rather have: Euler
-with steps of \val{ch04.same.dt} seconds, or RK4 with steps of
-\val{ch04.euler.dt}?
+RK4 asks the rule four times a step, so for the same work Euler can take
+steps four times smaller. Which would you rather have: Euler with steps of
+\val{ch04.same.dt} seconds, or RK4 with steps of \val{ch04.euler.dt}?
 \end{think}
-\reveal{RK4, by a distance. Over ten seconds Euler with the small steps
-gains \val{ch04.same.gain} per cent of its energy; RK4 loses
-\val{ch04.rk4.ppm} parts in a million. For the same work its error is about
-\val{ch04.rk4.better} times smaller.}
+\reveal{RK4, by a distance. Over ten seconds Euler gains \val{ch04.same.gain}
+per cent of its energy; RK4 loses \val{ch04.rk4.ppm} parts in a million. For
+the same work its error is about \val{ch04.rk4.better} times smaller.}
 
 \pyregion{code/ch04/energy_drift.py}{drift}{Measuring how far a simulated spring's energy drifts}{lst:ch04-drift}
 
 \transcript{ch04-energy-drift}
 
 \noindent
-The column \code{rule calls} counts the work: how many times each run asked
-the rule for the rates. Two things come from the last line. RK4 is not exact
-either: over a thousand seconds it has lost \val{ch04.rk4.ppm.thousand} parts
-in a million, so it too is right for longer rather than right. And its error
-runs the other way, a slight loss where Euler gains. In the plane of states
-the difference is plain to see:
+\code{rule calls} counts the work. The last line says that RK4 is not exact
+either: over a thousand seconds it loses \val{ch04.rk4.ppm.thousand} parts in
+a million. It too is right for longer rather than right, only very much
+longer.
 
 \plotfig{ch04-euler-rk4}{The same spring followed for ten seconds by two
 steppers with the same step. Left: in the plane of states, Euler (red)
@@ -246,9 +218,8 @@ energy each one reports.}{Euler spiralling out against RK4}
 \begin{lab}{l04_02_drift}{Measure the drift}
 Write the spring's energy, and a function that follows the spring with a
 given stepper for a given time and reports how much its energy has changed.
-Then answer a question this chapter leaves open: halve the step, and how many
-times smaller does each method's drift become? The tests know the answer; try
-to predict it first.
+Then answer a question the chapter leaves open: halve the step, and how many
+times smaller does each method's drift become? Predict before you run.
 \end{lab}
 
 \section{The map of every state}
@@ -256,159 +227,138 @@ to predict it first.
 \index{phase space}\index{phase portrait}\index{pendulum}
 
 \noindent
-The left half of Figure~\ref{fig:ch04-euler-rk4} is a new kind of picture. It plots nothing
-against time. Each point in it is a whole state of the spring, a position and
-a velocity together, and the motion is a path from point to point. A plane of
-every possible state is called a \emph{phase space}, and a drawing of the
-paths in it is a \emph{phase portrait}. Every chaotic system in this book is
-drawn in one.
+The left half of Figure~\ref{fig:ch04-euler-rk4} plots nothing against time.
+Each point in it is a whole state, a position and a velocity together, and
+the motion is a path from point to point. A plane of every possible state is
+a \emph{phase space}, and a drawing of the paths in it is a \emph{phase
+portrait}. Every chaotic system in this book is drawn in one.
 
-A pendulum is the richer example. Its state is two numbers: the angle from
-hanging straight down, and how fast that angle is changing. Its rule of
-change is the spring's with one difference. The pull back towards the bottom
-is not proportional to the angle: it is largest when the pendulum sticks out
+A pendulum is the richer example. Its state is the angle from hanging
+straight down and how fast that angle is changing. Its rule is the spring's
+with one difference: the pull back is largest when the pendulum sticks out
 sideways and falls to nothing when it points straight down or straight up.
-(The function that behaves like that is the sine, and \code{chaoslab}'s
-pendulum rule calls \code{math.sin}.)
+(That is the sine, which \code{chaoslab}'s pendulum rule calls.)
 
-Now draw the rule as a map. At every point of the plane \dash{} every angle,
-every speed \dash{} the rule gives the rates, and so the direction the state
-is about to move in. Put a small arrow there. Motion is following the arrows.
+Now draw the rule as a map. At every point of the plane the rule gives the
+rates, and so the direction the state is about to move in. Put a small arrow
+there. Motion is following the arrows.
 
 \begin{think}
-Somewhere on the map the arrow has no length at all: nothing is changing.
-What are those states, as positions of a real pendulum? And what happens if
-you nudge each one?
+Somewhere on the map the arrow has no length: nothing is changing. What are
+those states, as positions of a real pendulum? What happens if you nudge
+each?
 \end{think}
-\reveal{Hanging straight down, at rest; and balanced exactly upside down, at
-rest. Nudge the first and the pendulum swings gently around it; nudge the
-second and it falls away. They are the two fixed points, one stable and one
-unstable, in the sense of Chapter~\ref{ch:iteration}.}
+\reveal{Hanging straight down at rest, and balanced exactly upside down at
+rest. Nudged, the first swings gently around; the second falls away. They are
+the two fixed points, one stable and one unstable, as in
+Chapter~\ref{ch:iteration}.}
 
 \plotfig{ch04-pendulum-map}{The map of every state of a pendulum one metre
-long. Grey arrows show which way the state moves at each point. The blue
-loops are swings released at 30, 90 and 150 degrees; the green paths go over
-the top; the dashed curve separates the two. The filled dot is hanging down
-at rest; the two open circles are the same upside-down
-position.}{a pendulum's phase portrait}
+long. Grey arrows show which way the state moves. Blue loops are swings
+released at 30, 90 and 150 degrees; green paths go over the top; the dashed
+curve separates the two. The filled dot is hanging at rest; the two open
+circles are the same upside-down position.}{a pendulum's phase portrait}
 
 \noindent
-Read it like a map. Near the middle the paths are closed loops: the pendulum
-swings out and back, round the same loop for ever. A path that closes on
-itself is a \emph{cycle}, and a cycle is perfectly predictable: go once round
-and you know every later lap. Far above and below, the paths run the whole
-width: the pendulum goes over the top and keeps turning. The dashed curve
-between them is the one motion that creeps up to the upside-down position and
-takes for ever to arrive.
+Near the middle the paths are closed loops: the pendulum swings out and back,
+round the same loop for ever. A path that closes on itself is a
+\emph{cycle}, and a cycle is perfectly predictable: once round, and you know
+every later lap. Far above and below, the paths run the whole width: the
+pendulum goes over the top and keeps turning.
 
 \begin{think}
-A bigger loop is longer, but the state also moves faster round it. Does a
+A bigger loop is longer, but the state moves faster round it. Does a
 pendulum released at $90$ degrees take longer to swing out and back than one
 released at $10$?
 \end{think}
 \reveal{Longer: \val{ch04.pend.ninety} seconds against \val{ch04.pend.ten},
-about \val{ch04.pend.ninety.pct} per cent more. Released at $170$ degrees,
-nearly upside down, it takes \val{ch04.pend.big} seconds,
-\val{ch04.pend.ratio} times as long.}
+about \val{ch04.pend.ninety.pct} per cent more. Released at $170$ degrees it
+takes \val{ch04.pend.big} seconds, \val{ch04.pend.ratio} times as long.}
 
 \pyregion{code/ch04/pendulum.py}{period}{Timing a pendulum's swing}{lst:ch04-period}
 
 \transcript{ch04-pendulum}
 
 \noindent
-The school rule that a pendulum's swing time does not depend on how far it
-swings is the small-swing version, and for small swings it is right: the
-times settle on \val{ch04.pend.small} seconds as the swing shrinks. It is why
-a precision pendulum clock swings through only a few degrees; clockmakers
-call the slowing of a wider swing \emph{circular error}.
+The school rule that the swing time does not depend on the swing is right for
+small swings: the times settle on \val{ch04.pend.small} seconds as the swing
+shrinks. That is why a precision pendulum clock swings through only a few
+degrees.
 
 \section{Settle, cycle or run off}
 \label{sec:ch04-settle}
 \index{attractor}\index{limit cycle}\index{Poincaré--Bendixson theorem}
 
 \noindent
-A real pendulum has friction, and friction takes a little energy out of every
-swing.
+A real pendulum has friction, which takes a little energy out of every swing.
 
 \begin{think}
 On the map, what happens to the path of a pendulum with friction released at
 $150$ degrees, and where does it end?
 \end{think}
-\reveal{It cannot close into a loop, because each swing is smaller than the
-one before. It spirals inwards and ends on the filled dot: hanging straight
-down, at rest.}
-A state that nearby paths all run into is an \emph{attractor}. The damped
-pendulum's resting point is the simplest kind. There is a second kind: a loop
-that paths run into. The Dutch engineer Balthasar van der Pol wrote down the
-classic example about a century ago, for circuits built with radio valves. Its rule
-is the spring's with an extra push:
+\reveal{Each swing is smaller than the last, so the path cannot close. It
+spirals inwards and ends on the filled dot: hanging straight down, at rest.}
+A state that nearby paths all run into is an \emph{attractor}, and the
+damped pendulum's resting point is the simplest kind. A loop can attract too.
+The Dutch engineer Balthasar van der Pol wrote down the classic example about
+a century ago, for circuits built with radio valves:
 \[ x \text{ changes at the rate } v, \qquad
    v \text{ changes at the rate } -x + (1 - x \times x)\, v. \]
-While $x$ lies between $-1$ and $1$, the new term speeds the motion up; beyond
-them it brakes it. Start near the middle, at \val{ch04.vdp.start.in}, and the
+While $x$ lies between $-1$ and $1$ the new term speeds the motion up; beyond
+them it brakes. Start near the middle, at \val{ch04.vdp.start.in}, and the
 swing grows; start far out, at \val{ch04.vdp.start.out}, and it shrinks. After
-\val{ch04.vdp.time} seconds both are swinging out to \val{ch04.vdp.reach.in}
-and \val{ch04.vdp.reach.out}: the same loop, reached from inside and from
-outside. A loop that attracts is a \emph{limit cycle}. A pendulum clock is
-one: its mechanism gives the pendulum a
-small kick every swing, friction takes energy away, and the swing settles to
-one size however hard you started it.
+\val{ch04.vdp.time} seconds both swing out to \val{ch04.vdp.reach.in} and
+\val{ch04.vdp.reach.out}: one loop, reached from inside and from outside. It
+is a \emph{limit cycle}, and a pendulum clock is one: a small kick every
+swing, friction taking energy away, and a swing that settles to one size
+however you started it.
 
 \plotfig{ch04-settle}{Two ways for motion in a plane to settle. Left: a
 pendulum with friction, released at 150 degrees, spirals onto the point where
-it hangs at rest. Right: van der Pol's rule from two starts, one inside and
-one outside, winding onto the same loop.}{settling onto a point and onto a
-loop}
+it hangs at rest. Right: van der Pol's rule from a start inside and a start
+outside, winding onto the same loop.}{settling onto a point and onto a loop}
 
 \begin{think}
 Why can two different paths on one of these maps never cross?
 \end{think}
-\reveal{At a crossing point the state would have two different futures, but
-the rule gives exactly one arrow at every point. One state, one future: the
-determinism of Chapter~\ref{ch:models}, drawn as a picture.}
-In a plane that one fact is surprisingly strong. A path that may cross
-neither itself nor any other path, and stays in a bounded region, is fenced
-in by its own past. It can wind towards a fixed point or wind towards a loop,
-and the only other thing it can do is run off to infinity. It cannot wander
-for ever without settling.
+\reveal{At a crossing the state would have two futures, but the rule gives
+one arrow at every point: one state, one future.}
+In a plane that one fact is strong. A path that may cross neither itself nor
+any other path, and stays in a bounded region, is fenced in by its own past.
+It can wind towards a fixed point or towards a loop, or it can run off to
+infinity. It cannot wander for ever without settling.
 
 \begin{rigourbox}
-That is the \emph{Poincaré--Bendixson theorem}, named after Henri Poincaré
-and the Swedish mathematician Ivar Bendixson. It needs the rule to be smooth
-(changing gently from point to point), and its exact statement allows one
-more ending, a chain of fixed points joined by paths, which changes nothing
-here. Its proof takes several pages of a university course and is in any
-textbook of dynamical systems. It is about motion in continuous time: a rule
-that jumps in steps can hop over its own path, and
-Chapter~\ref{ch:logistic} finds wild behaviour in a stepping rule with one
-number. And it needs a plane: in three dimensions a path can pass over and
-under itself, and nothing fences it in.
+This is the \emph{Poincaré--Bendixson theorem}, after Henri Poincaré and the
+Swedish mathematician Ivar Bendixson. It needs a smooth rule, and its exact
+statement allows one more ending, a chain of fixed points joined by paths.
+Its proof takes several pages of a university course and is in any textbook
+of dynamical systems. It is about motion in continuous time: a rule that
+jumps in steps can hop over its own path, and Chapter~\ref{ch:logistic} finds
+wild behaviour in a stepping rule with one number. And it needs a plane: in
+three dimensions a path can pass over and under itself.
 \end{rigourbox}
 
 \noindent
 So chaos in continuous time needs at least three numbers of state. That is
-why the weather model of Chapter~\ref{ch:lorenz}, which Edward Lorenz cut
-down in 1963 from a larger model of convection, has three numbers and not
-two: with two it could not do what it does.
+why the weather model of Chapter~\ref{ch:lorenz}, which Edward Lorenz cut down
+in 1963 from a larger model of convection, has three numbers and not two.
 
 \begin{think}
-One pendulum has two numbers of state, so the theorem fences it in. Hang a
-second pendulum from the bottom of the first. How many numbers is the state
-now, and does the theorem still promise simple motion?
+Hang a second pendulum from the bottom of the first. How many numbers is the
+state now, and does the theorem still promise simple motion?
 \end{think}
 \reveal{Four: an angle and a speed for each pendulum. The theorem says
-nothing about four numbers, so it promises nothing, and
-Chapter~\ref{ch:mechanics} shows that the double pendulum's motion is
-chaotic.}
+nothing about four numbers, and Chapter~\ref{ch:mechanics} shows that the
+double pendulum's motion is chaotic.}
 
 \begin{trapbox}
 \textbf{\enquote{A pendulum is a simple system, so its motion must be
 simple.}} For one pendulum it is: two numbers of state, a plane, and a
-theorem that allows only settling, cycling or running off. Hang a second
-pendulum from the first and the state has four numbers, the fence is gone,
-and the motion can become chaotic. How simple a system looks \dash{} two
-rods, two weights, one law of gravity \dash{} says little about how simple
-its motion is. Counting the numbers in its state says more.
+theorem that allows only settling, cycling or running off. Hang a second from
+it and the state has four numbers, the fence is gone, and the motion can
+become chaotic. How simple a system looks says little about how simple its
+motion is. Counting the numbers in its state says more.
 \end{trapbox}
 
 \section{Two bodies: the clockwork at its best}
@@ -417,12 +367,11 @@ its motion is. Counting the numbers in its state says more.
 
 \noindent
 Four numbers of state make chaos possible; they do not make it happen. The
-best evidence is the system that built the clockwork view in the first place:
-one planet going round the sun. Newton's gravity is a rule of change. The
-planet's position changes at its velocity, and its velocity changes towards
-the sun by an amount that falls with the square of the distance: twice as
-far, a quarter of the pull. The sun is so much heavier that we let it sit
-still.
+best evidence is the system that built the clockwork view: one planet going
+round the sun. Newton's gravity is a rule of change. The planet's position
+changes at its velocity, and its velocity changes towards the sun by an
+amount that falls with the square of the distance: twice as far, a quarter of
+the pull. The sun is so much heavier that it can sit still.
 
 \pyregion{code/ch04/two_bodies.py}{gravity}{Newton's gravity as a rule of change}{lst:ch04-gravity}
 
@@ -430,66 +379,59 @@ still.
 The state is four numbers: where the planet is, across and up, and how fast
 it is going, across and up. The listing launches it sideways at
 \val{ch04.kepler.orbits} different speeds, follows each orbit ten times round
-with RK4, and times every return to the starting line. The \code{size} of an
-orbit is half its longest width.
+with RK4, and times every return to the starting line. An orbit's
+\code{size} is half its longest width.
 
 \transcript{ch04-two-bodies}
 
 \noindent
-Look at the second and third columns. The average of ten laps is the first
-lap, to every digit printed: the planet comes back on schedule, again and
-again, round an ellipse, a stretched circle. The last column is the same for
-all three orbits, \val{ch04.kepler.law}: the square of the time for one lap,
-divided by the cube of the size. Johannes Kepler found that rule in the
-planets' positions in 1619; Newton showed in 1687 that it follows from
+The average of ten laps is the first lap, to every digit printed: the planet
+comes back round its ellipse on schedule, again and again. The last column is
+the same for all three orbits, \val{ch04.kepler.law}: the square of the lap
+time divided by the cube of the size. Johannes Kepler found that rule in the
+planets' positions in 1619 and Newton showed in 1687 that it follows from
 gravity; your laptop has found it again from the rule of change alone.
 
-Four numbers, and nothing like chaos, because two quantities never change:
-the energy, and the rate at which the line from sun to planet sweeps out area
-(Kepler's second law). Each one that never changes pins the state down
-further, and with two pinned the motion has no room left to be anything but
-regular. Add a third body and that stops being true, which is where
-Chapter~\ref{ch:mechanics} begins.
+Why no chaos with four numbers? Two quantities never change: the energy, and
+the rate at which the line from sun to planet sweeps out area. Each pins the
+state down further, and with two pinned the motion has no room left to be
+anything but regular. Add a third body and that stops being true, which is
+where Chapter~\ref{ch:mechanics} begins.
 
 \begin{worldbox}
-The tables of where every planet, large moon and many asteroids will be
-\dash{} the ephemerides that spacecraft navigators steer by, published by
-NASA's Jet Propulsion Laboratory \dash{} are made the way this listing made
-its orbits: Newton's rule of change for the whole solar system, followed
-forward in small steps, and checked against radar and spacecraft tracking.
-When a probe arrives at a planet on time after years in flight, a rule of
-change followed in small steps has made a prediction and been right.
+The tables of where the planets, large moons and many asteroids will be,
+which spacecraft navigators steer by, are published by NASA's Jet Propulsion
+Laboratory. They are made the way this listing made its orbits: Newton's rule
+of change for the whole solar system, followed forward in small steps and
+checked against radar and spacecraft tracking.
 \end{worldbox}
 
 \noindent
-That is the clockwork at its best: a rule of change, a computer taking small
-steps, and a prediction that comes back on schedule to every digit it prints.
-Part~II asks what happens when the rule is every bit as exact and the future is
-not.
+That is the clockwork at its best: a rule of change, small steps, and a
+prediction that comes back on schedule to every digit it prints. Part~II asks
+what happens when the rule is every bit as exact and the future is not.
 
 \begin{summarybox}
 \begin{itemize}
-\item A \textbf{rule of change} (a \textbf{differential equation}) says how
+\item A \textbf{rule of change}, or \textbf{differential equation}, says how
   fast each number of the state is changing right now, not what it will be
-  next. A spring's state is a position and a velocity.
+  next.
 \item \textbf{Euler's method} moves each number for one short step at the
-  rate it has now, and repeats. On a spring it gains energy every step, and a
-  smaller step makes it \textbf{right for longer}, not right.
-\item \textbf{RK4} samples the rates four times a step and averages them. For
-  the same work its error is many thousands of times smaller, and it too
-  drifts, only far more slowly. Energy is the check.
+  rate it has now. On a spring it gains energy every step, and a smaller step
+  makes it \textbf{right for longer}, not right.
+\item \textbf{RK4} samples the rates four times a step and averages them; for
+  the same work its error is far smaller, but it drifts too. Energy is the
+  check.
 \item A \textbf{phase space} is a plane of every possible state; the rule is
-  an arrow at every point and motion follows the arrows. A pendulum draws
-  closed loops (\textbf{cycles}) around its stable \textbf{fixed point}, and
-  big swings take longer than small ones.
-\item Friction makes the path spiral into a fixed point, an
-  \textbf{attractor}; a rule that pushes and brakes can make paths wind onto a
-  loop. Paths never cross, so in a plane motion can only settle, cycle or run
-  off (\textbf{Poincaré--Bendixson}), and chaos in continuous time needs at
-  least three numbers.
-\item Two bodies under gravity have four numbers of state and still trace
-  ellipses on schedule for ever, as Kepler's third law says: three numbers are
-  needed for chaos, not enough.
+  an arrow at every point. A pendulum draws \textbf{cycles} around its stable
+  \textbf{fixed point}, and big swings take longer than small ones.
+\item Friction spirals a path into an \textbf{attractor}; a loop can attract
+  too. Paths never cross, so in a plane motion can only settle, cycle or run
+  off (\textbf{Poincaré--Bendixson}): chaos in continuous time needs at least
+  three numbers.
+\item Two bodies have four numbers of state and still trace ellipses on
+  schedule, as Kepler's third law says: three numbers are needed for chaos,
+  not enough.
 \end{itemize}
 \end{summarybox}
 
@@ -497,39 +439,32 @@ not.
 
 \begin{checkpoint}
 \item A speedometer reads $90$ kilometres an hour. Roughly how far does the
-  car go in the next $20$ seconds, and why can the same reading not tell you
-  where it will be in an hour?
+  car go in the next $20$ seconds?
   \answerto{About half a kilometre: $90$ kilometres an hour is \num{1.5}
-  kilometres a minute, and $20$ seconds is a third of a minute. Over an hour
-  the speed changes, and the reading is only true at one instant.}
+  kilometres a minute, and $20$ seconds is a third of a minute.}
 \item A spring with $k = 1$ is at $x = 0$ moving at $v = 1$, so its energy is
   \num{0.5}. Take one Euler step of \num{0.1}. What are the new $x$, $v$ and
   energy?
-  \answerto{$x = 0 + \num{0.1} \times 1 = \num{0.1}$ and
-  $v = 1 + \num{0.1} \times 0 = 1$. The energy is $\num{0.5} + \num{0.005}
-  = \num{0.505}$, one per cent more: exactly the factor
+  \answerto{$x = \num{0.1}$ and $v = 1$, so the energy is
+  $\num{0.5} + \num{0.005} = \num{0.505}$: one per cent more, the factor
   $1 + \num{0.1} \times \num{0.1}$.}
-\item Euler's method with a step of \num{0.1} gains \val{ch04.euler.gain.ten}
-  per cent of the spring's energy in ten seconds. Roughly how long can a run
-  with a step of \num{0.001} go before it has gained as much?
-  \answerto{About a thousand seconds. A step a hundred times smaller gains a
-  hundred times less per second, so the same gain takes a hundred times
-  longer: right for longer, not right.}
+\item Euler with a step of \num{0.1} gains \val{ch04.euler.gain.ten} per cent
+  of the spring's energy in ten seconds. Roughly how long can a run with a
+  step of \num{0.001} go before it has gained as much?
+  \answerto{About a thousand seconds: a step a hundred times smaller gains a
+  hundred times less per second.}
 \item Describe the four samples RK4 takes in one step, and how it combines
   them.
-  \answerto{The rates at the start; the rates half a step ahead at the first
-  rates; the rates half a step ahead at the second; the rates a whole step
-  ahead at the third. It then moves the whole step at their average with
-  weights $1$, $2$, $2$, $1$, divided by $6$.}
-\item On a pendulum's phase portrait, what do a closed loop, a path running
-  the whole width and a spiral each mean for the real pendulum?
-  \answerto{A closed loop is swinging back and forth; a path across the whole
-  width is going over the top and turning; a spiral inwards is a pendulum
-  losing energy to friction and settling to hang at rest.}
+  \answerto{The rates at the start; half a step ahead at the first rates;
+  half a step ahead at the second; a whole step ahead at the third. It moves
+  at their average with weights $1$, $2$, $2$, $1$.}
+\item On a pendulum's phase portrait, what do a closed loop, a path across the
+  whole width and a spiral each mean for the real pendulum?
+  \answerto{Swinging back and forth; going over the top and turning; losing
+  energy to friction and settling to hang at rest.}
 \item Why can a smooth rule of change with two numbers of state never be
   chaotic, and how many numbers does chaos in continuous time need?
-  \answerto{Paths in its plane can never cross, because each state has one
-  future, so a bounded path can only settle to a fixed point or wind onto a
-  loop (the Poincaré--Bendixson theorem). Chaos in continuous time needs at
-  least three numbers of state.}
+  \answerto{Its paths can never cross, because each state has one future, so
+  a bounded path can only settle to a fixed point or wind onto a loop
+  (Poincaré--Bendixson). Chaos in continuous time needs at least three.}
 \end{checkpoint}

@@ -144,12 +144,11 @@ further: each round pitches four times as many tents, each a ninth of the
 area, so it adds $\tfrac{4}{9}$ of what the round before added, and those
 additions die away like the half circle's.
 
-\begin{projectbox}
-The rule is \api{koch} in \pkg{chaoslab}. The one unfamiliar line is the
-tent's tip: half a piece along the middle third, then sideways by \code{h}
-times the piece, the height of an equilateral triangle.
+The rule itself is \api{koch} in \pkg{chaoslab}. The one unfamiliar line is
+the tent's tip: half a piece along the middle third, then sideways by
+\code{h} times the piece, the height of an equilateral triangle.
+
 \pyregion{code/src/chaoslab/fractals.py}{koch}{The Koch rule, in chaoslab}{lst:ch11-kochrule}
-\end{projectbox}
 
 \begin{think}
 Suppose you could draw every round, for ever, and measure the finished curve
@@ -191,7 +190,7 @@ Nor is $\tfrac{1}{4}$, which is never an end: it lies in the left third;
 stretch that third three times and $\tfrac{1}{4}$ lands on $\tfrac{3}{4}$,
 in a right third; stretch that one and it is back at $\tfrac{1}{4}$. It
 dodges every middle third for ever.
-\end{revealblock}
+\end{revealblock}%
 What is left is the \emph{Cantor set}: a dust of infinitely many points,
 more than you could ever write down in a list, holding no length at all.
 Length is the wrong question for both shapes: one has too much of it, the

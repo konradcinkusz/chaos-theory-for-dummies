@@ -21,9 +21,10 @@ sys.path.insert(0, str(HERE))
 
 from _values import Values
 from ascii_mandelbrot import LIMIT as ASCII_LIMIT
-from chaoslab import escape_time, logistic, r_to_c
 from complex_numbers import degrees, times
 from slow_escape import LIMIT as SLOW_LIMIT
+
+from chaoslab import escape_time, logistic, r_to_c
 
 v = Values("ch12")
 

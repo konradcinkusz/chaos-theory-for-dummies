@@ -34,10 +34,10 @@ def factors(r: float, x0: float, delta: float, n: int) -> list[float]:
 def main() -> None:
     # --8<-- [start:table]
     r, a, b = 4.0, 0.3, 0.3 + 1e-10
-    print("step     x     gap grew by   slope there")
+    print("step        x    gap grew by    slope there")
     for n in range(1, 9):
         grew = abs(step(r, b) - step(r, a)) / abs(b - a)
-        print(f"{n:4d}   {a:.3f}   {grew:10.3f}   {abs(stretch(r, a)):10.3f}")
+        print(f"{n:4d}{a:9.3f}{grew:15.3f}{abs(stretch(r, a)):15.3f}")
         a, b = step(r, a), step(r, b)
     # --8<-- [end:table]
 
