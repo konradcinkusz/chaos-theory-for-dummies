@@ -1,0 +1,38 @@
+[
+  {
+    "n": 101,
+    "label": "sec:ch10-knead",
+    "en": {
+      "habit": "If a system can never leave a small region, it cannot be very sensitive to its start.",
+      "truth": "The region caps how \\emph{big} an error can get, not how fast it grows. A tiny error doubles and doubles until it is as large as the region, and from then on two runs are as unrelated as two points dropped in it at random."
+    },
+    "pl": {
+      "habit": "Jeśli układ nigdy nie opuszcza małego obszaru, nie może być bardzo wrażliwy na stan początkowy.",
+      "truth": "Obszar ogranicza to, jak \\emph{duży} może być błąd, a nie to, jak szybko rośnie. Maleńki błąd podwaja się raz za razem, aż dorówna rozmiarom obszaru, a od tej chwili dwa przebiegi są tak niezależne jak dwa punkty wrzucone do niego na chybił trafił."
+    }
+  },
+  {
+    "n": 102,
+    "label": "sec:ch10-area",
+    "en": {
+      "habit": "If the area keeps shrinking, the motion must be dying out.",
+      "truth": "Hénon's map multiplies every area by \\num{0.3} each step because it squeezes hard in one direction while it stretches in another. A patch becomes a longer and thinner ribbon whose points keep moving for ever."
+    },
+    "pl": {
+      "habit": "Skoro pole wciąż maleje, ruch musi zamierać.",
+      "truth": "Odwzorowanie Hénona mnoży każde pole przez \\num{0.3} w każdym kroku, bo mocno ściska w jednym kierunku, a rozciąga w innym. Plama punktów staje się coraz dłuższą i cieńszą wstęgą, której punkty poruszają się bez końca."
+    }
+  },
+  {
+    "n": 103,
+    "label": "sec:ch10-zoom",
+    "en": {
+      "habit": "Zoom in far enough on any curve and it turns into a straight line.",
+      "truth": "That is true of smooth curves. Each line of a strange attractor splits under magnification into a bundle of lines, and each of those splits again: layers within layers at every scale."
+    },
+    "pl": {
+      "habit": "Wystarczy dość mocno powiększyć dowolną krzywą, a stanie się linią prostą.",
+      "truth": "To prawda dla krzywych gładkich. Każda linia atraktora dziwnego rozpada się w powiększeniu na wiązkę linii, a każda z nich znowu: warstwy w warstwach w każdej skali."
+    }
+  }
+]

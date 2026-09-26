@@ -1,0 +1,38 @@
+[
+  {
+    "n": 91,
+    "label": "sec:ch09-flow",
+    "en": {
+      "habit": "Chaos needs many variables.",
+      "truth": "Lorenz's model has three numbers and two multiplications, and it is chaotic. Three is the fewest a flow needs, because a path in a plane cannot cross itself; it is also enough."
+    },
+    "pl": {
+      "habit": "Chaos potrzebuje wielu zmiennych.",
+      "truth": "Model Lorenza ma trzy liczby i dwa mnożenia, i jest chaotyczny. Trzy to najmniej, ile potrzebuje przepływ, bo droga na płaszczyźnie nie może przeciąć samej siebie; to też wystarcza."
+    }
+  },
+  {
+    "n": 92,
+    "label": "sec:ch09-attractor",
+    "en": {
+      "habit": "A chaotic system can go anywhere.",
+      "truth": "Unpredictable is not unbounded. Every Lorenz run, from almost any start, is drawn onto the same bounded butterfly-shaped set, the attractor, and never leaves it."
+    },
+    "pl": {
+      "habit": "Układ chaotyczny może pójść gdziekolwiek.",
+      "truth": "Nieprzewidywalny to nie to samo co nieograniczony. Każdy przebieg Lorenza, z niemal każdego startu, zostaje ściągnięty na ten sam ograniczony zbiór w kształcie motyla, atraktor, i nigdy go nie opuszcza."
+    }
+  },
+  {
+    "n": 93,
+    "label": "sec:ch09-statistics",
+    "en": {
+      "habit": "If the path is unpredictable, nothing about it is predictable.",
+      "truth": "The path is unpredictable beyond about twenty time units, but the statistics of the attractor \\dash{} the fraction of time on each wing, the average height, even the Lyapunov exponent \\dash{} come out the same from every start."
+    },
+    "pl": {
+      "habit": "Jeśli droga jest nieprzewidywalna, nic w niej nie da się przewidzieć.",
+      "truth": "Droga jest nieprzewidywalna dalej niż na mniej więcej dwadzieścia jednostek czasu, ale statystyki atraktora \\dash{} część czasu na każdym skrzydle, średnia wysokość, a nawet wykładnik Lapunowa \\dash{} wychodzą takie same z każdego startu."
+    }
+  }
+]

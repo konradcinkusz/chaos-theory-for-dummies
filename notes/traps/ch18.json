@@ -1,0 +1,38 @@
+[
+  {
+    "n": 181,
+    "label": "sec:ch18-beyond",
+    "en": {
+      "habit": "Unpredictable means unknowable.",
+      "truth": "Beyond the horizon the path is lost, and nearly everything else is known: where the system can go, how often it visits each region, and the odds. A forecast given as odds is the correct answer, not a hedge."
+    },
+    "pl": {
+      "habit": "Nieprzewidywalne znaczy niepoznawalne.",
+      "truth": "Za horyzontem trajektoria przepada, a prawie wszystko inne jest znane: dokąd układ może dojść, jak często odwiedza każdy obszar i jakie są szanse. Prognoza podana jako szanse to poprawna odpowiedź, nie wykręt."
+    }
+  },
+  {
+    "n": 182,
+    "label": "sec:ch18-noise",
+    "en": {
+      "habit": "Small causes always matter.",
+      "truth": "In a stable system they die away. In a chaotic one a small cause changes the details beyond the horizon and nothing about the statistics, and no single small cause can be blamed for a big effect after the fact."
+    },
+    "pl": {
+      "habit": "Małe przyczyny zawsze mają znaczenie.",
+      "truth": "W układzie stabilnym wygasają. W chaotycznym mała przyczyna zmienia szczegóły za horyzontem i nic w statystykach, a żadnej pojedynczej małej przyczyny nie da się po fakcie obwinić o duży skutek."
+    }
+  },
+  {
+    "n": 183,
+    "label": "sec:ch18-everyone",
+    "en": {
+      "habit": "Chaos means anything goes.",
+      "truth": "Chaos is an exact rule confined to a bounded attractor, with steady statistics and a horizon you can compute. Calling something chaotic is a claim to be tested, not a reason to stop forecasting."
+    },
+    "pl": {
+      "habit": "Chaos znaczy: wszystko wolno.",
+      "truth": "Chaos to dokładna reguła zamknięta w ograniczonym atraktorze, ze stałymi statystykami i horyzontem, który da się policzyć. Nazwanie czegoś chaotycznym to twierdzenie do sprawdzenia, a nie powód, żeby przestać prognozować."
+    }
+  }
+]

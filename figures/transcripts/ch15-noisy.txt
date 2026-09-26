@@ -1,0 +1,12 @@
+noise  squares  1-step error
+ 0.00       28       0.00099
+ 0.01       28         0.018
+ 0.05       44         0.076
+ 0.20       84          0.26
+right answers out of 100 short records:
+length  forecast test    squares test
+        clean  noisy    clean  noisy
+    10     79     74       56     38
+    20     98     89       95     73
+    40    100     95      100     92
+   100    100     99      100     99

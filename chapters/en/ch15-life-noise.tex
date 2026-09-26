@@ -1,0 +1,477 @@
+%% ch15 --- Life, markets and noise: telling chaos from chance
+%%
+%% Written September 2026. Every number the reader cannot do in their head
+%% comes from code/measure/ch15.py, which imports the SAME functions the
+%% listings print (code/ch15/). The random numbers come from Python's own
+%% generator with named seeds, so the shuffles and the noise are the same on
+%% every machine; forecast errors are printed to two significant figures.
+%%
+%% WHAT THIS CHAPTER MAY NOT SAY. The logistic map is Chapter 5's and is used
+%% here as a known source of chaos, not re-derived. The doubling of an error
+%% at r = 4 is Chapter 7's measurement, quoted, and the forecast here only
+%% shows it from the outside. The period-doubling route is Chapter 8's; the
+%% epidemic model walks it without naming Feigenbaum's number. Whether a
+%% chaotic map makes a good source of random numbers is Chapter 16's trap and
+%% is not touched. The field guide to prediction is Chapter 18's.
+%%
+%% Twin: chapters/pl/ch15-life-noise.tex. Section for section, macro for
+%% macro, number for number; tools/parity.py compares them.
+
+\chapter{Life, markets and noise: telling chaos from chance}
+\label{ch:life}
+\index{chaos!telling from noise}\index{noise}
+
+\noindent
+A cardiologist looks at the gaps between heartbeats, an epidemiologist at a
+century of monthly measles counts, a trader at a price. Each sees a wiggly
+line that never quite repeats, and wants to know what makes it wiggle: a
+rule, with a few numbers pushing each other about, or chance, countless small
+causes no model will ever list. Most often it is some of both.
+
+Chapter~\ref{ch:logistic} showed that a rule one line long can produce output
+as irregular as a lottery. This chapter asks the question the other way
+round: handed a wiggly series and no rule, can you tell whether a rule made
+it? You will build two tests, measure how well they work when the data are
+noisy and short, and then visit the places where chaos has been claimed. The
+message is not that chaos is everywhere, nor that it is nowhere. It is that a
+claim of chaos can be checked.
+
+\begin{outcomes}
+\outcome{make a chaotic series and a random one out of exactly the same
+  numbers, and say why no histogram can tell them apart}
+\outcome{draw a return map, count the squares it lands in, and read the
+  count}
+\outcome{forecast a series from its own past by the method of analogues,
+  and measure how the error grows with the number of steps ahead}
+\outcome{say how measurement noise and a short record weaken both tests}
+\outcome{judge a claim of chaos in populations, epidemics, hearts or markets
+  by the evidence offered for it}
+\end{outcomes}
+
+\section{Two series, one set of numbers}
+\label{sec:ch15-twins}
+\index{surrogate data}
+
+\noindent
+Start with a puzzle. Two series each hold \val{ch15.n} numbers between $0$
+and $1$. One was made by the logistic rule of Chapter~\ref{ch:logistic} with
+its knob at $r = 4$: if $x_n$ is the value at step $n$, the next one is
+\[ x_{n+1} = 4\,x_n\,(1 - x_n), \]
+four times the value times one minus the value. The other series is random.
+Both are printed below to four decimal places; the program that made them
+keeps about sixteen significant figures.
+
+\begin{think}
+Series~A begins \val{ch15.a.1}, \val{ch15.a.2}, \val{ch15.a.3},
+\val{ch15.a.4}. Series~B begins \val{ch15.b.1}, \val{ch15.b.2},
+\val{ch15.b.3}, \val{ch15.b.4}. Which one did the rule make? Can you tell by
+looking, and can you tell by a calculation?
+\end{think}
+\reveal{B. By eye you cannot tell. By calculation you can: $4 \times
+\num{0.2} \times \num{0.8} = \num{0.64}$, which is B's second value, and
+$4 \times \num{0.64} \times \num{0.36}$ is \val{ch15.b.3}, its third. For A
+the rule gives about \val{ch15.a.next} from the first value, and the second
+value is \val{ch15.a.2}.}
+Look at what the test used. Not the size of the numbers, not how often each
+size turns up, but their \emph{order}: whether each value follows from the
+one before. That is the whole of this chapter.
+
+\begin{trapbox}
+\textbf{\enquote{A random-looking sequence must come from randomness.}}
+Series~B looked every bit as random as A, and it came from one line of
+arithmetic with no chance in it. Looking random is a fact about the look. It
+says nothing about the cause until you have tested for the kind of order a
+rule leaves behind.
+\end{trapbox}
+
+\noindent
+Series~A was not made by rolling dice. It was made from series~B, by
+shuffling:
+
+\pyregion{code/ch15/twins.py}{make}{Two series from one: a rule, and the same numbers shuffled}{lst:ch15-make}
+
+\noindent
+The first function iterates the rule; the second shuffles a copy of the
+list with Python's random number generator, started from a fixed
+\emph{seed} so that the shuffle is the same on every computer and your run
+matches the page. A series built from another by scrambling its order is
+called a \emph{surrogate}: the hardest random
+series to tell from the original, because it has exactly the same numbers.
+
+\begin{think}
+How will the histogram of the shuffled series \dash{} how many of its values
+fall in each fifth of the range from $0$ to $1$ \dash{} compare with that of
+the rule's series?
+\end{think}
+\reveal{Identical, bar for bar. A histogram counts values and ignores their
+order, and a shuffle changes only the order.}
+
+\transcript{ch15-twins}
+
+\noindent
+Note the shape: \val{ch15.hist.low} of the \val{ch15.n} values sit in the
+lowest fifth and only \val{ch15.hist.mid} in the middle one, because the
+rule lingers near $0$ and $1$. The shuffle has the same lopsided histogram,
+and the same average, spread, largest and smallest value. No summary that
+ignores order can tell the twins apart.
+
+\plotfig{ch15-twins}{The rule's series and its shuffle. Top: the first
+hundred steps of each, equally ragged. Bottom: their histograms, which are
+identical.}{two series with one histogram}
+
+\section{Plot each value against the next}
+\label{sec:ch15-return}
+\index{return map}
+
+\noindent
+In the puzzle you could test each value against the one before because you
+were told the rule. With real data nobody tells you, so let the data draw the
+rule for you. Put a point at $(x_n, x_{n+1})$ for every step $n$: across by
+this value, up by the next. The picture is called a \emph{return map}.
+
+\begin{think}
+Where will the points of the rule's return map lie? And the shuffle's?
+\end{think}
+\reveal{The rule's points lie on one curve, the hump of $y = 4x(1 - x)$,
+because every next value \emph{is} the rule applied to the value before. The
+shuffle's points spread over the whole square, because in a shuffle the next
+value has nothing to do with this one.}
+
+\plotfig{ch15-return-maps}{Each value plotted against the next. The rule's
+series draws its own rule; the shuffled series fills the square. The faint
+lines cut the square into a hundred little squares.}{a curve and a cloud}
+
+\noindent
+A picture is a judgement; a count is a measurement. Cut the square into a
+hundred little squares and count how many the return map lands in:
+
+\pyregion{code/ch15/return_map.py}{pairs}{Pairs of neighbours, and the squares they land in}{lst:ch15-pairs}
+
+\transcript{ch15-return-map}
+
+\noindent
+A curve can pass through only so many squares. The rule's \val{ch15.n}
+values touch \val{ch15.sq.rule}, and a longer record would not raise the
+count, because every new point lands on the same curve. The shuffle keeps
+finding new squares until it has touched all \val{ch15.sq.shuf}.
+
+\begin{lab}{l15_01_return}{Curve or cloud?}
+Write the return map test yourself: pair each value with the next, count the
+squares the pairs land in, and return \code{"curve"} if fewer than half the
+squares are touched and \code{"cloud"} otherwise. Then try a grid of two by
+two on a series that cycles through three values, and see how a grid that is
+too coarse misleads.
+\end{lab}
+
+\begin{worldbox}
+Robert Shaw, a physicist at the University of California at Santa Cruz,
+timed the drops falling from a leaking tap. At some rates of flow the drops
+came at irregular intervals, and when he plotted each interval against the
+next, the points did not fill a cloud: they lay along a thin curved shape. A
+kitchen tap became one of the best-known demonstrations of chaos read from a
+single measured quantity.
+\end{worldbox}
+
+\noindent
+Shaw measured one thing, the gap between drops, though the water has far more
+going on than one number describes. That he saw a shape is not luck. In 1980
+Norman Packard, James Crutchfield, Doyne Farmer and Shaw himself showed how
+to rebuild the shape of a system's motion from one measured quantity, by
+using delayed copies of it \dash{} the reading now, a moment ago, a moment
+before that \dash{} as stand-ins for the numbers nobody measured. In 1981
+Floris Takens proved that this works. The return map is the simplest case:
+one quantity, one delay.
+
+\begin{rigourbox}
+Takens' theorem in words: for a smooth deterministic system whose state has
+$d$ numbers, $2d + 1$ delayed copies of almost any single measurement give a
+faithful copy of the motion, bent and stretched but with the same shape. The
+proof, in his 1981 paper \emph{Detecting strange attractors in turbulence},
+uses differential topology.
+\end{rigourbox}
+
+\section{Forecasting from the past}
+\label{sec:ch15-analogues}
+\index{method of analogues}\index{nearest neighbour}
+
+\noindent
+The second test asks what a user of the data cares about: can I predict it?
+With no rule, you can search the record for the moment most like now and
+assume that what happened next then will happen next now. This is the
+\emph{method of analogues}. In 1969 Edward Lorenz tried it on weather maps
+and found no past day close enough to be useful: with so many numbers in its
+state, the atmosphere had not come back near where it had been. For a series
+of single numbers it works:
+
+\pyregion{code/ch15/analogues.py}{forecast}{Forecasting by the nearest past analogue}{lst:ch15-forecast}
+
+\noindent
+\code{forecast} finds the past value closest to \code{x}, its \emph{nearest
+neighbour}, and returns what came \code{h} steps after it.
+\code{mean\_error} learns from the first thousand values, forecasts every
+value after them, and averages the sizes of the misses.
+
+\begin{think}
+For the rule's series the average miss one step ahead is about
+\val{ch15.fc.rule}, a thousandth. A blind guess \dash{} any value picked from
+the histogram \dash{} misses by about \val{ch15.fc.shuf}.
+Chapter~\ref{ch:lyapunov} measured that at $r = 4$ a small error roughly
+doubles at every step. About how many steps ahead can the forecast go before
+its misses reach half of a blind guess's?
+\end{think}
+\reveal{About nine: a thousandth doubled nine times is about a half, since
+$2^{9} = 512$. The measurement agrees: the misses first pass half of the
+shuffle's at step \val{ch15.fc.half}.}
+
+\transcript{ch15-analogues}
+
+\plotfig{ch15-forecast}{The average miss of a forecast by analogues against
+the number of steps ahead, on a logarithmic scale. The shuffle is a blind
+guess at every horizon; the rule's series is forecast well, and less well at
+every step.}{forecast error against steps ahead}
+
+\noindent
+For the shuffled series the forecast misses by about \val{ch15.fc.shuf} at
+every horizon: its past holds no information about its next value. For the
+rule's series the miss one step ahead is about \val{ch15.fc.times} times
+smaller, and it grows by a factor of about \val{ch15.fc.double} a step
+\dash{} the stretching Chapter~\ref{ch:lyapunov} measured from the inside,
+seen from the outside \dash{} until after a dozen steps it too is a blind
+guess.
+
+So chaos and noise differ in both directions. Noise is equally unpredictable
+at every horizon. Chaos is predictable a few steps ahead, where noise is not,
+and loses that at a steady, measurable rate: a stronger fingerprint of chaos
+than irregularity will ever be.
+
+\section{Real data is a mix}
+\label{sec:ch15-noisy}
+\index{noise!measurement}
+
+\noindent
+Nothing is measured exactly. A scale, a thermometer or a clerk copying a
+register moves each value a little, at random. To see what that does, move
+each value of the rule's series by a random amount no bigger than some size:
+
+\pyregion{code/ch15/noisy.py}{noise}{Measurement noise: each value moved at random}{lst:ch15-noise}
+
+\begin{think}
+Add noise of up to \val{ch15.noise.small} to the rule's series: a hundredth,
+thinner than the curve in the return map as printed. What happens to the
+average miss one step ahead, which was \val{ch15.fc.rule}?
+\end{think}
+\reveal{It rises to \val{ch15.noise.small.err}, many times worse. The
+analogue the forecast finds is itself off by up to a hundredth, and so is the
+value being forecast, before the rule's doubling has even started.}
+
+\plotfig{ch15-noisy}{Return maps of the rule's series seen through
+measurement noise of three sizes. The curve thickens into a band, and at the
+largest size the band nearly fills the square.}{a curve thickening in noise}
+
+\transcript{ch15-noisy}
+
+\noindent
+In the upper table, the whole record, the curve thickens into a band as the
+noise grows: with noise of up to \val{ch15.noise.big}, a fifth of the whole
+range, it touches \val{ch15.noise.big.sq} squares. Even so, with
+\val{ch15.n} values the forecast still beats a blind guess,
+\val{ch15.noise.big.err} against \val{ch15.fc.shuf}.
+
+The lower table is the cruel part. It cuts the record into short pieces and
+counts, out of a hundred, how often each test says the rule's piece is less
+random than its own shuffle. With forty noisy values the forecast test is
+right \val{ch15.short.fc.forty} times. With ten it is right
+\val{ch15.short.fc} times, and the squares test only \val{ch15.short.sq}
+\dash{} worse than tossing a coin. Short, noisy data can make order look like
+chance, and chance look like order.
+And this is the easiest chaos there is, with one number per step; a system
+with many numbers in its state needs a far longer record.
+
+\begin{lab}{l15_02_forecast}{Ask several analogues}
+With noise in the record, the closest analogue may be close by accident.
+Write a forecaster that finds the few closest past values instead and
+averages what came after them. The test checks it on a small library you can
+work by hand, and then that averaging five analogues beats trusting one on a
+noisy series.
+\end{lab}
+
+\section{Populations, epidemics, hearts}
+\label{sec:ch15-life}
+\index{population dynamics}\index{epidemic}\index{SIR model}
+
+\noindent
+Robert May's 1976 paper on the logistic map was written for ecologists. Its
+lesson was that a population jumping about irregularly from year to year
+need not be pushed by weather or luck: its own breeding rule could do it.
+
+\begin{think}
+Many real insect populations do rise and fall irregularly from one year to
+the next. Does that make them chaotic?
+\end{think}
+\reveal{No. Irregular numbers are what chaos produces, and also what a steady
+population buffeted by weather, disease and chance produces. Irregularity
+cannot tell the two apart; only tests of order can.}
+
+\begin{trapbox}
+\textbf{\enquote{Irregular data proves chaos.}} Every series in this chapter
+was irregular, and half of them were shuffles. Chaos is the claim that a rule
+with few numbers in it makes the irregularity, and it needs evidence of that
+rule: structure in the return map, a forecast that starts good and worsens
+steadily, and a record long and clean enough for either to mean something.
+\end{trapbox}
+
+\noindent
+The strongest evidence has come from the laboratory, where the rule can be
+changed on purpose. In 1997 Robert Costantino and colleagues reported in
+\emph{Science} on flour beetles in jars, whose rates of adult death and
+recruitment the experimenters set by hand. As those rates changed, the
+colonies moved between steady numbers, cycles and irregular swings where
+their model predicted. A wild population counted yearly for a few decades
+gives about as few values as the lower table above.
+
+Epidemics are the other classic. The \emph{SIR model} divides people into
+the susceptible, who can catch the disease, the infectious, who have it, and
+the recovered. New infections each day are proportional to how many
+susceptible and infectious people there are to meet, a case stays infectious
+for \val{ch15.sir.days} days on average, and births bring in new
+susceptibles. Take a measles-like disease, where one case among people with
+no immunity infects about \val{ch15.sir.r0} others, and a lifetime of
+\val{ch15.sir.life} years. Then add a school year: children mix more in term
+than in the holidays, so let the contact rate rise and fall once a year by a
+fraction called the \emph{season}.
+
+\pyregion{code/ch15/epidemic.py}{rule}{An epidemic with a school year: the SIR rule stepped a quarter-day at a time}{lst:ch15-sir}
+
+\transcript{ch15-epidemic}
+
+\noindent
+With no school year the model settles: \val{ch15.sir.steady} cases per
+thousand people, every year the same. With a season of \val{ch15.sir.two},
+big and small years alternate, as measles did in England and Wales before
+vaccination began in 1968. At \val{ch15.sir.four} the pattern repeats every
+four years, and at \val{ch15.sir.wild} it never repeats, and a nudge of one
+part in a billion at the start sends the years a different way. That is the
+road into chaos of Chapter~\ref{ch:bifurcations}, walked by an epidemic.
+
+It is also where honesty is needed. In the chaotic setting the model's
+epidemics burn out so completely that at the lowest point fewer than one
+person in $10^{\val{ch15.sir.trough}}$ is infectious. No city has a
+millionth of a person: a real disease would die out. Whether measles was ever
+chaotic is still argued over. In 1990 George Sugihara and Robert May applied a forecast by analogues to
+monthly measles counts from New York City and found this chapter's
+signature, a good forecast that worsened steadily with the horizon, while
+chickenpox in the same city looked like a yearly cycle with noise on top.
+
+Hearts are harder still. In laboratory experiments reported in 1981, clusters
+of heart cells driven by regular electrical pulses went through period
+doubling into irregular beating. A healthy heart does not beat like a
+metronome either, but the once popular claim that its variability is chaos
+rests on this chapter's tests applied to short noisy records, and remains
+contested. Variability is not the same thing as chaos.
+
+\section{Markets, and what a claim of chaos needs}
+\label{sec:ch15-evidence}
+\index{markets}
+
+\noindent
+Prices are the most watched wiggly lines in the world, and for a while many
+hoped that chaos was the pattern beneath them.
+
+\begin{think}
+Suppose someone proved that a share price is made by a chaotic rule with only
+a few numbers in its state. Could you get rich forecasting it?
+\end{think}
+\reveal{Not far. Chaos is forecastable only a few steps ahead, only as well
+as the measurements allow, and not at all beyond its horizon. And every
+trader who found the same rule would trade on it, changing the prices it
+describes.}
+
+\begin{trapbox}
+\textbf{\enquote{Chaos in markets means you can predict them.}} Chaotic
+prices would promise a short horizon with a hard limit behind it, not a
+crystal ball. In fact economists who searched found returns hard to forecast
+and calm and turbulent periods bunched together, but the evidence for a
+chaotic rule with few numbers in its state is weak and contested.
+Irregular, jumpy and hard to predict do not add up to chaotic.
+\end{trapbox}
+
+\noindent
+Put the chapter together, and a claim of chaos in real data needs:
+
+\begin{itemize}
+\item \textbf{a long record}, long compared with the number of quantities
+  that matter;
+\item \textbf{little noise}, or tests that allow for it;
+\item \textbf{a fair comparison}: the series must beat its surrogates,
+  including surrogates that keep its slow ups and downs, because a series
+  with memory, like daily temperature, is forecastable a day ahead with no
+  chaos at all;
+\item \textbf{the right shape of forecast error}: small a step ahead and
+  growing at a steady rate;
+\item and, best of all, \textbf{a mechanism}, ideally with a knob that can
+  be turned, as the beetles had.
+\end{itemize}
+
+\noindent
+Few claims about hearts, brains or economies clear all five. That is chaos
+theory doing its job: telling you what a wiggly line does and does not
+license you to conclude.
+
+\begin{summarybox}
+\begin{itemize}
+\item A \textbf{surrogate} made by shuffling has the same numbers, so the
+  same \textbf{histogram}. Only the \textbf{order} can tell a rule from
+  chance.
+\item A \textbf{return map} plots each value against the next: a rule draws a
+  curve, noise fills the square. \textbf{Delay embedding} (Takens, 1981)
+  rebuilds a system's shape from one measured quantity.
+\item The \textbf{method of analogues} forecasts from the nearest past value.
+  Chaos is forecast well a step ahead and worse at a steady rate; noise is a
+  blind guess at every horizon.
+\item \textbf{Measurement noise} and \textbf{short records} weaken both tests;
+  with ten noisy values the squares test does worse than a coin.
+\item Chaos has been shown convincingly in laboratory populations; for
+  measles, hearts and markets the evidence is mixed, contested or weak.
+  \textbf{Irregular is not chaotic}.
+\item A claim of chaos needs a long clean record, a fair comparison with
+  surrogates, the right shape of forecast error, and ideally a mechanism.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item What does shuffling a series keep, and what does it destroy?
+  \answerto{It keeps every value, so the histogram. It destroys the order,
+  which is where a rule linking each value to the next would show.}
+\item The return map of a series lies on one thin curve. What does that tell
+  you about how the series was made?
+  \answerto{That each value is fixed by the one before it: a rule of one
+  number made it. Noise would spread the points over the square.}
+\item One series touches $30$ of the hundred squares with $500$ values and
+  still $30$ with $5000$. Another touches $80$ and then $100$. Which behaves
+  like a rule's series?
+  \answerto{The first: a curve passes through only so many squares, however
+  many points land on it. The second keeps filling the square, as noise
+  does.}
+\item A forecast by analogues misses by about \num{0.001} one step ahead, and
+  its misses double at every step. About how many steps ahead does the miss
+  reach \num{0.25}?
+  \answerto{About eight: $2^{8} = 256$, and $\num{0.001} \times 256$ is
+  about \num{0.26}.}
+\item Why is a record of ten noisy values poor evidence for chaos or against
+  it?
+  \answerto{Both tests are unreliable on so little: in this chapter's
+  measurement the squares test on ten noisy values was right less often than
+  a tossed coin would be.}
+\item What happens to the model epidemic as the school year is made stronger,
+  and what makes its chaotic setting doubtful as a picture of real measles?
+  \answerto{Its years go from all alike, to alternating, to repeating every
+  four years, to never repeating; and its chaotic troughs are so deep that a
+  real disease would die out.}
+\item Someone shows you that a share price is irregular. Is that evidence of
+  chaos? What would be?
+  \answerto{No: noise is irregular too. Evidence would be a forecast that
+  beats surrogates, with an error that starts small and grows steadily, in a
+  long, clean record.}
+\end{checkpoint}

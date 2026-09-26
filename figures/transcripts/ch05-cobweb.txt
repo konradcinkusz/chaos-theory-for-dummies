@@ -1,0 +1,7 @@
+start    x = 0.200   height = 0.000
+up       x = 0.200   height = 0.448
+across   x = 0.448   height = 0.448
+up       x = 0.448   height = 0.692
+across   x = 0.692   height = 0.692
+up       x = 0.692   height = 0.596
+across   x = 0.596   height = 0.596

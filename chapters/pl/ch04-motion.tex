@@ -1,0 +1,481 @@
+%% ch04 --- Ruch: reguły zmiany i mapa wszystkich stanów
+%%
+%% Napisany we wrześniu 2026. Każda liczba, której czytelnik nie policzy w
+%% pamięci, pochodzi z code/measure/ch04.py, który importuje TE SAME funkcje,
+%% które drukują listingi (code/ch04/ i flows z chaoslab), więc strona i
+%% listing nie mogą się rozejść. Sprężyna, pętla i planeta używają tylko
+%% + - * / i sqrt, więc ich cyfry są takie same na każdej maszynie; wahadło
+%% woła math.sin, ale nie jest chaotyczne, a jego czasy wahnięć są drukowane
+%% z trzema miejscami po przecinku, których różnica w ostatnim bicie nie
+%% ruszy.
+%%
+%% Bliźniak: chapters/en/ch04-motion.tex. Podrozdział za podrozdziałem, makro
+%% za makrem, liczba za liczbą; tools/parity.py je porównuje.
+
+\chapter{Ruch: reguły zmiany i mapa wszystkich stanów}
+\label{ch:motion}
+\index{ruch}\index{równanie różniczkowe}
+
+\noindent
+Herbata z rozdziału~\ref{ch:models} żyła w pełnych minutach: jej reguła
+przeskakiwała od jednej minuty do następnej. Wahadło nie przeskakuje; w każdej
+chwili gdzieś jest i dokądś zmierza. Prawa ruchu Newtona, opublikowane w 1687
+roku, nie mówią, gdzie będzie planeta w przyszły wtorek. Mówią, jak szybko
+zmienia się jej prędkość w tej chwili. Jak wydobyć przyszłość z takiej
+reguły?
+
+Ten rozdział odpowiada sztuczką z rozdziału~\ref{ch:iteration}: rób małe
+kroki. Potem rysuje obraz, w którym narysowana jest reszta książki \dash{}
+mapę, na której każdy możliwy stan jest punktem, a każda przyszłość drogą
+\dash{} i kończy się twierdzeniem, które mówi, dlaczego model pogody z
+rozdziału~\ref{ch:lorenz} potrzebuje trzech liczb.
+
+\begin{outcomes}
+\outcome{czytać regułę zmiany jako informację o tym, jak szybko zmienia się w
+  tej chwili każda liczba stanu}
+\outcome{zamienić regułę zmiany na drogę w kodzie, metodą Eulera i metodą
+  RK4}
+\outcome{użyć energii, żeby sprawdzić, czy symulacja mówi prawdę}
+\outcome{czytać portret fazowy: jego punkty stałe, jego pętle i kierunek
+  ruchu}
+\outcome{powiedzieć, co ruch na płaszczyźnie może, a czego nie może, i ilu
+  liczb potrzebuje chaos w czasie ciągłym}
+\end{outcomes}
+
+\section{Reguła, która mówi, jak szybko}
+\label{sec:ch04-rates}
+\index{reguła zmiany}\index{prędkość}
+
+\noindent
+Prędkościomierz w samochodzie to reguła zmiany. Nie mówi, gdzie jesteś;
+mówi, jak szybko zmienia się to, gdzie jesteś.
+
+\begin{think}
+Prędkościomierz pokazuje $60$ kilometrów na godzinę. Mniej więcej gdzie
+będzie samochód za minutę? A za godzinę?
+\end{think}
+\reveal{Za minutę mniej więcej kilometr dalej: $60$ kilometrów na godzinę to
+kilometr na minutę. Za godzinę nie da się tego powiedzieć, bo prędkość
+wiele razy się zmieni.}
+W krótkim czasie to, jak szybko coś się zmienia, mówi, jak daleko zajdzie; w
+długim mówi niewiele. Więc przejeżdżasz kawałek, znowu patrzysz na
+prędkościomierz i jedziesz dalej.
+
+Oto pierwszy przykład. Ciężarek wisi na sprężynie; odciągasz go o jeden metr
+od położenia spoczynku i puszczasz. Jego stan to dwie liczby:
+\emph{położenie} $x$, czyli jak daleko jest od spoczynku, i \emph{prędkość}
+$v$, czyli jak szybko zmienia się $x$. Reguła mówi, jak szybko zmienia się
+każda z nich:
+\begin{itemize}
+\item położenie zmienia się w tempie $v$, bo tym właśnie jest prędkość;
+\item prędkość zmienia się w tempie $-k\,x$: sprężyna ciągnie z powrotem ku
+  środkowi, tym mocniej, im bardziej jest rozciągnięta. Liczba $k$ mówi, jak
+  sztywna jest sprężyna; przyjmij $k = 1$. Znak minus mówi, że siła ciągnie
+  wstecz.
+\end{itemize}
+Inne książki zapisują tę samą regułę jako
+\[ \frac{\mathrm{d}x}{\mathrm{d}t} = v, \qquad
+   \frac{\mathrm{d}v}{\mathrm{d}t} = -k\,x, \]
+gdzie $\tfrac{\mathrm{d}x}{\mathrm{d}t}$ czyta się \enquote{jak szybko
+zmienia się $x$}. Reguła tego rodzaju to \emph{równanie różniczkowe}. Ta
+książka nigdy nie rozwiązuje go ręcznie. Śledzi je małymi krokami, tak jak
+robi to komputer prognozujący pogodę.
+
+\section{Małe kroki}
+\label{sec:ch04-euler}
+\index{metoda Eulera}\index{krok czasowy}
+
+\noindent
+Najprostszy sposób śledzenia reguły zmiany nosi imię Leonharda Eulera, który
+opisał go w XVIII wieku. Wybierz krótki odcinek czasu, \emph{krok}, i przesuń
+każdą liczbę o jeden krok w tempie, jakie ma teraz:
+\[ \text{nowe } x = x + \text{krok} \times v, \qquad
+   \text{nowe } v = v + \text{krok} \times (-k\,x). \]
+Potem zapytaj regułę znowu w nowym stanie i powtarzaj. Reguła zmiany stała
+się regułą następnego kroku i dalej działa iteracja.
+
+\pyregion{code/ch04/spring.py}{euler}{Sprężyna śledzona metodą Eulera}{lst:ch04-euler}
+
+\noindent
+\code{rates} to reguła, a \code{euler\_step} to metoda Eulera, dwa wiersze.
+\code{energy} dodaje energię ruchu, połowę $v \times v$, do energii
+zmagazynowanej w sprężynie, połowy $k \times x \times x$. Ciężarek startuje z
+$x = 1$, w spoczynku, a kroki trwają \val{ch04.euler.dt} sekundy.
+
+\mermaidfig{ch04-step-loop}{Metoda Eulera. Reguła podaje tempa w tej chwili;
+mały krok przesuwa tak, jakby się nie zmieniały; w nowym stanie znowu pyta
+się regułę.}{reguła zmiany śledzona krokami}
+
+\begin{think}
+Prawdziwa sprężyna bez tarcia drga w nieskończoność, za każdym razem
+dochodząc tak samo daleko: nic nie odbiera jej energii i nic jej nie dodaje.
+Co powinna pokazywać kolumna energii, wiersz po wierszu?
+\end{think}
+\reveal{Za każdym razem tę samą liczbę: \num{0.5}, połowę $1 \times 1$.}
+
+\transcript{ch04-spring-euler}
+
+\noindent
+Nie pokazuje. Wychylenia rosną, a energia wspina się od \num{0.5} do
+\val{ch04.euler.energy.ten} w dziesięć sekund. Nic w regule nie dodało tej
+energii. Zrobiła to symulacja.
+
+Powód widać na obrazku. Narysuj stan jako punkt: położenie w poziomie,
+prędkość w pionie. Przy $k = 1$ energia to połowa kwadratu odległości punktu
+od środka, więc prawdziwa sprężyna krąży po okręgu. Krok Eulera idzie wzdłuż
+prostej, którą w tej chwili wskazuje reguła, a prosta styczna do okręgu
+wychodzi z niego na zewnątrz. Każdy krok ląduje trochę na zewnątrz, i to
+dokładnie, z twierdzenia Pitagorasa: każdy krok mnoży energię przez
+$1 + \text{krok} \times \text{krok}$, czyli \val{ch04.euler.factor} przy
+kroku \val{ch04.euler.dt}. Jeden procent na krok, \val{ch04.euler.steps}
+razy w dziesięć sekund.
+
+\begin{think}
+Weź kroki dziesięć razy mniejsze, \val{ch04.small.dt} sekundy. Czy symulacja
+jest teraz poprawna?
+\end{think}
+\reveal{Poprawna dłużej, a nie poprawna. W dziesięć sekund energia rośnie o
+\val{ch04.small.gain.ten} procent zamiast o \val{ch04.euler.gain.ten}; po
+stu sekundach urosła o \val{ch04.small.gain.hundred} procent, mniej więcej
+tyle, ile większy krok zyskał w dziesięć.}
+Każdy mały krok zyskuje sto razy mniej, a w każdej sekundzie jest ich
+dziesięć razy więcej. Dziesięć razy mniejsze kroki kupiły dziesięć razy
+dłuższy czas, za dziesięć razy więcej pracy.
+
+\begin{trapbox}
+\textbf{\enquote{Mniejszy krok sprawia, że symulacja jest poprawna.}} Sprawia,
+że jest poprawna dłużej. Błąd metody krokowej powstaje na nowo przy każdym
+kroku i się piętrzy, więc mniejszy krok kupuje czas, zanim ta sterta urośnie
+za bardzo. Uczciwe pytanie do symulacji nie brzmi, jak mały miała krok, tylko
+jak długo ją sprawdzano. Część~II spotyka surowszy horyzont, którego nie
+przesunie żaden rozmiar kroku.
+\end{trapbox}
+
+\section{Spójrz naprzód i uśrednij}
+\label{sec:ch04-rk4}
+\index{metoda Rungego--Kutty}\index{RK4}
+
+\noindent
+Euler pyta regułę raz, na początku kroku, i wierzy odpowiedzi przez cały
+krok. Tempa zmieniają się w trakcie kroku, a Euler nigdy się o tym nie
+dowiaduje. Metoda, której używa ta książka, opracowana przez Carla Rungego i
+Martina Kuttę na przełomie XIX i XX wieku i znana jako RK4, pyta cztery razy:
+\begin{enumerate}
+\item o tempa na początku;
+\item o tempa pół kroku dalej, idąc w pierwszych tempach;
+\item o tempa pół kroku dalej, idąc w drugich tempach;
+\item o tempa cały krok dalej, idąc w trzecich.
+\end{enumerate}
+Potem robi prawdziwy krok ze średnią tych czterech, licząc dwie środkowe
+dwukrotnie.
+
+\pyregion{code/src/chaoslab/flows.py}{rk4}{Przepis RK4 z biblioteki książki}{lst:ch04-rk4}
+
+\noindent
+\code{field} to reguła zmiany, \code{k1} do \code{k4} to cztery próbki, a
+\code{\_add} wylicza, gdzie byłbyś po przejściu kawałka w danych tempach.
+Wagi $1$, $2$, $2$, $1$ są dobrane tak, żeby błędy próbek znosiły się
+nawzajem, jak tylko się da; algebrę tu pomijamy. Ta sama funkcja, obok
+\api{euler\_step} i \api{integrate}, poniesie model pogody z
+rozdziału~\ref{ch:lorenz}.
+
+\begin{lab}{l04_01_rk4}{Jeden krok RK4}
+Napisz \code{rk4\_step} według przepisu. Test porównuje go z biblioteką na
+sprężynie i na wahadle, a także na regule \enquote{$x$ rośnie w tempie
+równym $x$}: jeden krok długości $1$ z $1$ musi wylądować na $1 + 1 +
+\tfrac{1}{2} + \tfrac{1}{6} + \tfrac{1}{24}$, blisko prawdziwej odpowiedzi
+$e \approx \num{2.718}$.
+\end{lab}
+
+\begin{think}
+RK4 pyta regułę cztery razy na krok, więc za tę samą pracę Euler może robić
+kroki cztery razy mniejsze. Co wolisz: Eulera z krokami \val{ch04.same.dt}
+sekundy czy RK4 z krokami \val{ch04.euler.dt}?
+\end{think}
+\reveal{RK4, z ogromną przewagą. W dziesięć sekund Euler zyskuje
+\val{ch04.same.gain} procent energii; RK4 traci \val{ch04.rk4.ppm} części na
+milion. Za tę samą pracę jego błąd jest około \val{ch04.rk4.better} razy
+mniejszy.}
+
+\pyregion{code/ch04/energy_drift.py}{drift}{Pomiar dryfu energii symulowanej sprężyny}{lst:ch04-drift}
+
+\transcript{ch04-energy-drift}
+
+\noindent
+\code{rule calls} liczy pracę. Ostatni wiersz mówi, że RK4 też nie jest
+dokładne: w tysiąc sekund traci \val{ch04.rk4.ppm.thousand} części na
+milion. Ono również jest poprawne dłużej, a nie poprawne, tylko o wiele
+dłużej.
+
+\begin{lab}{l04_02_drift}{Zmierz dryf}
+Napisz energię sprężyny i funkcję, która śledzi sprężynę daną metodą przez
+dany czas i podaje, o ile zmieniła się jej energia. Potem odpowiedz na
+pytanie, które rozdział zostawia otwarte: zmniejsz krok o połowę \dash{} ile
+razy mniejszy stanie się dryf energii w każdej z metod? (Komentarz w listingu
+RK4 dotyczy błędu położenia, a to inna miara.) Przewiduj, zanim uruchomisz.
+\end{lab}
+
+\plotfig{ch04-euler-rk4}{Ta sama sprężyna śledzona przez dziesięć sekund
+dwiema metodami z tym samym krokiem. Po lewej: na płaszczyźnie stanów Euler
+(czerwony) oddala się spiralą od prawdziwego okręgu, a RK4 (niebieski)
+zostaje na nim. Po prawej: energia, którą podaje każda z
+nich.}{Euler uciekający spiralą i RK4}
+
+\section{Mapa wszystkich stanów}
+\label{sec:ch04-phase}
+\index{przestrzeń fazowa}\index{portret fazowy}\index{wahadło}
+
+\noindent
+Lewa połowa rysunku~\ref{fig:ch04-euler-rk4} nie pokazuje niczego w
+funkcji czasu. Każdy jej punkt to cały stan, położenie i prędkość naraz, a
+ruch to droga od punktu do punktu. Płaszczyzna wszystkich możliwych stanów to
+\emph{przestrzeń fazowa}, a rysunek dróg na niej to \emph{portret fazowy}.
+Każdy układ chaotyczny w tej książce jest narysowany na takim portrecie.
+
+Bogatszym przykładem jest wahadło. Jego stan to kąt od pionu w dół i to, jak
+szybko ten kąt się zmienia. Jego reguła to reguła sprężyny z jedną różnicą:
+siła ciągnąca z powrotem jest największa, gdy wahadło sterczy w bok, a znika,
+gdy wskazuje prosto w dół albo prosto w górę. (To sinus, którego woła reguła
+wahadła z \code{chaoslab}.)
+
+\begin{think}
+Wahadło puszczone dalej ma dłuższą drogę, ale też porusza się szybciej. Czy
+wahadło puszczone z $90$ stopni wychyla się tam i z powrotem dłużej niż
+puszczone z $10$?
+\end{think}
+\reveal{Dłużej: \val{ch04.pend.ninety} sekundy wobec \val{ch04.pend.ten},
+o około \val{ch04.pend.ninety.pct} procent więcej. Puszczone ze $170$
+stopni potrzebuje \val{ch04.pend.big} sekundy, \val{ch04.pend.ratio} razy
+więcej.}
+
+\pyregion{code/ch04/pendulum.py}{period}{Mierzenie czasu wahnięcia wahadła}{lst:ch04-period}
+
+\transcript{ch04-pendulum}
+
+\noindent
+Szkolna reguła, że czas wahnięcia nie zależy od wychylenia, jest prawdziwa
+dla małych wychyleń: czasy zbliżają się do \val{ch04.pend.small} sekundy, gdy
+wychylenie maleje. Dlatego precyzyjny zegar wahadłowy wychyla się ledwie o
+kilka stopni.
+
+Teraz narysuj regułę jako mapę. W każdym punkcie płaszczyzny reguła podaje
+tempa, a więc kierunek, w którym stan zaraz się ruszy. Postaw tam małą
+strzałkę. Ruch to podążanie za strzałkami.
+
+\begin{think}
+Gdzieś na mapie strzałka ma zerową długość: nic się nie zmienia. Jakie to
+stany, jako położenia prawdziwego wahadła? Co się stanie, gdy każdy z nich
+lekko trącisz?
+\end{think}
+\reveal{Zwisanie prosto w dół w spoczynku i balansowanie dokładnie do góry
+nogami w spoczynku. Trącone, pierwsze łagodnie się wokół niego waha; drugie
+odpada. To dwa punkty stałe, jeden stabilny, drugi niestabilny, jak w
+rozdziale~\ref{ch:iteration}.}
+
+\plotfig{ch04-pendulum-map}{Mapa wszystkich stanów wahadła o długości
+jednego metra. Szare strzałki pokazują, w którą stronę rusza się stan.
+Niebieskie pętle to wahania puszczone z 30, 90 i 150 stopni; zielone drogi
+przechodzą przez górę; linia przerywana oddziela jedne od drugich. Pełna
+kropka to zwisanie w spoczynku; dwa puste kółka to to samo położenie do góry
+nogami.}{portret fazowy wahadła}
+
+\noindent
+Blisko środka drogi są zamkniętymi pętlami: wahadło wychyla się tam i z
+powrotem, w nieskończoność po tej samej pętli. Droga, która zamyka się sama w
+sobie, to \emph{cykl}, a cykl jest doskonale przewidywalny: jedno okrążenie i
+znasz wszystkie następne. Daleko u góry i u dołu drogi biegną przez całą
+szerokość: wahadło przechodzi przez górę i obraca się dalej.
+
+\section{Zatrzymać się, krążyć albo uciec}
+\label{sec:ch04-settle}
+\index{atraktor}\index{cykl graniczny}\index{twierdzenie Poincarégo--Bendixsona}
+
+\noindent
+Prawdziwe wahadło ma tarcie, które z każdym wahnięciem odbiera trochę
+energii.
+
+\begin{think}
+Co dzieje się na mapie z drogą wahadła z tarciem puszczonego ze $150$
+stopni i gdzie się ona kończy?
+\end{think}
+\reveal{Każde wahnięcie jest mniejsze od poprzedniego, więc droga nie może się
+zamknąć. Zwija się spiralą do środka i kończy na pełnej kropce: wahadło zwisa
+prosto w dół, w spoczynku.}
+Stan, do którego wpadają wszystkie pobliskie drogi, to \emph{atraktor}, a
+punkt spoczynku wahadła z tarciem to jego najprostszy rodzaj. Przyciągać może
+też pętla. Holenderski inżynier Balthasar van der Pol zapisał klasyczny
+przykład mniej więcej sto lat temu, dla obwodów z lampami radiowymi:
+\[ x \text{ zmienia się w tempie } v, \qquad
+   v \text{ zmienia się w tempie } -x + (1 - x \times x)\, v. \]
+Dopóki $x$ leży między $-1$ a $1$, nowy człon przyspiesza ruch; poza tym
+przedziałem hamuje. Zacznij blisko środka, od \val{ch04.vdp.start.in}, a
+wychylenia rosną; zacznij daleko, od \val{ch04.vdp.start.out}, a maleją. Po
+\val{ch04.vdp.time} sekundach oba wychylają się do \val{ch04.vdp.reach.in} i
+\val{ch04.vdp.reach.out}: jedna pętla, osiągnięta od środka i od zewnątrz.
+To \emph{cykl graniczny}, a zegar wahadłowy jest jednym z nich: małe
+pchnięcie przy każdym wahnięciu, tarcie odbierające energię i wychylenie,
+które ustala się na jednej wielkości, jakkolwiek je zacząłeś.
+
+\plotfig{ch04-settle}{Dwa sposoby, w jakie ruch na płaszczyźnie może się
+ustalić. Po lewej: wahadło z tarciem puszczone ze 150 stopni zwija się
+spiralą do punktu, w którym zwisa w spoczynku. Po prawej: reguła van der Pola
+ze startu wewnątrz i ze startu na zewnątrz, nawijająca się na tę samą
+pętlę.}{ustalanie się w punkcie i na pętli}
+
+\begin{think}
+Dlaczego dwie różne drogi na takiej mapie nigdy się nie przecinają?
+\end{think}
+\reveal{W punkcie przecięcia stan miałby dwie przyszłości, a reguła daje
+jedną strzałkę: jeden stan, jedna przyszłość.}
+Na płaszczyźnie ten jeden fakt ma wielką siłę. Droga, która nie może
+przeciąć ani siebie, ani żadnej innej drogi, i nie opuszcza ograniczonego
+obszaru, jest ogrodzona własną przeszłością. Może zwijać się do punktu
+stałego albo do pętli, albo uciec do nieskończoności. Nie może błąkać się bez
+końca.
+
+\begin{rigourbox}
+To \emph{twierdzenie Poincarégo--Bendixsona}, od nazwisk Henriego Poincarégo
+i Szweda Ivara Bendixsona. Wymaga gładkiej reguły, a jego
+dokładne sformułowanie dopuszcza jeszcze jedno zakończenie, łańcuch punktów
+stałych połączonych drogami. Dowód, na kilka stron, jest w każdym podręczniku
+układów dynamicznych. Dotyczy ruchu w czasie
+ciągłym: reguła skacząca krokami może przeskoczyć własną drogę, a
+rozdział~\ref{ch:logistic} znajduje dzikie zachowanie w regule krokowej z
+jedną liczbą. I wymaga płaszczyzny: w trzech wymiarach droga może przejść
+nad sobą i pod sobą.
+\end{rigourbox}
+
+\noindent
+Chaos w czasie ciągłym potrzebuje więc co najmniej trzech liczb stanu. Dlatego
+model pogody z rozdziału~\ref{ch:lorenz}, który Edward Lorenz okroił w 1963
+roku z większego modelu konwekcji, ma trzy liczby, a nie dwie.
+
+\begin{think}
+Zawieś drugie wahadło u dołu pierwszego. Ilu liczb potrzebuje teraz stan i
+czy twierdzenie nadal obiecuje prosty ruch?
+\end{think}
+\reveal{Czterech: kąta i prędkości dla każdego wahadła. Twierdzenie nic nie
+mówi o czterech liczbach, a rozdział~\ref{ch:mechanics} pokazuje, że ruch
+wahadła podwójnego jest chaotyczny.}
+
+\begin{trapbox}
+\textbf{\enquote{Wahadło to prosty układ, więc jego ruch musi być prosty.}}
+Dla jednego wahadła tak jest: dwie liczby stanu, płaszczyzna i twierdzenie,
+które pozwala tylko zatrzymać się, krążyć albo uciec. Zawieś na nim drugie, a
+stan ma cztery liczby, płot znika i ruch może stać się chaotyczny. To, jak
+prosto wygląda układ, mówi niewiele o tym, jak prosty jest jego ruch. Więcej
+mówi policzenie liczb w jego stanie.
+\end{trapbox}
+
+\section{Dwa ciała: mechanizm zegara w najlepszym wydaniu}
+\label{sec:ch04-planets}
+\index{zagadnienie dwóch ciał}\index{trzecie prawo Keplera}
+
+\noindent
+Cztery liczby stanu umożliwiają chaos; nie sprawiają, że on następuje.
+Najlepszym dowodem jest układ, na którym zbudowano obraz świata jak zegara:
+jedna planeta krążąca wokół Słońca. Grawitacja Newtona to reguła zmiany.
+Położenie planety zmienia się w tempie jej prędkości, a prędkość zmienia się
+w stronę Słońca o wielkość, która maleje z kwadratem odległości: dwa razy
+dalej, cztery razy słabiej. Słońce jest tak dużo cięższe, że może stać w
+miejscu.
+
+\pyregion{code/ch04/two_bodies.py}{gravity}{Grawitacja Newtona jako reguła zmiany}{lst:ch04-gravity}
+
+\noindent
+Stan to cztery liczby: gdzie jest planeta, w poziomie i w pionie, i jak
+szybko się porusza, w poziomie i w pionie. Listing wystrzeliwuje ją w bok z
+\val{ch04.kepler.orbits} różnymi prędkościami, śledzi każdą orbitę dziesięć
+razy dookoła metodą RK4 i mierzy czas każdego powrotu na linię startu.
+\code{size} orbity to połowa jej największej szerokości.
+
+\transcript{ch04-two-bodies}
+
+\noindent
+Średnia z dziesięciu okrążeń to pierwsze okrążenie, co do każdej wydrukowanej
+cyfry: planeta wraca po swojej elipsie zgodnie z rozkładem, raz za razem.
+Ostatnia kolumna jest taka sama dla wszystkich trzech orbit,
+\val{ch04.kepler.law}: kwadrat czasu okrążenia podzielony przez sześcian
+rozmiaru. Johannes Kepler znalazł tę regułę w położeniach planet w 1619 roku,
+a Newton pokazał w 1687, że wynika ona z grawitacji; twój laptop znalazł ją
+ponownie z samej reguły zmiany.
+
+Dlaczego przy czterech liczbach nie ma chaosu? Dwie wielkości nigdy się nie
+zmieniają: energia i tempo, w jakim odcinek od Słońca do planety zakreśla
+pole. Każda z nich mocniej przyszpila stan, a przy dwóch przyszpilonych ruch
+nie ma już miejsca, żeby być czymkolwiek poza regularnym. Dodaj trzecie
+ciało, a to przestaje być prawdą; od tego zaczyna się
+rozdział~\ref{ch:mechanics}.
+
+\begin{worldbox}
+Tablice położeń planet, dużych księżyców i wielu planetoid, według których
+sterują nawigatorzy sond kosmicznych, publikuje Jet Propulsion Laboratory
+NASA. Powstają tak, jak ten listing wyznaczył swoje orbity: Newtonowska
+reguła zmiany dla całego Układu Słonecznego śledzona naprzód małymi krokami i
+sprawdzana z pomiarami radarowymi i śledzeniem sond.
+\end{worldbox}
+
+\noindent
+To mechanizm zegara w najlepszym wydaniu: reguła zmiany, małe kroki i
+przewidywanie, które wraca zgodnie z rozkładem co do każdej wydrukowanej
+cyfry. Część~II pyta, co się dzieje, gdy reguła jest równie dokładna, a
+przyszłość nie.
+
+\begin{summarybox}
+\begin{itemize}
+\item \textbf{Reguła zmiany}, czyli \textbf{równanie różniczkowe}, mówi, jak
+  szybko zmienia się w tej chwili każda liczba stanu, a nie jaka będzie za
+  chwilę.
+\item \textbf{Metoda Eulera} przesuwa każdą liczbę o jeden krótki krok w
+  tempie, jakie ma teraz. Na sprężynie zyskuje energię przy każdym kroku, a
+  mniejszy krok czyni ją \textbf{poprawną dłużej}, a nie poprawną.
+\item \textbf{RK4} próbkuje tempa cztery razy na krok i je uśrednia; za tę
+  samą pracę jej błąd jest dużo mniejszy, ale ona też dryfuje. Sprawdzianem
+  jest energia.
+\item \textbf{Przestrzeń fazowa} to płaszczyzna wszystkich możliwych stanów;
+  reguła to strzałka w każdym punkcie. Wahadło rysuje \textbf{cykle} wokół
+  swojego stabilnego \textbf{punktu stałego}, a duże wahnięcia trwają dłużej
+  niż małe.
+\item Tarcie zwija drogę spiralą do \textbf{atraktora}; przyciągać może też
+  pętla. Drogi się nie przecinają, więc na płaszczyźnie ruch może się tylko
+  zatrzymać, krążyć albo uciec (\textbf{Poincaré--Bendixson}): chaos w czasie
+  ciągłym potrzebuje co najmniej trzech liczb.
+\item Dwa ciała mają cztery liczby stanu, a mimo to kreślą elipsy zgodnie z
+  rozkładem, jak mówi trzecie prawo Keplera: trzy liczby są potrzebne do
+  chaosu, ale nie wystarczają.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Prędkościomierz pokazuje $90$ kilometrów na godzinę. Mniej więcej jak
+  daleko samochód zajedzie w ciągu następnych $20$ sekund?
+  \answerto{Około pół kilometra: $90$ kilometrów na godzinę to \num{1.5}
+  kilometra na minutę, a $20$ sekund to jedna trzecia minuty.}
+\item Sprężyna z $k = 1$ jest w $x = 0$ i porusza się z $v = 1$, więc jej
+  energia wynosi \num{0.5}. Zrób jeden krok Eulera o długości \num{0.1}.
+  Jakie są nowe $x$, $v$ i energia?
+  \answerto{$x = \num{0.1}$ i $v = 1$, więc energia wynosi
+  $\num{0.5} + \num{0.005} = \num{0.505}$: o jeden procent więcej, czynnik
+  $1 + \num{0.1} \times \num{0.1}$.}
+\item Euler z krokiem \num{0.1} zyskuje w dziesięć sekund
+  \val{ch04.euler.gain.ten} procent energii sprężyny. Mniej więcej jak
+  długo może trwać przebieg z krokiem \num{0.001}, zanim zyska tyle samo?
+  \answerto{Około tysiąca sekund: krok sto razy mniejszy zyskuje sto razy
+  mniej na sekundę.}
+\item Opisz cztery próbki, które RK4 pobiera w jednym kroku, i jak je łączy.
+  \answerto{Tempa na początku; pół kroku dalej w pierwszych tempach; pół
+  kroku dalej w drugich; cały krok dalej w trzecich. Przesuwa się ze średnią
+  o wagach $1$, $2$, $2$, $1$.}
+\item Co na portrecie fazowym wahadła oznacza dla prawdziwego wahadła
+  zamknięta pętla, droga przez całą szerokość i spirala?
+  \answerto{Wahanie się tam i z powrotem; przechodzenie przez górę i
+  obracanie się; utratę energii przez tarcie i zatrzymanie się w zwisie.}
+\item Dlaczego gładka reguła zmiany z dwiema liczbami stanu nigdy nie jest
+  chaotyczna i ilu liczb potrzebuje chaos w czasie ciągłym?
+  \answerto{Jej drogi nigdy się nie przecinają, bo każdy stan ma jedną
+  przyszłość, więc ograniczona droga może tylko zatrzymać się w punkcie
+  stałym albo nawinąć na pętlę (Poincaré--Bendixson). Chaos w czasie
+  ciągłym potrzebuje co najmniej trzech.}
+\end{checkpoint}

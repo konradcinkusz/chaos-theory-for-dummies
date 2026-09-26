@@ -1,0 +1,26 @@
+[
+  {
+    "n": 31,
+    "label": "sec:ch03-superposition",
+    "en": {
+      "habit": "The effect of two pushes is the sum of the effects.",
+      "truth": "Only for a straight-line rule. On a curved one, which is what feedback makes, the effect of a push depends on where the system already stands: two pushes can together do much more, much less or the opposite of their sum."
+    },
+    "pl": {
+      "habit": "Skutek dwóch pchnięć to suma ich skutków.",
+      "truth": "Tylko dla reguły prostoliniowej. Na krzywej, a taką robi z reguły sprzężenie zwrotne, skutek pchnięcia zależy od tego, gdzie układ już się znajduje: dwa pchnięcia mogą razem zrobić znacznie więcej, znacznie mniej albo coś przeciwnego niż ich suma."
+    }
+  },
+  {
+    "n": 32,
+    "label": "sec:ch03-overshoot",
+    "en": {
+      "habit": "A limit to growth means growth stops smoothly.",
+      "truth": "With a gentle growth rate it does. With a strong one, or with a delay between cause and effect, the population overshoots its level and oscillates, and turned up further the swings need not die away at all."
+    },
+    "pl": {
+      "habit": "Granica wzrostu oznacza, że wzrost łagodnie się zatrzymuje.",
+      "truth": "Przy łagodnym tempie wzrostu tak. Przy silnym, albo gdy między przyczyną a skutkiem jest opóźnienie, populacja przestrzeliwuje swój poziom i oscyluje, a po dalszym podkręceniu wahania wcale nie muszą wygasać."
+    }
+  }
+]

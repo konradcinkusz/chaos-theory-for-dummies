@@ -1,0 +1,25 @@
+% ============================================================
+%  Chaos from Zero
+%  How mathematics describes the world -- and where it stops predicting it
+%  Konrad Cinkusz
+%
+%  ENGLISH edition. A4, 12pt, one-sided: this book is read on a screen,
+%  usually with an editor open beside it, and is not laid out for print.
+%
+%  Two main files exist, one per language. They differ only in \booklang and
+%  the PDF title. Everything else, including the whole document body, is
+%  shared, so a chapter cannot go missing from one of them.
+%
+%  Build:  latexmk -pdf main-en.tex        (or: make en)
+%          make            -- numbers, plots, diagrams, both editions, gates
+%          make debt       -- every outstanding-work ledger
+% ============================================================
+
+\documentclass[12pt,oneside,openany]{book}
+
+\def\booklang{en}
+\input{preamble}
+
+\hypersetup{pdftitle={Chaos from Zero}}
+
+\input{body}

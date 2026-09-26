@@ -1,0 +1,8 @@
+hours      cells      grams
+    0    1.0e+00    1.0e-12
+    8    1.7e+07    1.7e-05
+   16    2.8e+14    2.8e+02
+   24    4.7e+21    4.7e+09
+   32    7.9e+28    7.9e+16
+   40    1.3e+36    1.3e+24
+heavier than the Earth after 133 doublings, 44.3 hours

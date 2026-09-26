@@ -1,0 +1,118 @@
+%% how-to-use --- how the book is meant to be read, and what its boxes mean.
+%%
+%% Twin: frontmatter/en/how-to-use.tex. parity.py compares them token by
+%% token, like every chapter.
+
+\chapter*{\lblHowToUse}
+\phantomsection
+\addcontentsline{toc}{chapter}{\lblHowToUse}
+\markboth{\lblHowToUse}{\lblHowToUse}
+
+\noindent
+Ta książka zakłada, że umiesz dodawać, mnożyć, policzyć procent i odczytać
+wykres. Nie zakłada, że pamiętasz jakąkolwiek algebrę, i nigdy nie używa
+symbolu, którego wcześniej nie wprowadziła. Każdy wzór jest też powiedziany
+słowami, a tam, gdzie wzór tylko by przeszkadzał, wzoru nie ma. Jeśli
+skończyłeś z matematyką w szkole i zawsze chciałeś wiedzieć, co ludzie mają
+na myśli, kiedy mówią \enquote{chaos}, to jesteś czytelnikiem, dla którego ją
+napisano.
+
+Prosi cię za to o jedno: o udział. Książka jest zbudowana z małych kroków,
+a na końcu wielu z nich pada pytanie.
+
+\section*{Pętla}
+
+Każdy rozdział czyta się tak samo:
+
+\begin{enumerate}[leftmargin=1.6em, itemsep=3pt]
+  \item \textbf{Przeczytaj krótki fragment.} Każdy podrozdział to kilka
+        akapitów.
+  \item \textbf{Zatrzymaj się i pomyśl.} Fioletowa ramka zadaje ci pytanie.
+        Odpowiedz na nie \dash{} na kartce, na głos albo na zasadzie
+        zgadywania \dash{} zanim pójdziesz dalej. Odpowiedź jest tuż pod
+        spodem, więc zasłoń ją dłonią.
+  \item \textbf{Uruchom kod}, jeśli masz obok komputer. Każdy listing to
+        mały plik, a uruchomienie go to jedno polecenie.
+  \item \textbf{Zrób laboratorium}, jeśli chcesz, żeby pomysł stał się
+        twój: laboratorium to napisany do połowy program i test, który mówi
+        ci, kiedy działa.
+  \item \textbf{Rozwiąż sprawdzian} na końcu rozdziału i porównaj odpowiedzi
+        z dodatkiem~\ref{app:answers}.
+\end{enumerate}
+
+\section*{Dlaczego książka wciąż zadaje ci pytania}
+
+Pytanie zadane, zanim poznasz odpowiedź, jest niewygodne. Tak ma być.
+Odpowiedź, po którą sięgnąłeś sam, nawet błędna, zostaje w głowie dużo
+dłużej niż taka, którą tylko przeczytałeś, a błędny strzał, który potem
+zostaje poprawiony, to najszybszy sposób, żeby odkryć, które twoje intuicje
+cię zawiodą. W tym temacie jest ich pełno. Pierwszy strzał większości ludzi
+co do tego, jak szybko rośnie mały błąd, albo co potrafi prosta reguła, jest
+błędny, a książka jest ułożona tak, żebyś oddał ten strzał, zanim zobaczysz
+dlaczego.
+
+Więc kiedy ramka prosi, żebyś odpowiedział, zanim pójdziesz dalej, zrób to,
+proszę. Nikt tego nie ocenia.
+
+\section*{Laboratorium}
+
+Wszystko w tej książce, co może sprawdzić komputer, zostało przez komputer
+sprawdzone, a ty możesz to sprawdzić ponownie. Programy są w repozytorium
+książki, w katalogu \texttt{code/}. Są napisane w Pythonie i potrzebują
+jednego narzędzia, \pkg{uv}, które samo instaluje właściwą wersję Pythona i
+wszystkie biblioteki. Kiedy już je masz, z katalogu \texttt{code/}
+repozytorium:
+
+\begin{shellcmd}
+uv sync
+uv run python ch01/falling_stone.py
+uv run pytest -k l01_01
+\end{shellcmd}
+
+Pierwsza linia przygotowuje laboratorium, raz. Druga uruchamia listing z
+rozdziału~\ref{ch:models}. Trzecia uruchamia test pierwszego laboratorium z
+tego rozdziału. Nie musisz znać Pythona, żeby zacząć: pierwsze rozdziały
+tłumaczą każdą linię, którą drukują, a programy przez całą książkę pozostają
+krótkie.
+
+\section*{Ramki}
+
+Poza pytaniami tekst przerywają ramki, każda z jednym zadaniem:
+
+\begin{description}[leftmargin=1.2em, itemsep=2pt]
+  \item[\lblTrap.] Błąd, który popełnia prawie każdy, pokazany po tym, jak
+    miałeś okazję popełnić go sam.
+  \item[\lblWorld.] Prawdziwe miejsce, w którym pomysł się pojawia:
+    dziedzina, urządzenie, praktyka.
+  \item[\lblRigour.] Co książka stwierdza bez dowodu i gdzie ten dowód
+    można znaleźć.
+  \item[\lblNote, \lblWarning.] Dygresja i przestroga.
+  \item[\lblProject.] Kawałek małej biblioteki chaosu tej książki, z której
+    korzystają listingi.
+  \item[\lblLab.] Coś do zrobienia przy klawiaturze, z testem, który mówi
+    ci, kiedy to zrobiłeś.
+\end{description}
+
+\section*{Liczby, którym można ufać}
+
+Każdą liczbę w tej książce, której nie da się policzyć w pamięci,
+wyprodukował program, a książka drukuje to, co wypisał program, a nie liczbę,
+którą ktoś przepisał. Proces budowania sprawdza każdą z nich ponownie przy
+każdej zmianie. Tutaj ma to większe znaczenie niż zwykle, z powodu, któremu
+książka poświęca cały rozdział: w układzie chaotycznym obliczenie może pomylić
+się na ostatniej cyfrze i kilkadziesiąt kroków później być zupełnie błędne.
+Rozdział~\ref{ch:computers} wyjaśnia, jak książka się przed tym chroni i
+dlaczego niektóre jej liczby są celowo zaokrąglone.
+
+\section*{Czytanie bez komputera}
+
+Da się. Wynik każdego listingu jest wydrukowany obok niego, każdy wykres
+jest na stronie, a pytania działają na papierze. Ominą cię tylko
+laboratoria, a one są dla czytelników, którzy chcą pójść dalej, a nie po to,
+żeby zamykać drogę do wywodu.
+
+\section*{Dwa języki, jedna książka}
+
+Książka ukazuje się po angielsku i po polsku z jednego źródła. Oba wydania
+zawierają te same rozdziały, podrozdziały, wykresy, liczby i pytania w tej
+samej kolejności, a proces budowania porównuje je, żeby tego dopilnować.

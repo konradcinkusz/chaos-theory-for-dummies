@@ -1,0 +1,38 @@
+[
+  {
+    "n": 141,
+    "label": "sec:ch14-ensemble",
+    "en": {
+      "habit": "A forecast is a single number.",
+      "truth": "A forecast is a number and how far to trust it. The same ensemble mean deserves confidence on a day the members agree and a shrug on a day they scatter, and the spread of the ensemble tracks the size of the error without anyone seeing the truth."
+    },
+    "pl": {
+      "habit": "Prognoza to jedna liczba.",
+      "truth": "Prognoza to liczba i informacja, na ile jej ufać. Ta sama średnia zespołu zasługuje na zaufanie w dniu, w którym członkowie się zgadzają, i na wzruszenie ramion w dniu, w którym się rozchodzą, a rozrzut zespołu nadąża za wielkością błędu, choć nikt nie widzi prawdy."
+    }
+  },
+  {
+    "n": 142,
+    "label": "sec:ch14-rain",
+    "en": {
+      "habit": "A 30 per cent chance of rain, followed by rain, was a wrong forecast.",
+      "truth": "One day cannot refute a probability. A forecast of 30 per cent is right if it rains on about 30 per cent of the days it is issued; that check, reliability, needs many forecasts, and a good ensemble passes it."
+    },
+    "pl": {
+      "habit": "Prognoza 30 procent szansy na deszcz, po której spadł deszcz, była błędna.",
+      "truth": "Jeden dzień nie obali prawdopodobieństwa. Prognoza 30 procent jest trafna, jeśli pada w mniej więcej 30 procentach dni, w które ją wydano; to sprawdzenie, wiarygodność, wymaga wielu prognoz, a dobry zespół je przechodzi."
+    }
+  },
+  {
+    "n": 143,
+    "label": "sec:ch14-climate",
+    "en": {
+      "habit": "If the weather cannot be predicted, the climate cannot be predicted either.",
+      "truth": "Weather is the path and climate is the statistics of the attractor. Two runs that disagree about every day agree about the average, the swing and how often it rains; a change in the forcing moves those statistics, which is the question a climate projection asks."
+    },
+    "pl": {
+      "habit": "Skoro nie da się przewidzieć pogody, nie da się też przewidzieć klimatu.",
+      "truth": "Pogoda to trajektoria, a klimat to statystyka atraktora. Dwa przebiegi, które nie zgadzają się co do żadnego dnia, zgadzają się co do średniej, wahania i tego, jak często pada; zmiana wymuszenia przesuwa te statystyki i właśnie o to pyta projekcja klimatyczna."
+    }
+  }
+]

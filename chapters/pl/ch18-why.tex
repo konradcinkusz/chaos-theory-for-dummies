@@ -1,0 +1,523 @@
+%% ch18 --- Po co ci chaos: przewodnik terenowy po przewidywaniu
+%%
+%% Napisany we wrześniu 2026 jako rozdział zamykający książkę. Zamienia
+%% książkę w pięć pytań, które warto zadać każdemu przewidywaniu (i dwa
+%% kolejne, zebrane w przewodniku), a na każde odpowiada liczbą policzoną
+%% TUTAJ: każda wartość pochodzi z code/measure/ch18.py, który importuje TE
+%% SAME funkcje, które drukują listingi (code/ch18/).
+%%
+%% CZEGO TEN ROZDZIAŁ NIE MÓWI. Nie cytuje żadnej liczby zmierzonej w innym
+%% rozdziale. Wykładniki, horyzonty i szanse są tu liczone od nowa, a liczba,
+%% której książka nie mierzy (dwa tygodnie pogody, pięciomilionowy czas
+%% Lapunowa planet, sekundy podwójnego wahadła), jest oznaczona jako
+%% cytowana albo jako rząd wielkości.
+%%
+%% Bliźniak: chapters/en/ch18-why.tex. Podrozdział za podrozdziałem, makro
+%% za makrem, liczba za liczbą; tools/parity.py je porównuje.
+
+\chapter{Po co ci chaos: przewodnik terenowy po przewidywaniu}
+\label{ch:why}
+\index{przewidywanie!przewodnik terenowy}\index{prognoza}
+
+\noindent
+Oto cztery przewidywania, na które możesz trafić w ciągu jednego tygodnia.
+Tablica mówi, że całkowite zaćmienie Słońca nastąpi 2 sierpnia 2027 roku.
+Aplikacja pogodowa podaje 70 procent szans na deszcz w sobotę. Wyciąg z
+funduszu emerytalnego mówi, ile będą warte twoje oszczędności w 2060 roku.
+A program komputerowy odpowiada na pytanie o przyszłoroczne stopy
+procentowe bez cienia wątpliwości.
+
+Któremu z nich zaufasz i jak daleko? Teraz możesz na to odpowiedzieć
+liczbami, które sam policzyłeś. Ten rozdział zamienia książkę w przewodnik
+terenowy: pięć pytań, które warto zadać każdemu przewidywaniu, każde z
+odpowiedzią opartą na pomiarze, a potem argument, dlaczego każdy ich
+potrzebuje.
+
+\begin{outcomes}
+\outcome{zapytać o każde przewidywanie, czy mała zmiana stanu początkowego
+  rośnie}
+\outcome{policzyć horyzont prognozy i powiedzieć, co dają lepsze dane}
+\outcome{powiedzieć, co da się przewidzieć za horyzontem, i czytać szanse}
+\outcome{odróżnić chaos od szumu, a małą przyczynę od dużego skutku}
+\outcome{zastosować siedem pytań przewodnika do prognozy albo modelu}
+\outcome{wyjaśnić, liczbami, które sam policzysz, dlaczego jedne rzeczy da
+  się przewidzieć na stulecia, a inne tylko na dni}
+\end{outcomes}
+
+\section{Pytanie pierwsze: czy mała zmiana rośnie?}
+\label{sec:ch18-grow}
+\index{wrażliwość na warunki początkowe!test}
+
+\noindent
+Zacznij od najczystszej pary z listy: zaćmienia i deszczu. Obie prognozy
+powstają tak samo. Komputer bierze zmierzoną teraźniejszość, stosuje
+dokładne prawa fizyki i idzie krok po kroku naprzód w czasie.
+
+\begin{think}
+Tablica zaćmień jest dobra na tysiące lat, a szczegółowa prognoza pogody na
+mniej więcej tydzień. Obie powstają z dokładnych praw, stosowanych krok po
+kroku od zmierzonego stanu początkowego. Na czym polega różnica, w języku tej
+książki?
+\end{think}
+\reveal{Na tym, jak szybko rośnie mały błąd stanu początkowego. W ruchach
+Ziemi i Księżyca rośnie tak wolno, że przez tysiąclecia pozostaje mały; w
+powietrzu rośnie, aż staje się tak duży jak sama pogoda.}
+Sprawdza się to testem, który rozdział~\ref{ch:butterfly} zamienił w pomiar:
+uruchom regułę dwa razy, z dwóch stanów początkowych bliższych sobie, niż
+potrafiłby je rozróżnić jakikolwiek przyrząd, i patrz na różnicę. Oto trzy
+reguły, które już znasz z tej książki, każda uruchomiona dwa razy z
+odległości jednej miliardowej:
+
+\pyregion{code/ch18/grows.py}{twice}{Pierwsze pytanie, zadane trzem regułom}{lst:ch18-twice}
+
+\transcript{ch18-grows}
+
+\noindent
+Stygnąca herbata zapomina o zaburzeniu: różnica jest co minutę mnożona
+przez \num{0.9}. Odwzorowanie logistyczne przy $r = \num{2.8}$ też
+zapomina, bo osiada w swoim punkcie stałym. Przy $r = 4$ jedna miliardowa
+rośnie, aż staje się tak duża, jak pozwala samo odwzorowanie. Jeśli
+różnica maleje, trajektorię da się przewidzieć tak długo, jak długo reguła
+jest poprawna. Jeśli rośnie, następne pytanie brzmi: jak szybko?
+
+Pytanie pierwsze ma przed sobą jeszcze jedno: czy w ogóle istnieje dokładna
+reguła? Dla planet i dla trzech równań Lorenza istnieje. W gospodarce czy w
+epidemii sama reguła zmienia się, gdy ludzie reagują na prognozę, a to jest
+inna trudność niż chaos.
+
+\section{Pytanie drugie: jak daleko jest horyzont?}
+\label{sec:ch18-horizon}
+\index{horyzont prognozy}\index{wykładnik Lapunowa}
+
+\noindent
+Rosnący błąd jest zwykle w każdym kroku mnożony przez mniej więcej ten sam
+czynnik, a rozdział~\ref{ch:lyapunov} zamienił ten czynnik w jedną liczbę: wykładnik
+Lapunowa, zapisywany $\lambda$ (grecka litera lambda), czyli logarytm
+naturalny $\ln$ średniego czynnika. Czynnik $2$ to wykładnik $\ln 2$, mniej
+więcej \val{ch18.ln.two}. Załóżmy, że stan początkowy jest błędny o $e_0$,
+a prognoza staje się bezużyteczna, gdy błąd przekroczy tolerancję $T$. Po
+$n$ krokach błąd to $e_0$ pomnożone $n$ razy przez ten czynnik, więc sięga
+$T$, gdy
+\[ n \approx \frac{\ln(T / e_0)}{\lambda}. \]
+Słowami: horyzont to logarytm tego, ile razy za mały jest twój błąd,
+podzielony przez wykładnik. Biblioteka książki ma to w jednym wierszu
+(\code{e**exponent} to tam czynnik, odtworzony z wykładnika):
+
+\pyregion{code/src/chaoslab/measure.py}{horizon}{Wzór na horyzont w bibliotece książki}{lst:ch18-horizon-lib}
+
+\noindent
+Wypróbuj go na odwzorowaniu logistycznym przy $r = 4$, którego wykładnik ten
+rozdział mierzy jako \val{ch18.lam.logistic} na krok ($\ln 2$, jak pokazuje
+rozdział~\ref{ch:lyapunov}). Przyjmij, że znasz stan początkowy z dokładnością do
+sześciu miejsc po przecinku, więc $e_0$ to jedna milionowa, i uznaj prognozę za
+bezużyteczną, gdy myli się o więcej niż $T = \num{0.1}$. Wtedy
+$T / e_0 = 100\,000$, a $n \approx \val{ch18.ln.six} /
+\val{ch18.lam.logistic} \approx \val{ch18.hor.six}$ kroku.
+
+\begin{think}
+Kupujesz przyrząd tysiąc razy dokładniejszy i teraz znasz stan początkowy z
+dokładnością do dziewięciu miejsc po przecinku. Jak długo wytrzyma
+prognoza: tysiąc razy dłużej, mniej więcej trzy razy dłużej, czy o kilka
+kroków dłużej?
+\end{think}
+\reveal{O kilka kroków dłużej: mniej więcej o \val{ch18.hor.gain} więcej,
+czyli razem \val{ch18.hor.nine}. Podzielenie $e_0$ przez tysiąc dodaje
+$\ln 1000 / \lambda = \val{ch18.ln.thousand} / \val{ch18.lam.logistic}$
+kroku i nic więcej.}
+To odpowiedź wzoru. Oto odpowiedź samego odwzorowania, zmierzona na
+piechotę dla \val{ch18.apart.starts} różnych stanów początkowych:
+
+\pyregion{code/ch18/thousandfold.py}{measure}{Tysiąc razy lepsze dane, zmierzone}{lst:ch18-thousandfold}
+
+\transcript{ch18-thousandfold}
+
+\plotfig{ch18-digits}{Jak daleko sięga prognoza w zależności od tego, ile
+miejsc po przecinku stanu początkowego jest poprawnych. Linie to wzór,
+punkty to mediana wielu zmierzonych par przebiegów. Każda dodatkowa cyfra
+kupuje tych samych kilka kroków.}{horyzont a liczba poprawnych cyfr}
+
+\noindent
+Wzór mówił \val{ch18.hor.six} i \val{ch18.hor.nine}; odwzorowanie mówi
+\val{ch18.apart.six} i \val{ch18.apart.nine}, czyli o
+\val{ch18.apart.gain} więcej. Każda dodatkowa poprawna
+cyfra kupuje tę samą liczbę kroków, $\ln 10 / \lambda = \val{ch18.ln.ten} /
+\val{ch18.lam.logistic}$, tutaj mniej więcej \val{ch18.per.digit}. Horyzont
+rośnie jak logarytm twojej dokładności, więc lepsze przyrządy i większe
+komputery mogą tylko dodać stały odcinek. Mały kalkulator zestawia obok
+siebie trzy układy z tej książki:
+
+\pyregion{code/ch18/horizon.py}{calculator}{Kalkulator horyzontu}{lst:ch18-calculator}
+
+\transcript{ch18-horizon}
+
+\noindent
+Błędy odwzorowania Hénona rosną wolniej, z wykładnikiem \val{ch18.lam.henon}
+na krok, więc każda cyfra kupuje mu
+\val{ch18.per.digit.henon} kroku; układ Lorenza, przy
+\val{ch18.lam.lorenz} na jednostkę czasu, zyskuje \val{ch18.per.digit.lorenz}
+jednostki czasu na cyfrę. Na wykresie w zależności od liczby poprawnych
+cyfr każdy horyzont jest linią prostą (rysunek~\ref{fig:ch18-digits}).
+
+Ta sama arytmetyka wyjaśnia zaćmienie. Obliczenia Układu Słonecznego, które
+Jacques Laskar przeprowadził w 1989 roku, przytoczone w
+rozdziale~\ref{ch:mechanics}, dały planetom wewnętrznym wykładnik około
+jednej piątej na milion lat: czas Lapunowa, czyli odwrotność wykładnika,
+wynosi mniej więcej pięć milionów lat. Przyjmij, że znasz położenie Ziemi z
+dokładnością do metra, i uznaj prognozę za bezużyteczną, gdy błąd dorówna rozmiarom jej
+orbity, 150 milionom kilometrów. Horyzont to pięć milionów lat razy
+$\ln 150\,000\,000\,000 \approx \val{ch18.planets.ln}$, czyli jakieś
+\val{ch18.planets.hor} milionów lat, a milimetr dodałby tylko około
+\val{ch18.planets.gain} milionów. Układ Słoneczny jest chaotyczny; w skali
+tablicy zaćmień jego błędy jeszcze nie zaczęły mieć znaczenia.
+
+\begin{lab}{l18_01_horizon}{Kalkulator horyzontu}
+Napisz \code{forecast\_length}, która zamienia wykładnik i liczbę poprawnych
+cyfr w horyzont; \code{extra\_steps}, która mówi, co daje dokładniejszy
+pomiar; oraz \code{digits\_needed}, która stosuje wzór w drugą stronę.
+Potem zapytaj, ilu cyfr potrzebowałoby sto kroków odwzorowania
+logistycznego, i porównaj to z mniej więcej szesnastoma cyframi dziesiętnymi,
+które mieszczą zwykłe liczby komputera (rozdział~\ref{ch:computers}).
+\end{lab}
+
+\section{Pytanie trzecie: co przetrwa horyzont?}
+\label{sec:ch18-beyond}
+\index{prognoza zespołowa}\index{atraktor!statystyki}
+
+\noindent
+Za horyzontem trajektoria jest stracona. To nie to samo co brak wszelkiej
+wiedzy, i właśnie tę część teorii chaosu najczęściej się przeocza.
+
+\begin{think}
+Czterdzieści kroków naprzód trajektoria odwzorowania logistycznego jest
+dawno stracona. Czy o kroku czterdziestym da się jeszcze coś
+przewidzieć?
+\end{think}
+\reveal{Tak: szanse. Szansa, że $x$ jest poniżej \num{0.25} w kroku
+czterdziestym, wynosi mniej więcej jedną trzecią, i taki sam jest ułamek
+czasu, który spędza tam każdy długi przebieg. Trajektoria przepadła; jej
+statystyki nie.}
+Twórcy prognoz uzyskują takie szanse, uruchamiając model wiele razy, ze stanów
+początkowych rozłożonych po wszystkim, na co pozwala pomiar, i licząc. To
+jest zespół, a rozdział~\ref{ch:weather} buduje go dla pogody. Oto
+najmniejsza wersja:
+
+\pyregion{code/ch18/beyond.py}{ensemble}{Prognoza z zespołu i jeden długi przebieg}{lst:ch18-ensemble}
+
+\transcript{ch18-beyond}
+
+\noindent
+Gdy stan początkowy jest poprawny do sześciu cyfr, wszystkie przebiegi,
+a jest ich \val{ch18.ens.members}, zgadzają się aż do kroku
+\val{ch18.ens.sure.six}, a prognoza jest jedną pewną odpowiedzią. Potem się
+rozchodzą, prognoza staje się szansami, a po kilku krokach szanse ustalają
+się na \val{ch18.ens.clim}: ułamku czasu, który jeden długi przebieg spędza
+poniżej \num{0.25}, z każdego z dwóch stanów początkowych. Przy dziewięciu
+cyfrach przebiegi zgadzają się aż do kroku \val{ch18.ens.sure.nine}, a
+potem dzieje się to samo (rysunek~\ref{fig:ch18-odds}).
+
+\plotfig{ch18-odds}{Prognoza zespołowa szansy, że $x$ jest poniżej
+\num{0.25}. Jest pewna, dopóki przebiegi się zgadzają, podaje szanse, gdy
+się rozchodzą, i ustala się na ułamku z długiego przebiegu. Trzy cyfry
+więcej to opóźniają, ale nie powstrzymują.}{prognoza, która staje się szansami}
+
+Prognoza układu chaotycznego ma więc trzy postacie, jedna po drugiej:
+trajektorię, dopóki przebiegi się zgadzają, szanse, gdy się rozchodzą, i
+potem statystyki długiego przebiegu. Te ostatnie rozdział~\ref{ch:lorenz}
+nazywa statystykami atraktora, a w przypadku pogody to jest klimat.
+
+\begin{trapbox}
+\textbf{\enquote{Nieprzewidywalne znaczy niepoznawalne.}} Za horyzontem nie
+da się poznać trajektorii, a prawie wszystko inne tak: dokąd układ może
+dojść, a dokąd nie, jak często odwiedza każdy obszar, jakie są szanse w
+każdym pytaniu, jakie zechcesz zadać. 70 procent szans na deszcz to nie
+wykręt synoptyka; to poprawna odpowiedź na pytanie, na które chaos
+uniemożliwił odpowiedź \enquote{tak} albo \enquote{nie}. Projekcja
+klimatyczna prognozuje statystyki, nie wtorki.
+\end{trapbox}
+
+\begin{worldbox}
+\enquote{Stożek niepewności}, który amerykańskie Narodowe Centrum
+Huraganów (National Hurricane Center) rysuje wokół prognozowanego toru
+burzy, rozszerza się z każdym dniem wyprzedzenia. Jego rozmiar wyznaczają
+błędy niedawnych prognoz samego centrum, tak aby środek burzy pozostawał w
+nim mniej więcej dwa razy na trzy: horyzont i zestaw szans na jednym
+obrazku, publikowany po to, by działały według niego miliony ludzi.
+\end{worldbox}
+
+\section{Pytanie czwarte: chaos, szum czy mała przyczyna?}
+\label{sec:ch18-noise}
+\index{szum}\index{efekt motyla}
+
+\noindent
+Nieregularne dane zachęcają do opowieści, a dwie z nich wymagają osobnego
+pytania.
+
+Pierwsza mówi: \enquote{to jest chaos}. Rozdział~\ref{ch:life} pokazuje, że
+szereg chaotyczny i losowy mogą mieć ten sam histogram i że rozróżnia je
+struktura: nanieś każdą wartość względem następnej, a chaos narysuje
+krzywą tam, gdzie szum rysuje chmurę, i chaos da się prognozować krok lub
+dwa naprzód tam, gdzie szumu nie. Ma znaczenie, co masz, i ile jest danych:
+krótki, zaszumiony zapis może wyglądać prawie jak cokolwiek.
+
+Druga opowieść biegnie wstecz, od dużego skutku do małej przyczyny.
+
+\begin{think}
+Pchnij stygnącą herbatę i odwzorowanie logistyczne przy $r = 4$ o jedną
+miliardową każde, jak w podrozdziale~\ref{sec:ch18-grow}. Które pchnięcie
+coś zmieniło czterdzieści kroków później? Czy zmieniło ułamek czasu, który
+odwzorowanie spędza poniżej \num{0.25}?
+\end{think}
+\reveal{Tylko pchnięcie odwzorowania logistycznego i tylko jego trajektorię:
+różnica urosła do rozmiarów samego odwzorowania. Ułamek czasu poniżej
+\num{0.25} to wciąż mniej więcej jedna trzecia, z każdego stanu
+początkowego. Pchnięcie herbaty wygasło.}
+
+\begin{trapbox}
+\textbf{\enquote{Małe przyczyny zawsze mają znaczenie.}} W układzie
+stabilnym wygasają, jak w przypadku herbaty. W chaotycznym mała przyczyna
+zmienia szczegóły za horyzontem i nic w statystykach, a ponieważ każda inna
+mała przyczyna też zmienia szczegóły, żadnej nie da się potem wskazać jako
+powodu. Motyl z rozdziału~\ref{ch:butterfly} nie spowodował burzy.
+Obwinianie jednej małej przyczyny o duży skutek po fakcie to opowieść, nie
+pomiar.
+\end{trapbox}
+
+\section{Pytanie piąte: czy da się tym sterować?}
+\label{sec:ch18-steer}
+\index{sterowanie chaosem}\index{synchronizacja}
+
+\noindent
+Ostatnie pytanie zamienia ograniczenie w narzędzie.
+
+\begin{think}
+Jeśli drobna zmiana stanu początkowego całkowicie zmienia przyszłość, to
+czy jest to zła, czy dobra wiadomość dla kogoś, kto chce układem sterować?
+\end{think}
+\reveal{Jedno i drugie. Właśnie dlatego nie da się prognozować układu
+daleko naprzód i właśnie dlatego drobne, dobrze wymierzone pchnięcie może go
+przesunąć daleko.}
+Edward Ott, Celso Grebogi i James Yorke uczynili z tego ideę swojej pracy o
+sterowaniu chaosem z 1990 roku: poczekaj, aż układ przejdzie blisko
+jednego z niestabilnych cykli ukrytych w jego atraktorze, lekko popchnij
+parametr, a da się go utrzymać na tym cyklu. Rozdział~\ref{ch:taming} robi
+to pchnięciami mniejszymi niż jeden procent i sprawia, że dwa chaotyczne
+układy idą w równym kroku, jak pokazali w tym samym roku Louis Pecora i
+Thomas Carroll. Chaos nie jest więc wymówką dla fatalizmu. Układ, którego
+nie da się prognozować, może być układem, którym da się sterować, a zmiana
+parametru, na przykład wymuszenia w modelu klimatu, przesuwa statystyki
+nawet wtedy, gdy żadnej trajektorii nie da się przewidzieć.
+
+\section{Przewodnik terenowy na jednej stronie}
+\label{sec:ch18-guide}
+\index{przewidywanie!przewodnik terenowy}
+
+\noindent
+Oto pięć pytań, dwa kolejne, na które książka zapracowała, i miejsce, w
+którym zmierzyłeś każde z nich:
+
+\begin{enumerate}[itemsep=2pt]
+\item Czy istnieje dokładna reguła i czy mała zmiana stanu początkowego
+  rośnie? (rozdział~\ref{ch:butterfly})
+\item Jak daleko jest horyzont i co dałyby lepsze dane?
+  (rozdział~\ref{ch:lyapunov})
+\item Co przetrwa horyzont: atraktor, statystyki, szanse?
+  (rozdziały~\ref{ch:lorenz} i~\ref{ch:weather})
+\item Czy nieregularność to chaos, czy szum, i czy danych starczy, żeby to
+  rozstrzygnąć? (rozdział~\ref{ch:life})
+\item Czy da się tym sterować albo przesunąć statystyki parametrem?
+  (rozdział~\ref{ch:taming})
+\item Czy odpowiedź przetrwa mniejszy krok i więcej cyfr?
+  (rozdziały~\ref{ch:motion} i~\ref{ch:computers})
+\item Czy ktoś po fakcie obwinia małą przyczynę o duży skutek?
+  (rozdział~\ref{ch:butterfly})
+\end{enumerate}
+
+\mermaidfig{ch18-field-guide}{Przewodnik terenowy w trzech ruchach. Jeśli
+mały błąd nie rośnie, przetrwa sama trajektoria; jeśli rośnie, horyzont
+mówi, jak długo, a za nim pytasz o statystyki i szanse.}{przewodnik
+terenowy w trzech ruchach}
+
+\noindent
+A oto znajome prognozy uporządkowane według horyzontu. Tylko jedna liczba
+jest policzona w tym rozdziale; reszta to rzędy wielkości, niektóre z nich
+z obiegowej wiedzy, oznaczone według tego, skąd pochodzą.
+
+\medskip
+\noindent
+{\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}p{2.9cm}
+  >{\raggedright\arraybackslash}p{2.9cm}
+  >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Prognoza} & \textbf{Horyzont} & \textbf{Skąd ta liczba}
+  & \textbf{Za nim pytaj o} \\
+\midrule
+Gdzie są planety & około \val{ch18.planets.hor} milionów lat
+  & policzone wyżej & gdzie leżą ich orbity \\ \addlinespace[3pt]
+Zaćmienia & tysiące lat & opublikowane tablice & nic więcej \\ \addlinespace[3pt]
+Pływy astronomiczne & lata & opublikowane tablice
+  & falę sztormową, która jest pogodą \\ \addlinespace[3pt]
+Szczegółowa pogoda & tydzień w praktyce, najwyżej dwa tygodnie
+  & cytowane (Lorenz, 1969) & szanse, potem klimat \\ \addlinespace[3pt]
+Podwójne wahadło & sekundy & rząd wielkości
+  & dokąd pozwala mu jego energia \\ \addlinespace[3pt]
+Kurs akcji z dnia na dzień & nieustalony & nieregularny to nie chaotyczny
+  & rozrzut dawnych zmian \\ \addlinespace[3pt]
+\bottomrule
+\end{tabularx}\par}
+
+\medskip
+\noindent
+Teraz wyciąg emerytalny i pewny siebie program. Projekcja emerytalna to
+wynik, jaki dałaby założona stopa zwrotu, więc pytaj o zakres stóp. Pewna
+siebie odpowiedź o przyszłorocznej gospodarce nie ma horyzontu, dopóki ktoś
+nie powie, jaka jest jej reguła, a pewny ton to nie przedział błędu.
+
+\begin{lab}{l18_02_guide}{Przewodnik terenowy na modelu, który sam piszesz}
+Napisz \code{error\_grows}, \code{growth\_rate} i
+\code{long\_run\_fraction}: trzy pierwsze pytania jako kod, który możesz
+skierować na dowolną regułę zamieniającą jedną liczbę w następną. Test
+sprawdza je na stygnącej herbacie i odwzorowaniu logistycznym. Potem
+napisz na końcu pliku własną regułę (namiot, sinus, populację z odłowem) i
+zadaj jej wszystkie siedem pytań.
+\end{lab}
+
+\section{Dlaczego każdy tego potrzebuje}
+\label{sec:ch18-everyone}
+\index{chaos!dlaczego ma znaczenie}
+
+\noindent
+\emph{Chaos zakończył erę mechanizmu zegara}, nie dodając ani jednego losowego
+składnika: dokładna reguła i prawie dokładny stan początkowy dają przyszłość
+znaną tylko do horyzontu, który rośnie jak logarytm twojej dokładności.
+
+\emph{Mówi, którym prognozom ufać i jak długo.} Zaćmienie i burza podlegają
+prawom tego samego rodzaju; różni je wykładnik. To uczy pokory wobec
+pewności na długi dystans, bo pojedyncza liczba daleko za horyzontem to
+zgadywanie przebrane za pomiar, i zaufania do modeli na krótki dystans, bo
+w obrębie horyzontu są zdumiewająco dobre.
+
+\emph{Czyni prawdopodobieństwa szacownymi.} Szanse to postać, jaką za
+horyzontem przybiera poprawna prognoza, a nie porażka prognozowania.
+
+\emph{Jest piękny i uniwersalny.} Stała Feigenbauma wychodzi z linijki
+algebry i z prawdziwych cieczy i obwodów (rozdział~\ref{ch:bifurcations});
+fraktale nadają linii brzegowej wymiar między jeden a dwa
+(rozdział~\ref{ch:fractals}); zbiór Mandelbrota mieści całą drogę do
+chaosu (rozdział~\ref{ch:mandelbrot}).
+
+\emph{I jest zasobem}: sterowanie, synchronizacja i wymieszanie, jakie mają
+mieć liczby losowe komputera (choć rozdział~\ref{ch:computers} ostrzega, że
+samo odwzorowanie chaotyczne jest ich kiepskim źródłem).
+
+Teoria chaosu nie jest teorią wszystkiego ani nieładu w ogóle: większość
+nieregularności świata to szum, niewiedza albo reguła, która ciągle się
+zmienia.
+
+\begin{think}
+Kolega mówi: \enquote{Gospodarka jest chaotyczna, więc każda prognoza jest
+równie dobra jak inna}. Co jest w tym źle?
+\end{think}
+\reveal{Obie połowy. Nikt nie wykazał, że gospodarka podlega stałej
+chaotycznej regule, a nawet układ chaotyczny nie może robić czegokolwiek:
+trzyma się swojego atraktora, jego szanse są ustalone, a jego prognoza na
+krótki dystans może być bardzo dobra.}
+
+\begin{trapbox}
+\textbf{\enquote{Chaos znaczy: wszystko wolno.}} Chaos to dokładna reguła,
+której ruch pozostaje w ograniczonym atraktorze, ze stałymi statystykami i
+horyzontem, który da się policzyć. Nazwanie czegoś chaotycznym to
+twierdzenie, które da się sprawdzić, a nie licencja na przyklejanie
+motylich skrzydeł wszystkiemu, co nieprzewidywalne, i nie powód, żeby
+przestać prognozować.
+\end{trapbox}
+
+\section{Demon Laplace'a po raz ostatni}
+\label{sec:ch18-demon}
+\index{demon Laplace'a}
+
+\noindent
+Rozdział~\ref{ch:models} zakończył się zasianiem pytania, a teraz możesz
+na nie odpowiedzieć.
+
+\begin{think}
+Załóżmy, że reguła jest dokładna i znasz ją doskonale. Czy przyszłość jest
+wtedy znana, dowolnie daleko naprzód?
+\end{think}
+\reveal{Nie. Jest znana tylko do horyzontu, który rośnie jak logarytm tego,
+jak dokładnie znasz stan początkowy. Za nim znany jest atraktor, statystyki
+i szanse.}
+Demon Laplace'a potrzebuje nieskończenie dokładnej teraźniejszości, a każda
+dodatkowa cyfra kupuje mu tylko kilka kroków więcej. Mechanizm zegara jest
+prawdziwy dla zaćmienia i pływów, a kończy się dla pogody, podwójnego
+wahadła i jednej linijki algebry.
+
+Zostają prognozy, które spotykasz codziennie: pociąg za siedem minut,
+deszcz w sobotę, projekcja, pewna siebie odpowiedź. Zadaj każdej pięć
+pytań. Niektórym prognozom zaufasz bardziej niż dotąd, innym znacznie
+mniej, i po raz pierwszy będziesz umieć powiedzieć dlaczego, liczbą.
+
+\begin{summarybox}
+\begin{itemize}
+\item \textbf{Pytanie pierwsze}: uruchom regułę dwa razy ze stanów
+  początkowych odległych o włos. Jeśli różnica maleje, trajektorię da się
+  prognozować tak daleko, jak długo reguła jest poprawna.
+\item \textbf{Pytanie drugie}: \textbf{horyzont} to mniej więcej
+  $\ln(T/e_0)$ podzielone przez wykładnik $\lambda$, więc każda poprawna
+  cyfra kupuje tych samych kilka kroków.
+\item \textbf{Pytanie trzecie}: za horyzontem przetrwają
+  \textbf{statystyki} i \textbf{szanse}, a zespół pokazuje, jak trajektoria
+  zamienia się w szanse.
+\item \textbf{Pytanie czwarte}: nieregularny to nie chaotyczny, dopóki nie
+  pokaże tego struktura, a dużego skutku nie da się potem przypisać jednej
+  małej przyczynie.
+\item \textbf{Pytanie piąte}: wrażliwość czyni chaos
+  \textbf{sterowalnym}.
+\item \textbf{Przewodnik terenowy} dodaje dwa pytania i porządkuje znajome
+  prognozy według horyzontu.
+\item Chaos zakończył erę \textbf{mechanizmu zegara} i czyni szanse
+  szacownymi; nie jest licencją na \enquote{wszystko wolno}.
+\item \textbf{Demon Laplace'a} znałby przyszłość tylko do horyzontu.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Dwa przebiegi reguły zaczynają się w odległości jednej miliardowej;
+  trzydzieści kroków później dzieli je jedna bilionowa. Co mówi pytanie
+  pierwsze?
+  \answerto{Błąd maleje, więc trajektorię da się prognozować tak daleko, jak
+  długo sama reguła jest poprawna.}
+\item Błędy w pewnym układzie rosną z wykładnikiem \num{0.5} na dzień. Znasz
+  stan początkowy z dokładnością do \num{0.001} i możesz tolerować błąd $1$.
+  Wiedząc, że $\ln 1000 \approx \val{ch18.ln.thousand}$, podaj horyzont.
+  \answerto{Mniej więcej $\val{ch18.ln.thousand} / \num{0.5} \approx
+  \num{13.8}$ dnia.}
+\item Teraz mierzysz ten stan początkowy dziesięć razy dokładniej. Wiedząc,
+  że $\ln 10 \approx \val{ch18.ln.ten}$, powiedz, o ile dłużej wytrzyma
+  prognoza.
+  \answerto{Mniej więcej o $\val{ch18.ln.ten} / \num{0.5} \approx \num{4.6}$
+  dnia dłużej: stały dodatkowy odcinek, nie dziesięć razy dłużej.}
+\item Daleko za horyzontem zespół przebiegów odwzorowania logistycznego przy
+  $r = 4$ daje szansę jedną na trzy, że $x$ jest poniżej \num{0.25}. Czy
+  ta prognoza jest bezwartościowa?
+  \answerto{Nie. To poprawna prognoza: ułamek czasu, który odwzorowanie tam
+  spędza, taki sam z każdego stanu początkowego.}
+\item Szereg codziennych pomiarów wygląda nieregularnie. Wymień dwie rzeczy,
+  które trzeba sprawdzić, zanim nazwie się go chaosem.
+  \answerto{Czy każda wartość naniesiona względem następnej rysuje krzywą,
+  a nie chmurę; czy da się go prognozować krok lub dwa naprzód z podobnych
+  chwil z przeszłości; i czy zapis jest dość długi, by to rozstrzygnąć.}
+\item Dlaczego ta sama własność, która rujnuje dalekie prognozy układu
+  chaotycznego, pozwala nim sterować?
+  \answerto{Układ jest wrażliwy na małe zmiany: drobny błąd rośnie, i tak
+  samo rośnie skutek drobnego, dobrze wymierzonego pchnięcia.}
+\item Wyjaśnij, dlaczego zaćmienia da się przewidzieć na tysiące lat, a
+  pogodę tylko na mniej więcej tydzień.
+  \answerto{Horyzont to $\ln(T/e_0)$ podzielone przez wykładnik. Wykładnik
+  Układu Słonecznego to mniej więcej jedna piąta na milion lat, co daje
+  horyzont około stu milionów lat; błędy atmosfery rosną tak samo w ciągu
+  dni. Lepsze dane dodają do każdego z nich stały odcinek.}
+\end{checkpoint}

@@ -1,0 +1,38 @@
+[
+  {
+    "n": 81,
+    "label": "sec:ch08-picture",
+    "en": {
+      "habit": "The change from order to chaos is a sudden switch.",
+      "truth": "On the logistic map's road, order breaks down in an infinite cascade of period doublings, each arriving sooner than the last; chaos begins where the cascade runs out, at $r \\approx \\num{3.5699}$."
+    },
+    "pl": {
+      "habit": "Przejście od porządku do chaosu to nagłe przełączenie.",
+      "truth": "Na drodze odwzorowania logistycznego porządek rozpada się w nieskończonej kaskadzie podwojeń okresu, z których każde przychodzi szybciej niż poprzednie; chaos zaczyna się tam, gdzie kaskada się kończy, przy $r \\approx \\num{3.5699}$."
+    }
+  },
+  {
+    "n": 82,
+    "label": "sec:ch08-universal",
+    "en": {
+      "habit": "A different equation gives a different route to chaos.",
+      "truth": "Any rule with a single smooth hump takes the same road: its doublings sit at different values of the knob, but the gaps between them shrink by the same ratio, Feigenbaum's $\\delta \\approx \\num{4.6692}$."
+    },
+    "pl": {
+      "habit": "Inne równanie daje inną drogę do chaosu.",
+      "truth": "Każda reguła z jednym gładkim garbem idzie tą samą drogą: jej podwojenia leżą przy innych wartościach pokrętła, ale odstępy między nimi maleją w tym samym stosunku, stałej Feigenbauma $\\delta \\approx \\num{4.6692}$."
+    }
+  },
+  {
+    "n": 83,
+    "label": "sec:ch08-windows",
+    "en": {
+      "habit": "Once a system has reached chaos, it is chaotic everywhere beyond that point.",
+      "truth": "Beyond the cascade the logistic map returns to order infinitely many times, in windows of every period; the widest, of period three, opens at $r = 1 + \\sqrt{8}$."
+    },
+    "pl": {
+      "habit": "Gdy układ raz osiągnie chaos, jest chaotyczny wszędzie dalej.",
+      "truth": "Za kaskadą odwzorowanie logistyczne wraca do porządku nieskończenie wiele razy, w oknach o każdym okresie; najszersze, okresu trzy, otwiera się przy $r = 1 + \\sqrt{8}$."
+    }
+  }
+]

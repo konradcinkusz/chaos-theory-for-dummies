@@ -1,0 +1,476 @@
+%% ch10 --- Rozciągnij i złóż: dziwne atraktory
+%%
+%% Napisany we wrześniu 2026. Każda liczba, której czytelnik nie policzy w
+%% pamięci, pochodzi z code/measure/ch10.py, który importuje TE SAME reguły,
+%% które drukują listingi (code/ch10/). Odwzorowanie namiotowe i
+%% odwzorowanie Hénona używają tylko +, - i *, więc każda trajektoria za
+%% liczbą na tej stronie jest bit w bit taka sama na każdej maszynie.
+%%
+%% Czego rozdział NIE mówi: nie mierzy wymiaru atraktora Hénona (to
+%% rozdział 11); mówi tylko, że leży między jeden a dwa.
+%%
+%% Bliźniak: chapters/en/ch10-strange-attractors.tex. Podrozdział za
+%% podrozdziałem, makro za makrem, liczba za liczbą; tools/parity.py je
+%% porównuje.
+
+\chapter{Rozciągnij i złóż: dziwne atraktory}
+\label{ch:strange}
+\index{atraktor dziwny}\index{rozciąganie i składanie}
+
+\noindent
+W rozdziale~\ref{ch:lorenz} dwa przebiegi równań Lorenza, które zaczęły się o
+włos od siebie, rozjechały się tak, że nie miały już ze sobą nic wspólnego, a
+mimo to żaden z nich nigdy nie opuścił obszaru w kształcie motyla, w którym
+się zaczął. Postaw te dwa fakty obok siebie, a wydadzą się niemożliwe. Jeśli
+sąsiednie stany są w każdym kroku od siebie odpychane, dlaczego nie lądują na
+przeciwnych krańcach wszechświata? A jeśli wszystko zostaje w małym obszarze,
+gdzie podziewa się całe to oddalanie?
+
+Odpowiedź każdy piekarz ma w rękach. Ten rozdział pokazuje ją najpierw na
+pasku ciasta, potem na dwuwierszowej regule, którą astronom Michel Hénon
+zapisał w 1976 roku, a na końcu prowadzi do kształtu bez pola, bez końca
+długości i z warstwami wewnątrz warstw, jakkolwiek blisko byś się przyglądał.
+
+\begin{outcomes}
+\outcome{wyjaśnić, jak ruch może na zawsze pozostawać w pewnym obszarze, a
+  mimo to być wrażliwy na stan początkowy, używając słów rozciąganie i
+  składanie}
+\outcome{iterować odwzorowanie namiotowe i odwzorowanie Hénona w Pythonie i
+  czytać to, co wypisują}
+\outcome{policzyć, przez jaki czynnik jeden krok odwzorowania Hénona mnoży
+  pole, i sprawdzić to pomiarem}
+\outcome{powiedzieć, czym są atraktor, jego basen przyciągania i atraktor
+  dziwny}
+\outcome{opisać, co pokazuje powiększanie atraktora dziwnego i czym różni się
+  to od powiększania gładkiej krzywej}
+\outcome{opisać, jak przekrój Poincarégo zamienia przepływ w odwzorowanie}
+\end{outcomes}
+
+\section{Rozciągnij, potem złóż}
+\label{sec:ch10-knead}
+\index{zagniatanie ciasta}\index{odwzorowanie namiotowe}
+
+\noindent
+Połóż kawałek ciasta na stolnicy i wciśnij w nie obok siebie dwie rodzynki.
+Teraz zagniataj: rozwałkuj ciasto do podwójnej długości, a potem przełóż
+dalszą połowę na bliższą. I jeszcze raz, i jeszcze. Po minucie rodzynki są
+daleko od siebie, a żadna nie opuściła stolnicy.
+
+Jedno zagniecenie to dwa ruchy i to one są treścią całego rozdziału.
+\emph{Rozciąganie} oddala od siebie każdą parę sąsiadów. \emph{Składanie}
+umieszcza rozciągnięte ciasto z powrotem w miejscu, z którego przyszło. Samo
+rozciąganie wyniosłoby rodzynki poza stolnicę; samo składanie nic by im nie
+zrobiło. Razem robią to, czego żadne z nich nie potrafi.
+
+Żeby zamienić to w arytmetykę, spłaszcz ciasto w pasek biegnący od $0$ do $1$
+i niech $x$ oznacza położenie rodzynki na nim. Rozciąganie przenosi $x$ w
+$2x$. Wszystko, co wystaje teraz poza $1$, zostaje złożone z powrotem, więc
+punkt, który wystawał do $2x$, ląduje w $2 - 2x$, tyle przed końcem, ile
+przedtem był za nim:
+\[ x_{n+1} = 2x_n \ \text{jeśli } 2x_n \le 1, \qquad
+   x_{n+1} = 2 - 2x_n \ \text{w przeciwnym razie}, \]
+gdzie $x_n$ to położenie rodzynki po $n$ zagnieceniach. Wykres tej reguły
+wspina się prostą linią od $0$ do $1$ i schodzi prosto w dół jak namiot
+widziany z boku, dlatego nazywa się ją \emph{odwzorowaniem namiotowym}.
+
+\begin{think}
+Dwie rodzynki zaczynają w $\num{0.2345}$ i $\num{0.2355}$, jedną tysięczną
+paska od siebie. Dopóki obie są po tej samej stronie zgięcia, każde
+zagniecenie podwaja odstęp między nimi. Gdyby podwajał się dalej, po ilu
+zagnieceniach byłby dłuższy niż cały pasek? Co musi się stać zamiast tego?
+\end{think}
+\reveal{Po dziesięciu: $\num{0.001} \times 2^{10} = \num{1.024}$, więcej niż
+długość paska. To niemożliwe: dwie rodzynki na pasku długości jeden nigdy nie
+są od siebie dalej niż o jeden, więc wcześniej zgięcie musi złapać jedną
+rodzynkę, a drugiej nie.}
+
+\pyregion{code/ch10/kneading.py}{knead}{Zagniatanie paska ciasta: rozciągnij, potem złóż}{lst:ch10-knead}
+
+\needspace{13\baselineskip}
+\transcript{ch10-kneading}
+
+\noindent
+Odstęp podwaja się dziewięć razy z rzędu, do \num{0.512}. Przy dziesiątym
+zagnieceniu jedna rodzynka zostaje złożona, a druga nie, i odstęp wynosi
+\val{ch10.knead.ten}. Zagniecenie później dzieli je tylko
+\val{ch10.knead.eleven}, przypadkiem: rozrzucone rodzynki mogą być w
+dowolnej odległości, a od tej chwili to, gdzie jest jedna, nic ci nie mówi o
+drugiej. Każde zagniecenie mnoży każdy krótki odstęp dokładnie przez $2$,
+więc wykładnik Lapunowa tej reguły, w sensie rozdziału~\ref{ch:lyapunov},
+wynosi $\ln 2 \approx \val{ch10.knead.lambda}$ na zagniecenie.
+
+\begin{trapbox}
+\textbf{\enquote{Jeśli układ nigdy nie może opuścić małego obszaru, nie może
+być bardzo wrażliwy na stan początkowy.}} Obszar ogranicza to, jak
+\emph{duży} może być błąd, a nie to, jak szybko rośnie. Maleńki błąd podwaja
+się raz za razem, aż dorówna obszarowi, a od tej chwili dwa przebiegi są tak
+niezależne jak dwie rodzynki rzucone na stolnicę na chybił trafił.
+Pozostawanie w misce i przewidywalność to dwie różne obietnice, a składanie
+pozwala układowi dotrzymać pierwszej bez drugiej.
+\end{trapbox}
+
+\begin{lab}{l10_01_knead}{Pasek ciasta}
+Napisz \code{knead}, jedno rozciągnięcie i jedno złożenie. Potem napisz
+\code{kneads\_until\_apart}, które liczy zagniecenia, zanim dwie rodzynki
+startujące w małym odstępie znajdą się dalej od siebie niż zadana tolerancja.
+Dla rodzynek oddalonych o jedną tysięczną i tolerancji \num{0.1} odpowiedź
+brzmi siedem. Zacznij je dziesięć razy bliżej i zobacz, jak niewiele
+dodatkowych zagnieceń to daje.
+\end{lab}
+
+\section{Dwuwierszowe odwzorowanie Hénona}
+\label{sec:ch10-henon}
+\index{odwzorowanie Henona@odwzorowanie Hénona}\index{Henon, Michel@Hénon, Michel}
+
+\noindent
+Pasek to jedna liczba. Układ Lorenza z rozdziału~\ref{ch:lorenz} ma trzy i
+rozciąga oraz składa, gdy trajektoria okrąża jeden z płatów, odrywa się od
+sąsiadów i zostaje rzucona z powrotem do środka. W 1976 roku Michel Hénon,
+astronom z obserwatorium w Nicei, opublikował regułę niemal tak prostą, jak
+to tylko możliwe, która robi to samo z płaszczyzną \dash{} tak prostą, że
+komputer może wykonać miliony jej kroków. Przenosi ona punkt $(x, y)$, czyli
+stan złożony z dwóch liczb, w nowy punkt:
+\[ x_{n+1} = 1 - a\,x_n^{2} + y_n, \qquad y_{n+1} = b\,x_n, \]
+gdzie $a = \val{ch10.a}$, a $b = \val{ch10.b}$. Słowami: nowe $x$ to jeden
+minus $a$ razy kwadrat starego $x$ plus stare $y$; nowe $y$ to stare $x$
+zmniejszone do trzech dziesiątych.
+
+Hénon złożył ją z trzech ruchów. \emph{Wygięcie} przesuwa każdy punkt w górę
+lub w dół o $1 - a x^{2}$, garb, który wysyła $x$ i $-x$ na tę samą wysokość,
+więc prosta biegnąca przez płaszczyznę zostaje zagięta w łuk: to jest
+składanie. \emph{Ściśnięcie} spłaszcza płaszczyznę na boki do trzech
+dziesiątych jej szerokości. \emph{Zamiana} zamienia miejscami obie liczby,
+więc następne wygięcie działa w poprzek poprzedniego.
+
+\begin{think}
+Zacznij w początku układu współrzędnych, $(0, 0)$. Gdzie jest punkt po
+jednym kroku odwzorowania Hénona, a gdzie po dwóch?
+\end{think}
+\reveal{Po jednym kroku $(1, 0)$. Po dwóch $x = 1 - \num{1.4} \times 1 + 0 =
+-\num{0.4}$ i $y = \num{0.3} \times 1$, więc punkt to
+$(-\num{0.4}, \num{0.3})$.}
+
+\pyregion{code/ch10/henon.py}{rule}{Odwzorowanie Hénona: dwie liczby, po jednym wierszu arytmetyki na każdą}{lst:ch10-henon}
+
+\needspace{9\baselineskip}
+\transcript{ch10-henon}
+
+\noindent
+Listing ciągnie dalej tam, gdzie zatrzymała się twoja ręka. Punkt skacze, nie
+uspokajając się, nie powtarzając i nie uciekając: jakkolwiek długo go
+puścisz, $x$ pozostaje między \val{ch10.attractor.left} a
+\val{ch10.attractor.right}.
+
+\section{Jeden kształt dla każdego startu}
+\label{sec:ch10-cloud}
+\index{atraktor}\index{basen przyciągania}
+
+\noindent
+Jeden start to jedna historia. Weź ich wiele: siatkę czterdzieści na
+czterdzieści, czyli \val{ch10.cloud.n} punktów startowych rozłożonych równo
+w kwadracie, w którym zarówno $x$, jak i $y$ biegną od $-\num{0.5}$ do
+$\num{0.5}$.
+
+\begin{think}
+Przepuść każdy z tych punktów przez trzydzieści kroków odwzorowania Hénona.
+Gdzie spodziewasz się zastać chmurę: wciąż rozłożoną po kwadracie, zebraną w
+jednym punkcie, czy gdzie indziej?
+\end{think}
+\reveal{Gdzie indziej. Kilka punktów ucieka na zawsze, a wszystkie pozostałe
+leżą na jednym cienkim, wygiętym zbiorze \dash{} tym samym, który rysuje
+pojedynczy start, jeśli puścić go dość długo. Nie zbierają się w punkcie, bo
+rozciąganie trzyma je z dala od siebie wzdłuż tego zbioru.}
+
+\pyregion{code/ch10/cloud.py}{cloud}{Chmura startów i to, czy każdy ląduje na atraktorze}{lst:ch10-cloud}
+
+\needspace{8\baselineskip}
+\transcript{ch10-cloud}
+
+\noindent
+Żeby rozstrzygnąć, czy punkt leży na tym zbiorze, program najpierw puszcza
+jeden start na \val{ch10.cloud.reference} kroków i zaznacza każdy kwadracik o
+boku \val{ch10.cloud.cell}, który ten start odwiedzi. Na początku tylko
+\val{ch10.cloud.zero} z \val{ch10.cloud.n} punktów leży w zaznaczonym
+kwadraciku. Od kroku \val{ch10.cloud.settled} leżą w nich wszystkie
+\val{ch10.cloud.kept}, które zostały, a \val{ch10.cloud.left} uciekło na
+zawsze, poza dziesiątkę i dalej w nieskończoność.
+
+To właśnie znaczy słowo \emph{atraktor}: zbiór stanów, na którym ruch osiada i
+którego już nie opuszcza, a który przyciąga stany dookoła. Punkt spoczynku
+tłumionego wahadła z rozdziału~\ref{ch:motion} to najprostszy atraktor; motyl
+z rozdziału~\ref{ch:lorenz} to kolejny. Każdy start, który kończy na
+atraktorze, należy do jego \emph{basenu przyciągania}, tak jak każda kropla
+deszczu, która dociera do jeziora, spadła w dorzeczu tego jeziora. Atraktor
+Hénona ma basen z brzegiem, a starty spoza niego uciekają w nieskończoność.
+
+\plotfig{ch10-attractor}{Atraktor Hénona (niebieski) na tle swojego basenu.
+Każdy start z białego obszaru kończy na atraktorze; każdy start z szarego
+obszaru ucieka na zawsze. Górna krawędź kwadratu z listingu sięga w szarość i
+stamtąd pochodzą starty, które uciekły.}{atraktor i jego basen}
+
+\section{Ściśnięty, nie zatrzymany}
+\label{sec:ch10-area}
+\index{pole}\index{wyznacznik}\index{dyssypacja}
+
+\noindent
+Chmura zaczęła jako kwadrat o pewnym polu, a skończyła na zbiorze cienkim jak
+linia. Reguła Hénona mówi dokładnie, jak szybko pole znika. Weź maleńki
+kwadrat o boku $h$ z wierzchołkiem w $(x, y)$. Jeden krok przenosi jego dwa
+boki, strzałki $(h, 0)$ i $(0, h)$, w dwie nowe strzałki. Przesunięcie $x$ o
+$h$ zmienia nowe $x$ o mniej więcej $-2ax\,h$, bo
+$(x + h)^{2} = x^{2} + 2xh + h^{2}$, a $h^{2}$ jest maleńkie w porównaniu z
+$h$, i zmienia nowe $y$ o $bh$. Przesunięcie $y$ o $h$ zmienia nowe $x$ o $h$,
+a nowego $y$ wcale. Kwadrat staje się więc pochylonym równoległobokiem o
+bokach
+\[ (p, q) = (-2ax\,h,\ b\,h), \qquad (r, s) = (h,\ 0). \]
+Pole równoległoboku o bokach $(p, q)$ i $(r, s)$ to wartość bezwzględna liczby
+$ps - qr$, zwanej \emph{wyznacznikiem}; dla prostokąta o bokach $(2, 0)$ i
+$(0, 3)$ daje ona $2 \times 3 - 0 \times 0 = 6$. Tutaj wynosi
+$(-2ax\,h) \times 0 - (b\,h) \times h = -b\,h^{2}$, więc pole $h^{2}$
+zamienia się w $b\,h^{2}$. Każdy krok mnoży każde pole przez
+$b = \val{ch10.b}$, gdziekolwiek był kwadrat: położenie $x$, od którego
+zależy, jak mocno kwadrat się rozciąga, zostaje pomnożone przez zero i znika
+z wyniku.
+
+\begin{think}
+Plama punktów startowych ma pole $1$. Jakie ma pole po dziesięciu krokach?
+Czy to znaczy, że jej punkty zwalniają i stają, jak tłumione wahadło z
+rozdziału~\ref{ch:motion}?
+\end{think}
+\reveal{Około \val{ch10.area.ten}, czyli $\num{0.3}^{10}$: sześć milionowych
+tego, co było. I nie, punkty wcale nie zwalniają. Z plamy wyciskane jest
+pole, nie ruch.}
+
+\begin{trapbox}
+\textbf{\enquote{Skoro pole wciąż maleje, ruch musi zamierać.}} Tłumione
+wahadło traci pole, bo wszystko jest ściągane do jednego punktu spoczynku.
+Odwzorowanie Hénona mocno ściska w jednym kierunku, a rozciąga w innym, więc
+plama staje się coraz dłuższą i cieńszą wstęgą, której punkty poruszają się
+bez końca. Malejące pole mówi, że ruch kończy na czymś cienkim, a nie że się
+zatrzymuje.
+\end{trapbox}
+
+\noindent
+Teraz zmierz to. Kwadrat o boku jednej dziesiątej zamienia się w szesnaście
+tysięcy punktów na jego brzegu; odwzorowanie przesuwa każdy z nich, a wzór
+sznurowadłowy, znany geodetom, mierzy pole wewnątrz nowego obrysu.
+
+\pyregion{code/ch10/area.py}{area}{Pomiar tego, co odwzorowanie robi z polem}{lst:ch10-area}
+
+\needspace{7\baselineskip}
+\transcript{ch10-area}
+
+\noindent
+Pole maleje o czynnik zapowiedziany przez wyznacznik, z dokładnością do pięciu
+miejsc po przecinku, aż do \val{ch10.area.six} wartości początkowej po
+sześciu krokach. Obrys robi coś przeciwnego: najpierw się skraca, bo
+ściśnięcie spłaszcza kwadrat, a potem wciąż rośnie i po sześciu krokach jest
+\val{ch10.outline.six} razy dłuższy, owinięty wokół mniej niż tysięcznej
+części pola.
+
+\plotfig{ch10-square-folds}{Kwadrat punktów startowych, pokolorowanych według
+tego, gdzie na osi $x$ każdy się zaczął, po nie więcej niż pięciu krokach.
+Jeden krok wygina go w półksiężyc, następny rozciąga w cienki pasek, a po
+trzecim pasek jest złożony sam na siebie i jego kolory leżą
+warstwami.}{kwadrat rozciągnięty i złożony}
+
+\noindent
+Jak mocne jest rozciąganie? Nieś maleńką strzałkę wzdłuż jednego długiego
+przebiegu, przesuwając ją w każdym kroku tak, jak przesuwały się boki
+kwadratu. Zmierz, o ile się wydłużyła, dodaj logarytm tego wydłużenia do
+bieżącej sumy i skurcz ją z powrotem do długości jeden. Średnia z logarytmów
+to wykładnik Lapunowa z rozdziału~\ref{ch:lyapunov}, tym razem dla
+odwzorowania płaszczyzny.
+
+\pyregion{code/ch10/stretch.py}{arrow}{Średnie rozciągnięcie maleńkiej strzałki}{lst:ch10-arrow}
+
+\needspace{11\baselineskip}
+\transcript{ch10-stretch}
+
+\noindent
+Pierwsze wiersze pochodzą z drugiej połowy pliku: dwa starty oddalone o
+$10^{-10}$, co Python zapisuje jako \code{1.0e-10}. Ich odstęp rośnie, aż w
+kroku $70$ wynosi mniej więcej $2$, a potem nigdy nie przekracza
+\val{ch10.gap.widest}, czyli mniej więcej szerokości atraktora. Ograniczony, a
+mimo to wrażliwy, jak ciasto. Wykładnik wynosi \val{ch10.lambda} na krok:
+wzdłuż atraktora maleńka strzałka rośnie średnio o czynnik
+\val{ch10.stretch} na krok, a w poprzek odwzorowanie ściska ją o czynnik
+\val{ch10.squeeze}. Pomnóż jedno przez drugie, a dostaniesz z powrotem mniej
+więcej \val{ch10.b}, czynnik pola. Rozciągnij w jedną stronę, ściśnij w
+drugą, złóż, żeby się zmieściło: to cały przepis.
+
+\needspace{10\baselineskip}
+\begin{lab}{l10_02_henon}{Jeden krok i jego pole}
+Napisz \code{step}, jeden krok odwzorowania Hénona, oraz \code{area\_factor},
+które przesuwa o jeden krok trzy wierzchołki maleńkiego kwadratu, odczytuje
+dwa nowe boki jako strzałki $(p, q)$ i $(r, s)$ i zwraca wartość bezwzględną
+$ps - qr$ podzieloną przez stare pole. Sprawdź, że daje \num{0.3},
+gdziekolwiek postawisz kwadrat, i że zmiana $b$ je zmienia, a zmiana $a$ nie.
+\end{lab}
+
+\section{Warstwy w warstwach}
+\label{sec:ch10-zoom}
+\index{atraktor dziwny!warstwy}\index{fraktal}
+
+\noindent
+Narysowany na całą stronę atraktor Hénona wygląda jak kilka wygiętych linii.
+Przyjrzyj się bliżej.
+
+\begin{think}
+Narysuj piórem dowolną gładką krzywą i powiększaj jej mały kawałek, raz za
+razem. Jak ten kawałek wygląda na końcu? A teraz zgadnij, co zobaczysz, gdy
+powiększysz jedną z linii atraktora.
+\end{think}
+\reveal{Gładka krzywa coraz bardziej przypomina prostą. Linia atraktora nie:
+pod lupą rozpada się na kilka równoległych linii, a każda z nich, powiększona
+znowu, znowu się rozpada.}
+
+\plotfig{ch10-zooms}{Powiększanie atraktora Hénona. Każda czerwona ramka jest
+pokazana w powiększeniu na następnym panelu. To, co wyglądało na jedną linię,
+jest wiązką linii, a każda linia tej wiązki sama jest wiązką.}{atraktor
+powiększony dwa razy}
+
+\noindent
+Warstwy wynikają wprost z przepisu. Każdy krok rozciąga zbiór, składa go i
+ściska, żeby się zmieścił, więc każde złożenie kładzie obok tego, co było,
+cieńszą kopię wszystkiego, a ta kopia niesie w sobie własne warstwy. Dwa
+skutki brzmią absurdalnie, dopóki nie zobaczysz ich na własne oczy. Atraktor
+nie ma pola, bo każde pole jest mnożone przez \val{ch10.b} w każdym kroku,
+bez końca. A jego długość nie ma końca, bo kreśli go krzywa rozciągana w
+każdym kroku o czynnik mniej więcej \val{ch10.stretch}, bez końca.
+
+\begin{trapbox}
+\textbf{\enquote{Wystarczy dość mocno powiększyć dowolną krzywą, a stanie się
+linią prostą.}} To prawda dla gładkich krzywych rysowanych piórem i dla
+wykresów wzorów, które poznałeś w szkole. Tutaj to nieprawda. Jakkolwiek
+mocno powiększysz atraktor Hénona, każda linia rozpada się na wiązkę: ta
+struktura nie ma najmniejszej skali.
+\end{trapbox}
+
+\noindent
+Atraktor o takiej warstwowej budowie, na którym ruch jest chaotyczny, nazywa
+się \emph{atraktorem dziwnym}; tę nazwę nadali mu David Ruelle i Floris
+Takens w 1971 roku. Motyl Lorenza jest takim atraktorem, a atraktor Hénona
+też. Taki zbiór jest czymś więcej niż linia, która miałaby skończoną długość,
+i czymś mniej niż pole, bo żadnego pola nie ma: jego wymiar leży między jeden
+a dwa, a rozdział~\ref{ch:fractals} mierzy, gdzie dokładnie.
+
+\begin{worldbox}
+Inżynierowie chemicy mieszają gęste płyny \dash{} żywice, uszczelniacze,
+pasty spożywcze \dash{} w \emph{mieszalniku statycznym}: rurze z rzędem
+krótkich skręconych łopatek i bez żadnych ruchomych części. Każda łopatka
+dzieli strumień na dwa, obraca połówki i układa je jedna na drugiej:
+rozciągnięcie i złożenie, wykonane przez sam kształt rury. Każda łopatka
+podwaja liczbę warstw, więc dwadzieścia łopatek daje ich mniej więcej milion,
+bo dziesięć podwojeń daje około tysiąca.
+\end{worldbox}
+
+\begin{rigourbox}
+Stephen Smale przełożył zagniatanie ciasta na matematykę mniej więcej dekadę
+przed odwzorowaniem Hénona. Jego \emph{podkowa} rozciąga kwadrat w długi
+pasek, wygina go w podkowę i kładzie z powrotem w poprzek kwadratu. Punkty,
+które zostają w kwadracie na zawsze, tworzą zbiór z lukami w lukach, a Smale
+udowodnił, że ruch na nim jest tak nieprzewidywalny jak ciąg rzutów monetą.
+To, co ten rozdział pokazuje o odwzorowaniu Hénona dla $a = \val{ch10.a}$ i
+$b = \val{ch10.b}$, jest zmierzone, a nie udowodnione: nikt nie udowodnił, że
+zbiór, który rysuje komputer, nie jest, powiedzmy, niezwykle długim cyklem.
+Michael Benedicks i Lennart Carleson udowodnili w 1991 roku, że odwzorowania
+postaci Hénona naprawdę mają atraktory dziwne dla wielu innych wyborów tych
+dwóch liczb.
+\end{rigourbox}
+
+\section{Przepływ pocięty na odwzorowanie}
+\label{sec:ch10-section}
+\index{przekroj Poincarego@przekrój Poincarégo}
+
+\noindent
+Dlaczego reguła z dwiema liczbami miałaby cokolwiek mówić o układzie Lorenza,
+przepływie z trzema? Wyobraź sobie motyla z taflą szkła wsuniętą w jedno z
+jego skrzydeł. Trajektoria przebija taflę raz za razem i za każdym razem
+zostawia kropkę. Zapomnij o drodze między przebiciami i zachowaj tylko
+kropki. Gdy znasz jedną kropkę, przepływ rozstrzyga, gdzie będzie następna,
+więc kropki podlegają własnej regule: odwzorowaniu tafli w nią samą, ze
+stanem złożonym z dwóch liczb. To jest \emph{przekrój Poincarégo}, nazwany na
+cześć Henriego Poincarégo, który użył go w pracy nad trzema ciałami z
+rozdziału~\ref{ch:mechanics}.
+
+\mermaidfig{ch10-section}{Przekrój Poincarégo. Droga przepływu raz za razem
+przecina taflę; reguła, która prowadzi od jednego przecięcia do następnego,
+jest odwzorowaniem tafli.}{przepływ, przekrój, odwzorowanie}
+
+\noindent
+Odwzorowanie Hénona nie jest przekrojem samego przepływu Lorenza, ale
+zbudowano je tak, żeby zachowywało się jak taki przekrój: między dwoma
+przebiciami przepływ podobny do Lorenzowskiego rozciąga kawałek tafli, ściska
+go i składa, a to właśnie robią wygięcie, ściśnięcie i zamiana.
+
+\begin{think}
+Rozdział~\ref{ch:motion} mówił, że gładki przepływ potrzebuje co najmniej
+trzech liczb w stanie, żeby być chaotycznym. Odwzorowanie Hénona jest
+chaotyczne przy dwóch, a odwzorowanie logistyczne z
+rozdziału~\ref{ch:logistic} przy jednej. Czy to sprzeczność?
+\end{think}
+\reveal{Nie. Tamta reguła dotyczy przepływów, których drogi biegną w sposób
+ciągły i na płaszczyźnie nigdy nie mogą się przeciąć. Odwzorowanie
+przeskakuje od jednego stanu do następnego, więc nic nie przeszkadza mu
+składać. Przecięcie przepływu z trzema liczbami taflą zostawia odwzorowanie z
+dwiema, a chaos przeżywa to cięcie.}
+
+\begin{summarybox}
+\begin{itemize}
+\item Chaos w ograniczonym układzie to dwa powtarzane ruchy:
+  \textbf{rozciąganie}, które oddala sąsiadów, i \textbf{składanie}, które
+  odkłada wszystko z powrotem. \textbf{Odwzorowanie namiotowe} zagniata pasek
+  i podwaja każdy mały odstęp.
+\item \textbf{Odwzorowanie Hénona}, $x_{n+1} = 1 - a x_n^{2} + y_n$ i
+  $y_{n+1} = b x_n$, wygina, ściska i zamienia miejscami współrzędne
+  płaszczyzny.
+\item Chmura startów kończy na jednym zbiorze, \textbf{atraktorze}; starty,
+  które tam trafiają, tworzą jego \textbf{basen przyciągania}.
+\item Każdy krok mnoży każde pole przez $b$, \textbf{wyznacznik} kroku, a mimo
+  to ruch nigdy nie ustaje: odwzorowanie \textbf{ściska} w jedną stronę, a
+  \textbf{rozciąga} w drugą.
+\item Po powiększeniu każda linia atraktora rozpada się na wiązkę, raz za
+  razem. Atraktor taki jak ten, z chaotycznym ruchem na nim, to
+  \textbf{atraktor dziwny}: bez pola i bez końca długości.
+\item \textbf{Przekrój Poincarégo} zamienia przepływ w odwzorowanie, dlatego
+  odwzorowanie z dwiema liczbami może być chaotyczne, choć przepływ z dwiema
+  nie może.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Rodzynka leży w punkcie $\num{0.3}$ paska. Gdzie jest po jednym
+  zagnieceniu, a gdzie po dwóch?
+  \answerto{W \num{0.6}, potem w \num{0.8}: podwojenie \num{0.6} daje
+  \num{1.2}, czyli za końcem, więc punkt składa się z powrotem do
+  $2 - \num{1.2} = \num{0.8}$.}
+\item Dwie rodzynki startują w odstępie \num{0.01} i pozostają po tej samej
+  stronie zgięcia. Jak daleko są od siebie po trzech zagnieceniach i dlaczego
+  podwajanie nie może trwać w nieskończoność?
+  \answerto{\num{0.08}. Pasek ma długość tylko jeden, więc prędzej czy później
+  zgięcie złapie jedną rodzynkę, a drugiej nie.}
+\item Wykonaj jeden krok odwzorowania Hénona z punktu $(\num{0.5}, 0)$.
+  \answerto{$1 - \num{1.4} \times \num{0.25} + 0 = \num{0.65}$ i
+  $\num{0.3} \times \num{0.5} = \num{0.15}$: punkt $(\num{0.65},
+  \num{0.15})$.}
+\item Plama punktów startowych ma pole $2$. Jakie ma pole po trzech krokach
+  odwzorowania Hénona i czy jej punkty przestały się ruszać?
+  \answerto{$2 \times \num{0.027} = \num{0.054}$. Nie: plama jest ściskana w
+  jedną stronę i rozciągana w drugą, a jej punkty wciąż się poruszają.}
+\item Czym różni się atraktor od swojego basenu przyciągania?
+  \answerto{Atraktor to zbiór, na którym ruch osiada i którego nigdy nie
+  opuszcza; jego basen to każdy start, który na nim kończy.}
+\item Co widzisz, gdy powiększasz gładką krzywą, a co, gdy powiększasz
+  atraktor Hénona?
+  \answerto{Gładka krzywa coraz bardziej przypomina prostą. Każda linia
+  atraktora rozpada się na wiązkę linii, raz za razem.}
+\item Czym jest przekrój Poincarégo i dlaczego pozwala, by odwzorowanie ze
+  stanem złożonym z dwóch liczb było chaotyczne?
+  \answerto{Zachowuje tylko punkty, w których droga przepływu przecina wybraną
+  powierzchnię; reguła od jednego przecięcia do następnego jest
+  odwzorowaniem. Reguła o trzech liczbach dotyczy przepływów, a odwzorowanie
+  przeskakuje, więc może składać.}
+\end{checkpoint}

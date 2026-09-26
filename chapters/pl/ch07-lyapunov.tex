@@ -1,0 +1,520 @@
+%% ch07 --- Liczba na chaos: wykładnik Lapunowa
+%%
+%% Napisany we wrześniu 2026. Każda liczba, której czytelnik nie policzy w
+%% pamięci, pochodzi z code/measure/ch07.py, który importuje TE SAME funkcje,
+%% które drukują listingi (code/ch07/), więc strona i listingi nie mogą się
+%% rozejść. Orbity używają wyłącznie + - * /; logarytmy są uśredniane po stu
+%% tysiącach składników i zapisywane z dwoma miejscami po przecinku, czego
+%% żadna różnica ostatniego bitu między maszynami nie ruszy.
+%%
+%% CZEGO TEN ROZDZIAŁ NIE MOŻE POWIEDZIEĆ. Obserwacja, że dwa przebiegi się
+%% rozchodzą, a ich odstęp mniej więcej się podwaja, należy do rozdziału 6;
+%% ten rozdział zamienia ją w jedną liczbę i horyzont. Pełny diagram
+%% bifurkacyjny, miejsce, gdzie zaczyna się chaos, zagęszczanie przejść i
+%% największe okno należą do rozdziału 8. Wykładnik układu Lorenza należy do
+%% rozdziału 9, czasy Lapunowa planet do rozdziału 13, horyzonty pogody do
+%% rozdziału 14, a zaokrąglanie jako błąd początkowy do rozdziału 16.
+%%
+%% Bliźniak: chapters/en/ch07-lyapunov.tex. Podrozdział za podrozdziałem,
+%% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
+
+\chapter{Liczba na chaos: wykładnik Lapunowa}
+\label{ch:lyapunov}
+\index{wykładnik Lapunowa}\index{horyzont przewidywania}
+
+\noindent
+Rozdział~\ref{ch:butterfly} policzył dwie rzeczy o odwzorowaniu logistycznym
+przy $r = 4$: odstęp między dwoma bliskimi przebiegami mniej więcej podwaja
+się w każdym kroku, a każde poprawne miejsce po przecinku stanu początkowego
+daje tylko kilka kroków prognozy więcej. Oba fakty znaleziono przez liczenie,
+dla jednego odwzorowania. Pytanie, które za nimi stoi, zadasz każdemu
+układowi w tej książce: jak szybko rosną małe błędy i jak daleko naprzód
+pozwala to widzieć?
+
+Ten rozdział zamienia liczenie w jedną liczbę, wykładnik Lapunowa, którą da
+się zmierzyć dla każdego układu, a tę liczbę w horyzont: liczbę kroków, na
+które przewidywanie jest dobre. Podczas
+lektury trzymaj się tego pytania: gdybyś zmierzył stan początkowy układu
+chaotycznego tysiąc razy dokładniej, o ile dalej mógłbyś go przewidywać?
+
+\begin{outcomes}
+\outcome{ustalić, jak bardzo jeden krok reguły rozciąga mały błąd, i sprawdzić
+  to, uruchamiając dwie kopie programu}
+\outcome{używać logarytmu naturalnego, żeby zamienić łańcuch mnożeń w sumę i
+  z powrotem}
+\outcome{obliczyć wykładnik Lapunowa odwzorowania logistycznego z orbity i
+  odczytać jego znak}
+\outcome{porównać obliczony wykładnik z wartością znaną dokładnie}
+\outcome{zamienić wykładnik, błąd pomiaru i tolerancję w horyzont
+  przewidywania}
+\outcome{powiedzieć, co daje lepszy pomiar, licząc w krokach}
+\end{outcomes}
+
+\section{Krok po kroku}
+\label{sec:ch07-stretch}
+\index{rozciągnięcie}
+
+\noindent
+Rozdział~\ref{ch:butterfly} zauważył, że odstęp między dwoma przebiegami
+rośnie nierówno: niektóre kroki prawie go czterokrotnie zwiększają, kilka go
+zmniejsza, a podwaja się dopiero średnio. Zacznij od tej nierówności.
+Uruchom odwzorowanie logistyczne przy $r = 4$ od $x = \num{0.3}$ i od
+wartości o $\num{1e-10}$ wyższej i patrz, co każdy pojedynczy krok robi z
+odstępem: podziel odstęp po kroku przez odstęp przed nim. Ten iloraz nazwijmy
+\emph{rozciągnięciem} kroku.
+
+\pyregion{code/ch07/stretch.py}{rule}{Odwzorowanie logistyczne i jego rozciągnięcie}{lst:ch07-rule}
+
+\noindent
+Funkcja \code{step} to odwzorowanie logistyczne z
+rozdziału~\ref{ch:logistic}. Funkcja \code{stretch} to jego nachylenie,
+$r(1 - 2x)$. Rozdział~\ref{ch:feedback} mierzył nachylenie, lekko przesuwając
+$x$ i patrząc, jak daleko przesunie się wynik; dla tej reguły da się je
+zapisać dokładnie, a pierwsze laboratorium sprawdza ten wzór przesuwaniem.
+Reszta programu mierzy rozciągnięcie pierwszych ośmiu kroków na podstawie
+dwóch przebiegów, obok nachylenia w miejscu, w którym jest pierwszy przebieg:
+
+\pyregion{code/ch07/stretch.py}{table}{Pomiar rozciągnięcia ośmiu kroków}{lst:ch07-table}
+
+\transcript{ch07-stretch}
+
+\noindent
+Dwie prawe kolumny się zgadzają. W jednym kroku malutki odstęp jest mnożony
+przez nachylenie reguły w miejscu, w którym jesteś, więc rozciągnięcie można
+odczytać z reguły, zamiast mierzyć je drugim przebiegiem. Ujemne nachylenie
+dodatkowo przerzuca odstęp na drugą stronę, co nie zmienia jego wielkości;
+tabela podaje wielkości.
+
+A rozciągnięcia wcale nie przypominają stałej $2$. Krok $3$ zmniejsza odstęp
+do mniej niż jednej trzeciej, a kroki $4$ i $5$ prawie go czterokrotnie
+zwiększają. W kroku $3$ przebieg jest blisko $\num{0.5}$, gdzie parabola jest
+płaska na szczycie; w krokach $4$ i $5$ jest blisko $1$ i blisko $0$, gdzie
+parabola jest stroma. Chaos nie rozciąga równomiernie: w jednym miejscu
+mocno, w innym łagodnie, a czasem ściska.
+
+\begin{think}
+Załóżmy, że jeden krok mnoży odstęp przez $4$, a następny przez $\tfrac14$.
+Co stało się z odstępem w ciągu tych dwóch kroków? I jaki jeden czynnik,
+użyty w obu krokach, dałby to samo?
+\end{think}
+\reveal{Nic się nie stało: $4 \times \tfrac14 = 1$, i odstęp wrócił tam,
+gdzie był. Tym jednym czynnikiem jest $1$, a nie $\num{2.125}$, które
+dostajesz, uśredniając $4$ i $\tfrac14$.}
+Wzrost się składa: każdy krok mnoży to, co zostawił poprzedni. Typowe
+rozciągnięcie nie jest więc zwykłą średnią rozciągnięć. To czynnik, który
+użyty w każdym kroku daje ten sam wynik łączny.
+
+\begin{trapbox}
+\textbf{\enquote{Żeby poznać typowe rozciągnięcie na krok, uśrednij
+rozciągnięcia.}} Sprawdź to na tabeli. Średnia ośmiu rozciągnięć wynosi
+\val{ch07.eight.mean}, a odstęp pomnożony przez nią osiem razy urósłby mniej
+więcej \val{ch07.eight.meanpow}-krotnie. Pomnóż zamiast tego osiem prawdziwych
+rozciągnięć, a okaże się, że odstęp urósł \val{ch07.eight.product}-krotnie.
+Kiedy coś się mnoży, dodawanie odpowiada na pytanie, którego nikt nie zadał;
+średnia, której szukasz, też musi mnożyć.
+\end{trapbox}
+
+\section{Logarytm zamienia mnożenie w dodawanie}
+\label{sec:ch07-log}
+\index{logarytm!naturalny}
+
+\noindent
+Rozdział~\ref{ch:iteration} użył logarytmu, żeby odpowiedzieć na pytanie
+\enquote{ile kroków, zanim\ldots?}. Ten rozdział potrzebuje jednego
+konkretnego logarytmu, logarytmu \emph{naturalnego}, zapisywanego $\ln$, i
+jednej rzeczy, którą on robi. Oto kilka jego wartości:
+
+\begin{center}
+\begin{tabular}{lcccccc}
+\toprule
+liczba & $\tfrac12$ & $1$ & $2$ & $4$ & $10$ & $e$ \\
+\midrule
+jej logarytm naturalny & $\val{ch07.ln.half}$ & $0$ & $\val{ch07.ln.two}$ &
+  $\val{ch07.ln.four}$ & $\val{ch07.ln.ten}$ & $1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Spójrz na $2$ i $4$. Ponieważ $4 = 2 \times 2$, logarytm czwórki jest dwa
+razy większy od logarytmu $2$. To wszystko, czego ten rozdział potrzebuje:
+\[ \ln(a \times b) = \ln a + \ln b. \]
+Słowami: logarytm iloczynu jest sumą logarytmów, więc mnożenie dwóch liczb
+zamienia się w dodawanie ich logarytmów. Liczby większe od $1$ mają logarytmy
+dodatnie, a liczby między $0$ a $1$ ujemne: $\tfrac12 \times 2 = 1$, więc
+$\ln\tfrac12$ i $\ln 2$ sumują się do $\ln 1$, czyli do $0$. Ostatnia
+kolumna zawiera $e$, mniej więcej \val{ch07.e}, liczbę, której logarytm
+naturalny wynosi dokładnie $1$; odgrywa ona rolę, jaką $10$ odgrywa dla
+logarytmu dziesiętnego. W Pythonie logarytm naturalny to \code{math.log}, a
+\code{math.log(2)} zaczyna się od \val{ch07.ln.two.long}.
+
+\begin{think}
+Korzystając tylko z $\ln 2 \approx \val{ch07.ln.two}$, oblicz $\ln 8$. A ile
+wynosi $\ln\tfrac14$?
+\end{think}
+\reveal{$8 = 2 \times 2 \times 2$, więc $\ln 8 = \ln 2 + \ln 2 + \ln 2$,
+czyli mniej więcej \val{ch07.ln.eight}. A $\tfrac14 \times 4 = 1$, więc
+$\ln\tfrac14$ wynosi $-\val{ch07.ln.four}$.}
+Jeśli napisałeś $\num{2.07}$, zrobiłeś to dobrze: zaokrąglenie $\ln 2$
+policzyłeś trzy razy.
+
+Tak logarytm naprawia średnią. Jeśli odstęp jest w kroku mnożony przez $g$,
+jego logarytm rośnie o $\ln g$: \emph{czynnik} na krok staje się
+\emph{tempem} na krok, a tempa się dodają, więc można je uśredniać
+zwyczajnie. Dla dwóch kroków z pytania tempa $\ln 4$ i $\ln\tfrac14$
+sumują się do $0$, średnie tempo wynosi $0$, a czynnik, którego logarytm to
+$0$, wynosi $1$: właściwa odpowiedź, znaleziona dodawaniem.
+
+Żeby wrócić od tempa do czynnika, potrzebujesz liczby, której logarytmem jest
+to tempo; zapisuje się ją $e^{\lambda}$, \enquote{$e$ do potęgi $\lambda$};
+$\lambda$ to grecka litera lambda i oznacza tempo. Zatem $e^{0} = 1$,
+$e^{1} = e$ i $e^{\ln 2} = 2$. Teraz osiem kroków z tabeli. Logarytmy ich
+rozciągnięć mają średnią \val{ch07.eight.rate}, a
+$e^{\val{ch07.eight.rate}}$ to mniej więcej \val{ch07.eight.geo}: średnio
+odstęp rósł o czynnik około $2$ na krok, a \val{ch07.eight.geo} pomnożone
+przez siebie osiem razy daje \val{ch07.eight.product}, które wyszło w tabeli.
+\enquote{Mniej więcej się podwaja} stało się pomiarem.
+
+\section{Wykładnik Lapunowa}
+\label{sec:ch07-exponent}
+\index{wykładnik Lapunowa!odwzorowania logistycznego}
+
+\noindent
+Osiem kroków to próbka. Prześledź zamiast tego orbitę przez sto tysięcy
+kroków, weź logarytm naturalny wielkości rozciągnięcia w każdym punkcie,
+który odwiedza, i uśrednij. Wynik to \emph{wykładnik Lapunowa}, nazwany na
+cześć rosyjskiego matematyka Aleksandra Lapunowa, którego praca o
+stabilności ruchu ukazała się w 1892 roku. Jeśli $s_1, s_2, \dots, s_N$ to
+rozciągnięcia wzdłuż orbity,
+\[ \lambda = \frac{\ln\abs{s_1} + \ln\abs{s_2} + \dots + \ln\abs{s_N}}{N}. \]
+Słowami: $\lambda$ to średnia logarytmów rozciągnięć. Kreski oznaczają
+\enquote{wielkość}, bo przerzucenie na drugą stronę nie czyni odstępu ani
+większym, ani mniejszym.
+
+Czytaj $\lambda$ jako tempo. W ciągu $N$ kroków mały błąd jest mnożony przez
+mniej więcej $e^{\lambda N}$, więc znak mówi, z jakim układem masz do
+czynienia:
+
+\begin{itemize}
+\item \textbf{$\lambda$ powyżej zera}: błędy rosną wykładniczo, a układ jest
+  chaotyczny;
+\item \textbf{$\lambda$ poniżej zera}: błędy maleją, a układ zapomina o
+  swoich zaburzeniach;
+\item \textbf{$\lambda$ równe zeru}: granica, na której błędy średnio ani nie
+  rosną, ani nie maleją.
+\end{itemize}
+
+\begin{think}
+Przy $r = 4$ odstęp mniej więcej podwaja się w każdym kroku. Jakiej wartości
+$\lambda$ się spodziewasz?
+\end{think}
+\reveal{Mniej więcej $\ln 2$, czyli \val{ch07.ln.two}: odstęp mnożony w
+każdym kroku przez $2$ rośnie w tempie $\ln 2$ na krok.}
+
+\begin{think}
+Przy $r = \num{2.8}$ orbita zatrzymuje się w punkcie stałym $1 - 1/r$ z
+rozdziału~\ref{ch:logistic}. Tam nachylenie $r(1 - 2x)$ wynosi
+$2 - r = -\num{0.8}$, a $\ln\num{0.8}$ to mniej więcej
+\val{ch07.ln.pointeight}. Ile wynosi $\lambda$?
+\end{think}
+\reveal{Mniej więcej \val{ch07.ln.pointeight}. Kiedy orbita siedzi w punkcie
+stałym, każdy składnik średniej to $\ln\num{0.8}$, więc średnia też. Jest
+ujemna: zaburzenie maleje w każdym kroku o jedną piątą.}
+
+\pyregion{code/ch07/exponent.py}{exponent}{Wykładnik Lapunowa przez uśrednianie}{lst:ch07-exponent}
+
+\noindent
+Pierwsza pętla wykonuje tysiąc kroków odwzorowania i je wyrzuca, żeby orbita
+się ustaliła, zanim cokolwiek zostanie uśrednione. Druga dodaje logarytm
+wielkości rozciągnięcia w każdym punkcie, a potem robi krok; ostatni wiersz
+dzieli. To jest wzór powyżej i nic więcej. Uruchom go przy czterech
+ustawieniach pokrętła $r$:
+
+\pyregion{code/ch07/exponent.py}{run}{Wykładnik przy czterech ustawieniach r}{lst:ch07-run}
+
+\transcript{ch07-exponent}
+
+\noindent
+Oba przewidywania się sprawdzają. Przy $r = \num{2.8}$ program znajduje
+\val{ch07.lam.twoeight}. Przy $r = 4$ znajduje \val{ch07.lam.four}, a
+dokładna wartość to $\ln 2 = \val{ch07.ln.two.long}$: średnia stu tysięcy
+bardzo różnych logarytmów zgadza się z nią z dokładnością do $\num{0.001}$.
+Przy $r = \num{3.2}$, gdzie orbita przeskakuje między dwiema wartościami, i
+przy $r = \num{3.5}$, gdzie krąży między czterema, wykładnik też jest
+ujemny: \val{ch07.lam.threetwo} i \val{ch07.lam.threefive}. Cykl, tak jak
+punkt stały, zapomina o swoich zaburzeniach.
+
+\plotfig{ch07-running-average}{Średnia bieżąca logarytmu rozciągnięcia
+wzdłuż sześciu orbit: trzech startów przy $r = 4$ i trzech przy
+$r = \num{3.7}$. Każda waha się przez kilkaset kroków, a potem się ustala, a
+trzy starty przy każdym ustawieniu ustalają się na tej samej
+liczbie.}{średnia, która się ustala}
+
+\begin{rigourbox}
+Dwie rzeczy są tu używane, ale nie dowodzone. Pierwsza: że średnia ustala się
+na tej samej liczbie przy prawie każdym starcie. To twierdzenie, a
+\enquote{prawie każdym} ma znaczenie: start dokładnie w $0$ zostaje w $0$ na
+zawsze i daje średnią $\ln 4$. Przebieg na komputerze może to twierdzenie
+zilustrować, jak robi to rysunek, ale nie może go dowieść. Druga: dlaczego
+$r = 4$ daje dokładnie $\ln 2$. Zapisz $x$ jako $\sin^{2}\theta$ dla pewnego
+kąta $\theta$, a jedna linijka szkolnej trygonometrii zamieni $4x(1 - x)$ w
+$\sin^{2}(2\theta)$: przy $r = 4$ odwzorowanie to przebrane podwajanie kąta,
+czyli odwzorowanie podwajające z rozdziału~\ref{ch:butterfly}, z kątem
+liczonym w półobrotach. Podwajanie rozciąga każdy błąd kąta dokładnie $2$
+razy, a zmiana przebrania nie zmienia średniego tempa.
+\end{rigourbox}
+
+\begin{lab}{l07_01_exponent}{Wykładnik z orbity}
+Napisz \code{stretch}, czyli nachylenie $r(1 - 2x)$, oraz \code{exponent},
+która pozwala orbicie się ustalić, a potem uśrednia wzdłuż niej logarytm
+wielkości rozciągnięcia. Testy sprawdzają nachylenie przesuwaniem, tak jak
+robił to rozdział~\ref{ch:feedback}, i porównują twój wykładnik z trzema
+wartościami znanymi dokładnie: $\ln 2$ przy $r = 4$, $\ln\num{0.8}$ przy
+$r = \num{2.8}$ i cyklem dwuokresowym przy $r = \num{3.2}$.
+\end{lab}
+
+\section{Jak daleko naprzód: horyzont przewidywania}
+\label{sec:ch07-horizon}
+\index{horyzont przewidywania}\index{czas Lapunowa}
+
+\noindent
+Po $n$ krokach mały błąd o wielkości $\delta$ (grecka litera delta) urasta do
+mniej więcej $\delta\, e^{\lambda n}$. Przestajesz ufać przewidywaniu, gdy
+jego błąd osiąga tolerancję $T$, największy błąd, z którym możesz żyć.
+Horyzont to więc liczba kroków, przy której $\delta\, e^{\lambda n} = T$.
+Zlogarytmuj obie strony: iloczyn staje się sumą, a logarytm $e^{\lambda n}$
+to $\lambda n$, bo $e$ ma logarytm $1$ i jest mnożone $\lambda n$ razy.
+Zostaje $\ln\delta + \lambda n = \ln T$, a stąd
+\[ n \approx \frac{1}{\lambda}\,\ln\frac{T}{\delta}. \]
+Słowami: horyzont to logarytm tego, ile razy błąd może urosnąć, podzielony
+przez tempo, w jakim rośnie.
+
+Liczba $1/\lambda$ nazywa się \emph{czasem Lapunowa}: to liczba kroków, w
+ciągu których błędy rosną $e$ razy. Przy $r = 4$ wynosi $1/\ln 2$, mniej
+więcej \val{ch07.lyap.time} kroku, a wzór mówi, że horyzont to czas Lapunowa
+pomnożony przez $\ln(T/\delta)$.
+
+\mermaidfig{ch07-three-steps}{Od reguły do horyzontu. Nachylenie daje
+rozciągnięcie w każdym kroku, średnia jego logarytmu daje wykładnik, a
+wykładnik razem z błędem i tolerancją daje horyzont.}{rozciągnięcie,
+wykładnik, horyzont}
+
+\begin{think}
+Załóżmy, że model prognozy ma czas Lapunowa równy dwóm dniom, a jego
+prognozy są dobre przez sześć. Nowa sieć przyrządów zmniejsza błąd jego
+stanu początkowego dziesięciokrotnie. Na jak długo prognozy są dobre teraz:
+na mniej więcej sześćdziesiąt dni, na mniej więcej dwanaście, czy krócej?
+\end{think}
+\reveal{Mniej więcej $\num{10.6}$ dnia. Dziesięciokrotnie mniejszy błąd
+dodaje $\ln 10$ do $\ln(T/\delta)$, więc dodaje $\ln 10$ czasów Lapunowa:
+$2 \times \val{ch07.ln.ten}$, czyli mniej więcej $\num{4.6}$ dnia.}
+
+\begin{trapbox}
+\textbf{\enquote{Dziesięć razy lepsze dane dają dziesięć razy dłuższe
+prognozy.}} Dają stałą liczbę dodatkowych kroków, $\ln 10/\lambda$, bez
+względu na to, jaki był wcześniej błąd. Przy $r = 4$ to \val{ch07.per.ten},
+liczba, którą rozdział~\ref{ch:butterfly} policzył dla każdego miejsca po
+przecinku, teraz wyprowadzona i prawdziwa dla każdego układu chaotycznego z
+jego własnym $\lambda$. Horyzont rośnie z logarytmem twojej dokładności, a
+nie z samą dokładnością: dwudzieste poprawne miejsce po przecinku daje nie
+więcej niż pierwsze.
+\end{trapbox}
+
+\pyregion{code/ch07/horizon.py}{formula}{Wzór na horyzont}{lst:ch07-formula}
+
+\noindent
+Program zestawia ten wiersz z liczeniem, które wykonał
+rozdział~\ref{ch:butterfly}: funkcja \code{counts} śledzi z tysiąca startów
+dwa przebiegi oddalone o $\delta$, aż różnią się o więcej niż $T$. W
+wydruku \code{1e-03} to pythonowy zapis $10^{-3}$, czyli jednej
+tysięcznej.
+
+\pyregion{code/ch07/horizon.py}{table}{Wzór kontra liczenie, dla czterech błędów stanu początkowego}{lst:ch07-count}
+
+\transcript{ch07-horizon}
+
+\noindent
+Wzór i średnia z liczenia zgadzają się z dokładnością do kroku; liczenie
+wychodzi odrobinę później, bo odstęp sprawdza się tylko po pełnych krokach,
+a gdy przestaje być mały, rośnie wolniej. Dwie ostatnie kolumny są
+ostrzeżeniem: poszczególne starty się różnią, niektóre bardzo, bo horyzont,
+tak jak wykładnik, jest średnią. Ale spójrz w dół wierszy. Każda tysiąckrotna
+poprawa dodaje te same dziesięć kroków; w pomiarze wiersze dzieli średnio
+\val{ch07.hz.gained} kroku, wobec $\ln 1000/\ln 2$ ze wzoru, czyli
+\val{ch07.ln.thousand} podzielone przez \val{ch07.ln.two}:
+\val{ch07.extra.thousand}.
+
+\plotfig{ch07-horizon-line}{Horyzont w zależności od błędu stanu
+początkowego, w skali logarytmicznej, z lepszymi pomiarami po prawej.
+Liczenie (kropki i pasmo, w którym mieści się większość startów) idzie
+wzdłuż prostej ze wzoru: każdy czynnik dziesięć w dokładności daje tę samą
+liczbę dodatkowych kroków.}{horyzont a błąd stanu początkowego}
+
+\begin{think}
+Komputer przechowuje liczbę z dokładnością do mniej więcej szesnastu cyfr
+znaczących. Załóżmy, że potrafisz tak dobrze zmierzyć stan początkowy
+odwzorowania przy $r = 4$, więc $\delta = 10^{-16}$. Przy $T = \num{0.1}$ jak
+daleko naprzód mógłbyś mniej więcej przewidywać? I ilu miejsc po przecinku
+stanu początkowego wymagałoby tysiąc kroków?
+\end{think}
+\reveal{Mniej więcej \val{ch07.hz.sixteen} kroków: piętnaście czynników
+dziesięć, po \val{ch07.per.ten} kroku każdy. Tysiąc kroków wymagałoby stanu
+początkowego z dokładnością do \val{ch07.digits.thousand} miejsc po
+przecinku; nawet sto kroków wymaga \val{ch07.digits.hundred}.}
+
+\begin{trapbox}
+\textbf{\enquote{Większy komputer w końcu uczyni każdy układ
+przewidywalnym.}} Szybszy komputer nie zna stanu początkowego ani trochę
+lepiej, a horyzont zależy od stanu początkowego tylko przez logarytm jego
+błędu. Żeby podwoić horyzont, musisz podwoić liczbę poprawnych cyfr, a
+najdokładniejsze pomiary, jakich kiedykolwiek dokonano, za pomocą zegarów
+atomowych, sięgają mniej niż dwudziestu. Komputer w dodatku zaokrągla w
+każdym kroku, co jest nowym błędem, jego własnym;
+rozdział~\ref{ch:computers} mierzy, ile to kosztuje.
+\end{trapbox}
+
+\noindent
+Dlatego prognozy pogody poprawiają się powoli. Satelity, gęstsze obserwacje
+i szybsze komputery wielokrotnie zmniejszyły błąd zmierzonego stanu
+atmosfery, a każdy taki czynnik kupił tę samą stałą porcję wyprzedzenia;
+zwykle przytacza się poprawę o mniej więcej jeden dzień użytecznej prognozy
+na dekadę. Atmosfera nie jest odwzorowaniem logistycznym, a
+rozdział~\ref{ch:weather} mówi, co jest w niej inne, ale arytmetyka
+logarytmu stosuje się do niej tak samo.
+
+\begin{worldbox}
+Czasem Lapunowa astronomowie opisują, jak daleko naprzód da się śledzić
+orbitę. W 1988 roku Gerald Sussman i Jack Wisdom prześledzili Plutona na
+komputerze zbudowanym specjalnie w tym celu, stwierdzili, że jego ruch jest
+chaotyczny, i oszacowali jego czas Lapunowa na mniej więcej dwadzieścia
+milionów lat; historia samych planet należy do
+rozdziału~\ref{ch:mechanics}. Sama ta liczba nie jest horyzontem. Horyzont
+to czas Lapunowa pomnożony przez $\ln(T/\delta)$, a ten logarytm wynosi
+tylko mniej więcej \val{ch07.ln.tenbillion} nawet wtedy, gdy błąd stanu
+początkowego jest dziesięć miliardów razy mniejszy od tolerancji, więc
+horyzont to co najwyżej kilkadziesiąt czasów Lapunowa.
+\end{worldbox}
+
+\begin{lab}{l07_02_horizon}{Jak daleko naprzód i jakim kosztem}
+Napisz \code{horizon}, czyli wzór z tego podrozdziału; \code{extra\_steps},
+czyli liczbę kroków zyskanych dzięki zmierzeniu stanu początkowego zadaną
+liczbę razy dokładniej; oraz \code{digits\_needed}, czyli liczbę miejsc po
+przecinku, jakiej wymaga prognoza zadanej długości. Testy sprawdzają, że
+tysiąckrotna poprawa daje tę samą liczbę kroków bez względu na to, od jakiego
+błędu zaczynasz.
+\end{lab}
+
+\section{Chaos przychodzi i odchodzi}
+\label{sec:ch07-sweep}
+\index{wykładnik Lapunowa!w zależności od r}
+
+\noindent
+Mając jedną liczbę na każde ustawienie pokrętła, możesz kręcić pokrętłem i
+ją obserwować. Rozdział~\ref{ch:logistic} znalazł punkt stały przy
+$r = \num{2.8}$ i cykl dwuokresowy przy $r = \num{3.2}$; między nimi, przy
+$r = 3$, punkt stały ustępuje.
+
+\begin{think}
+W punkcie stałym nachylenie wynosi $2 - r$. Ile wynosi przy $r = 3$ i co to
+oznacza dla $\lambda$?
+\end{think}
+\reveal{$2 - 3 = -1$, a $\ln 1 = 0$, więc $\lambda = 0$: zaburzenie ani się
+nie rozciąga, ani nie kurczy, tylko przerzuca. Uruchomiony przy $r = 3$
+program znajduje wartość odległą od zera o mniej niż $\num{0.001}$.}
+Zero to granica i wskazuje miejsca, gdzie jeden rodzaj zachowania przechodzi
+w inny. Żeby takie miejsca znaleźć, policz wykładnik przy wielu ustawieniach
+$r$. Listing używa funkcji \api{lyapunov} z biblioteki, która jest pętlą z
+\code{exponent}, z regułą i jej rozciągnięciem przekazanymi jako argumenty,
+więc działa dla każdego odwzorowania:
+
+\pyregion{code/ch07/sweep.py}{sweep}{Wykładnik przy szesnastu ustawieniach r}{lst:ch07-sweep}
+
+\transcript{ch07-sweep}
+
+\noindent
+Czytaj środkową kolumnę od góry. Jest ujemna aż do $r = \num{3.56}$ i
+dodatnia od $r = \num{3.60}$, więc chaos pojawia się gdzieś pomiędzy. Potem
+rośnie ku $\ln 2$ przy $r = 4$, z wyjątkiem $r = \num{3.84}$, gdzie znów jest
+ujemna: to wąski zakres pokrętła wewnątrz chaosu, w którym orbita znalazła
+cykl i znów zapomina o zaburzeniach. Tak rzadka tabela przeskakuje większość
+takich zakresów; rysunek nie.
+
+\plotfig{ch07-exponent-r}{Wykładnik Lapunowa w zależności od pokrętła $r$.
+Jest ujemny wszędzie tam, gdzie orbita się ustala, dotyka zera w każdym
+miejscu przejścia, jest dodatni tam, gdzie odwzorowanie jest chaotyczne, i
+znów spada poniżej zera w wąskich oknach. Czerwone kropki to cztery wartości
+z listingu wykładnika.}{wykładnik w zależności od $r$}
+
+\noindent
+Przed początkiem chaosu krzywa nigdy nie wznosi się ponad zero. Dotyka zera
+przy $r = 3$ i jeszcze raz trochę poniżej $r = \num{3.5}$, za każdym razem,
+gdy cykl przechodzi w cykl dwa razy dłuższy. Dalej jest przeważnie dodatnia
+i poprzebijana skierowanymi w dół szpilkami: oknami, w których wraca
+porządek. Gdzie dokładnie zaczyna się chaos, dlaczego przejścia się
+zagęszczają i które okno jest najszersze, to pytania
+rozdziału~\ref{ch:bifurcations}. Odpowiedzią tego rozdziału jest pomiar,
+który przy każdym ustawieniu odróżnia porządek od chaosu: jedna liczba i jej
+znak.
+
+\begin{summarybox}
+\begin{itemize}
+\item Jeden krok mnoży malutki błąd przez \textbf{rozciągnięcie}, czyli
+  nachylenie reguły w miejscu, w którym jesteś. Wzdłuż chaotycznej orbity
+  rozciągnięcia bardzo się różnią, a ich zwykła średnia jest złym
+  podsumowaniem.
+\item \textbf{Logarytm naturalny} zamienia mnożenie w dodawanie:
+  $\ln(a \times b) = \ln a + \ln b$, $\ln 1 = 0$, $\ln 2 \approx
+  \val{ch07.ln.two}$ i $\ln e = 1$. Czynnik wzrostu $g$ na krok staje się
+  tempem $\ln g$, a tempa można uśredniać.
+\item \textbf{Wykładnik Lapunowa} $\lambda$ to średnia z
+  $\ln\abs{\text{rozciągnięcie}}$ wzdłuż orbity: dodatni dla chaosu, ujemny
+  dla porządku, zero na granicy. Dla odwzorowania logistycznego przy $r = 4$
+  wynosi $\ln 2$, i obliczenie się z tym zgadza.
+\item \textbf{Horyzont przewidywania} to mniej więcej
+  $\frac{1}{\lambda}\ln(T/\delta)$, a $1/\lambda$ to \textbf{czas Lapunowa}.
+  Stan początkowy zmierzony tysiąc razy dokładniej daje $\ln 1000/\lambda$
+  dodatkowych kroków, przy $r = 4$ mniej więcej dziesięć: stałą porcję, a nie
+  tysiąc razy więcej.
+\item W zależności od $r$ wykładnik pokazuje, jak \textbf{chaos przychodzi i
+  odchodzi}: jest ujemny tam, gdzie orbita się ustala, zerowy w każdym
+  miejscu przejścia, dodatni w chaosie i znów ujemny w wąskich oknach.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Odstęp jest mnożony przez $3$, potem przez $\tfrac13$, potem przez $3$,
+  potem przez $\tfrac13$. O ile w sumie urósł i ile wynosi zwykła średnia tych
+  czterech czynników?
+  \answerto{Wcale nie urósł: iloczyn wynosi $1$. Zwykła średnia czynników to
+  $\tfrac53$, co sugeruje wzrost, którego nie było.}
+\item Korzystając z $\ln 2 \approx \val{ch07.ln.two}$ i
+  $\ln 10 \approx \val{ch07.ln.ten}$, oblicz $\ln 20$ i $\ln\num{0.2}$.
+  \answerto{$\ln 20 = \ln 2 + \ln 10 \approx \num{2.99}$. A
+  $\num{0.2} \times 10 = 2$, więc $\ln\num{0.2} = \ln 2 - \ln 10 \approx
+  -\num{1.61}$.}
+\item Orbita ustala się w punkcie stałym, w którym nachylenie wynosi
+  $-\num{0.5}$. Ile wynosi wykładnik Lapunowa i co mówi jego znak?
+  \answerto{$\ln\num{0.5} \approx -\num{0.69}$. Jest ujemny: błędy maleją, w
+  każdym kroku o połowę.}
+\item Układ ma $\lambda = \num{0.5}$ na krok. Błąd $\num{0.001}$ musi pozostać
+  poniżej $\num{0.1}$. Na mniej więcej ile kroków przewidywanie jest dobre?
+  \answerto{Mniej więcej $9$: $\ln(\num{0.1}/\num{0.001}) = \ln 100 = 2\ln 10
+  \approx \num{4.6}$, podzielone przez $\num{0.5}$.}
+\item W tym samym układzie mierzysz stan początkowy sto razy dokładniej. Ile
+  kroków zyskujesz? A jeśli zrobisz to jeszcze raz?
+  \answerto{Mniej więcej $9$ kroków za każdym razem:
+  $\ln 100/\num{0.5} \approx \num{9.2}$. Każda stukrotna poprawa daje tę samą
+  stałą liczbę kroków.}
+\item Dlaczego szybszy komputer sam w sobie prawie nie wydłuży prognozy
+  układu chaotycznego?
+  \answerto{Bo horyzont zależy od błędu stanu początkowego tylko przez jego
+  logarytm, a szybszy komputer nie mierzy stanu początkowego ani trochę
+  lepiej. Podwojenie horyzontu wymaga dwa razy więcej poprawnych cyfr stanu
+  początkowego.}
+\item Przy $r = \num{3.84}$ wykładnik jest ujemny, choć przy $r = \num{3.80}$
+  i $r = \num{3.88}$ jest dodatni. Co się tam dzieje?
+  \answerto{Okno: wewnątrz chaotycznego zakresu orbita ustaliła się w cyklu,
+  więc błędy znów maleją, a wykładnik spada poniżej zera.}
+\end{checkpoint}

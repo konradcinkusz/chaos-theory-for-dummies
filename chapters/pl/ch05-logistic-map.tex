@@ -1,0 +1,504 @@
+%% ch05 --- Jedna linijka algebry, każde możliwe zachowanie
+%%
+%% Napisany we wrześniu 2026. Zawias książki: rozdział, w którym czytelnik
+%% WIDZI, jak chaos wyłania się z jednej linijki arytmetyki, x -> r*x*(1 - x),
+%% gdy pokrętło r przechodzi od 2,8 do 3,9. Każda liczba, której czytelnik
+%% nie policzy w pamięci, pochodzi z code/measure/ch05.py, który importuje
+%% funkcje drukowane przez listingi (code/ch05/), więc strona i listingi nie
+%% mogą się rozejść. Odwzorowanie używa tylko mnożenia i odejmowania, więc
+%% nawet wartości z orbity chaotycznej są identyczne na każdej maszynie.
+%%
+%% CZEGO TEN ROZDZIAŁ NIE MOŻE POWIEDZIEĆ. Rozchodzenie się bliskich początków
+%% pokazuje raz, na rysunku-zapowiedzi bez żadnej liczby: liczenie kroków to
+%% pomiar rozdziału 6, tempo to wykładnik Lapunowa z rozdziału 7, a cały obraz
+%% r i zachowania (podwajanie okresu, stała Feigenbauma, położenie okien i
+%% znaczenie okresu trzy) należy do rozdziału 8.
+%%
+%% Bliźniak: chapters/en/ch05-logistic-map.tex. Podrozdział za podrozdziałem,
+%% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
+
+\chapter{Jedna linijka algebry, każde możliwe zachowanie}
+\label{ch:logistic}
+\index{odwzorowanie logistyczne}\index{chaos}
+
+\noindent
+Oto reguła, której można by nauczyć dziecko. Weź liczbę między $0$ a $1$.
+Pomnóż ją przez jeden minus ona sama, a wynik pomnóż przez ustaloną liczbę
+$r$. To jest następna liczba. Zrób z nią to samo, i jeszcze raz, i jeszcze.
+Żadnych kości do gry, żadnych pomiarów, żadnego świata zewnętrznego: każdy
+krok jest dokładnie wyznaczony przez poprzedni.
+
+Zanim przeczytasz dalej, zgadnij. Jeśli będziesz powoli podkręcać jedyne
+pokrętło tej reguły, $r$, ile różnych rodzajów zachowania spodziewasz się
+zobaczyć: jeden, dwa, garść? Ten rozdział kręci pokrętłem i patrzy. Pod
+koniec zobaczysz listę liczb, która nigdy się nie ustala i nigdy nie
+powtarza, wygląda, jakby wypadła z ruletki, a powstała wyłącznie z tej
+jednej linijki.
+
+\begin{outcomes}
+\outcome{iterować odwzorowanie logistyczne ręcznie przez krok lub dwa, a w
+  Pythonie przez tyle kroków, ile zechcesz}
+\outcome{znaleźć stan ustalony odwzorowania dla danego $r$ i na podstawie
+  nachylenia w tym punkcie powiedzieć, czy się utrzymuje}
+\outcome{narysować diagram pajęczynowy dla zakrzywionej reguły i odczytać z
+  niego, co zrobi orbita}
+\outcome{odróżnić stan ustalony, cykl i orbitę, która nigdy się nie
+  powtarza, oraz powiedzieć, co program szukający cykli może, a czego nie
+  może stwierdzić}
+\outcome{powiedzieć, co znaczy \emph{deterministyczny} i \emph{chaotyczny}
+  i dlaczego wyglądać na losowe to nie to samo, co być losowym}
+\end{outcomes}
+
+\section{Reguła i jej jedyne pokrętło}
+\label{sec:ch05-rule}
+\index{odwzorowanie logistyczne!reguła}
+
+\noindent
+Rozdział~\ref{ch:feedback} skończył się na populacji, której wzrost zwalnia
+w pobliżu granicy: przy łagodnym tempie się ustalała, a przy szybszym
+przestrzeliwała i się wahała. Ten rozdział zapisuje regułę tego rodzaju w
+postaci, która przyniosła jej sławę. Niech $x$ oznacza populację jako ułamek
+największej możliwej, czyli liczbę między $0$ a $1$. Przez $x_n$, czytane
+\enquote{$x$ z indeksem $n$}, oznaczaj jej wartość po $n$ krokach, tak że
+$x_0$ to stan początkowy. Reguła brzmi
+\[ x_{n+1} = r\, x_n\, (1 - x_n). \]
+Słowami: następna wartość to $r$ razy obecna wartość razy jeden minus
+obecna wartość. Czynnik $x_n$ mówi, że więcej rodziców to więcej młodych;
+czynnik $1 - x_n$ to sprzężenie zwrotne, pozostałe miejsce, które maleje,
+gdy populacja rośnie. Liczba $r$ to pokrętło wzrostu. Regułę, która
+zamienia liczbę na następną, nazywa się \emph{odwzorowaniem}, a ta jest
+\emph{odwzorowaniem logistycznym}. W porównaniu z regułami z
+rozdziału~\ref{ch:iteration}, $x_{n+1} = a\,x_n + b$, ma jedno dodatkowe
+mnożenie, przez $1 - x_n$, i wszystko w tym rozdziale bierze się z tego
+jednego czynnika.
+
+Iloczyn $x\,(1 - x)$ jest największy dla $x = \tfrac12$, gdzie wynosi
+$\tfrac12 \times \tfrac12 = \tfrac14$, więc następna wartość nigdy nie
+przekracza $r/4$. Dla $r$ nie większego niż $4$ liczba $x$ nigdy więc nie
+opuszcza przedziału od $0$ do $1$.
+
+\begin{think}
+Weź $r = \num{2.8}$ i zacznij od $x_0 = \num{0.5}$. Ile wynosi $x_1$? A
+$x_2$? Pierwsze policzysz w pamięci; do drugiego wystarczy co najwyżej
+ołówek.
+\end{think}
+\reveal{$x_1 = \num{2.8} \times \num{0.5} \times \num{0.5} = \num{0.7}$, a
+$x_2 = \num{2.8} \times \num{0.7} \times \num{0.3} = \num{0.588}$.}
+
+\noindent
+To wszystko, a komputer robi miliony takich kroków na sekundę. Oto reguła w
+postaci, w jakiej zapisuje ją kod książki.
+
+\pyregion{code/ch05/four_rates.py}{rule}{Odwzorowanie logistyczne: jedna linijka arytmetyki}{lst:ch05-rule}
+
+\noindent
+Każdy komputer zaokrągla mnożenie i odejmowanie dokładnie tak samo, więc
+liczby w tym rozdziale wychodzą identyczne co do ostatniej cyfry na każdej
+maszynie. Przy regule, której cały sens, jak zaraz zobaczysz, tkwi w
+cyfrach, to ważne.
+
+\section{Kręcenie pokrętłem}
+\label{sec:ch05-knob}
+\index{odwzorowanie logistyczne!cztery zachowania}
+
+\noindent
+Każde uruchomienie zaczynaj od $x_0 = \num{0.2}$. Pozwól regule zrobić
+$200$ kroków bez patrzenia, żeby \emph{orbita} \dash{} lista wartości, które
+reguła wytwarza z danego początku \dash{} miała czas wejść w to, co będzie
+robić, a potem zapisz osiem następnych wartości. Zrób to dla czterech
+ustawień pokrętła: $r = \num{2.8}$, $\num{3.2}$, $\num{3.5}$ i $\num{3.9}$.
+
+\begin{think}
+Rozdział~\ref{ch:feedback} pokazał, że przy łagodnym tempie wzrostu
+populacja się ustala, a przy szybszym przestrzeliwuje i się waha. Te cztery
+ustawienia sięgają od umiarkowanego do szybkiego. Czego spodziewasz się po
+$200$ krokach przy $r = \num{3.9}$: jednej powtarzanej wartości, wahania
+między kilkoma wartościami, czy czegoś innego?
+\end{think}
+\reveal{Czegoś innego. Przy $r = \num{3.9}$ wartości nigdy się nie
+ustalają i nigdy nie układają się we wzór.}
+
+\pyregion{code/ch05/four_rates.py}{run}{Dwieście kroków bez patrzenia, potem osiem kolejnych, przy czterech ustawieniach}{lst:ch05-run}
+
+\transcript{ch05-four-rates}
+
+\noindent
+Każdy wiersz to inny rodzaj zachowania. Przy $r = \num{2.8}$ populacja
+spoczęła na \val{ch05.fp.28}: to \emph{stan ustalony}. Przy $r = \num{3.2}$
+bez końca przeskakuje między \val{ch05.two.lo} a \val{ch05.two.hi}, rok
+wysoki, rok niski: to \emph{cykl o okresie dwa}. Przy $r = \num{3.5}$
+obiega cztery wartości, od \val{ch05.four.lo} do \val{ch05.four.hi}, i znowu
+te same cztery: cykl o okresie cztery. Przy $r = \num{3.9}$ liczby skaczą
+bez żadnego widocznego wzoru i, jak sprawdzisz niżej, żaden wzór się nie
+pojawia, choćbyś czekał dowolnie długo.
+
+\plotfig{ch05-four-series}{Cztery ustawienia przez pierwsze sześćdziesiąt
+kroków, wszystkie od $x_0 = \num{0.2}$. Zwróć uwagę, jak kończy się każdy
+panel: spoczynkiem, przeskakiwaniem, obieganiem czterech wartości i ciągłym
+skakaniem.}{cztery przebiegi w czasie}
+
+\noindent
+Na rysunku~\ref{fig:ch05-four-series} każdy panel zaczyna się od
+zamieszania, a trzy z czterech szybko łapią swój rytm. Czwarty nigdy.
+
+\begin{trapbox}
+\textbf{\enquote{Prosta reguła daje proste zachowanie.}} Wszystkie cztery
+panele pochodzą z tej samej linijki arytmetyki; zmieniło się tylko $r$, z
+$\num{2.8}$ na $\num{3.9}$. Zachowanie przeszło od jednej spoczynkowej
+wartości do liczb, które nigdy się nie powtarzają. To, jak skomplikowane
+wydaje się zachowanie układu, bardzo mało mówi o tym, jak skomplikowana jest
+jego reguła.
+\end{trapbox}
+
+\section{Stan ustalony i chwila, w której puszcza}
+\label{sec:ch05-fixed}
+\index{punkt stały}\index{punkt stały!stabilność}
+
+\noindent
+\emph{Punkt stały} to wartość, której reguła nie zmienia, a stan ustalony
+to punkt stały, na którym orbita spoczęła. Odwzorowanie logistyczne zawsze
+ma jeden w $x = 0$: brak populacji pozostaje brakiem populacji. Żeby
+znaleźć drugi, zapytaj, kiedy $r\,x\,(1 - x)$ równa się $x$. Podziel obie
+strony przez $x$, a dostaniesz $r\,(1 - x) = 1$, czyli $1 - x = 1/r$, i
+\[ x^{*} = 1 - \frac{1}{r}. \]
+Gwiazdka to zwyczajowe oznaczenie punktu stałego.
+
+\begin{think}
+Dla $r = 2$ wzór daje $x^{*} = \tfrac12$. Sprawdź, że reguła naprawdę nie
+zmienia $\tfrac12$. Co wzór daje dla $r = 4$ i czy to też się zgadza?
+\end{think}
+\reveal{$2 \times \tfrac12 \times \tfrac12 = \tfrac12$. Dla $r = 4$ daje
+$\tfrac34$, a $4 \times \tfrac34 \times \tfrac14 = \tfrac34$.}
+
+\noindent
+Przy $r = \num{2.8}$ wzór daje \val{ch05.fp.28}, dokładnie tam, gdzie
+spoczął wydruk. Przy $r = \num{3.2}$ daje \val{ch05.fp.32} \dash{} a orbita
+zamiast tego krąży wokół tej wartości, od \val{ch05.two.lo} do
+\val{ch05.two.hi}. Punkt stały istnieje; orbita nie chce na nim zostać.
+
+Rozdział~\ref{ch:feedback} wyjaśnił to pomiarem. Przesuń stan odrobinę od
+punktu stałego i zrób jeden krok: przesunięcie wraca pomnożone przez
+\emph{nachylenie} reguły w tym miejscu. Jeśli leży ono między $-1$ a $1$,
+przesunięcia maleją i punkt stały się utrzymuje; poza tym zakresem rosną i
+orbita zostaje odepchnięta. Ujemne nachylenie dodatkowo przerzuca
+przesunięcie na drugą stronę przy każdym kroku. Funkcja biblioteki
+\api{slope} mierzy je, przesuwając $x$ o jedną milionową w każdą stronę.
+
+\pyregion{code/ch05/fixed_point.py}{fixed}{Punkt stały i nachylenie reguły w tym miejscu}{lst:ch05-fixed}
+
+\transcript{ch05-fixed-point}
+
+\noindent
+Każde nachylenie wynosi $2 - r$: $2 - \num{2.8} = \num{-0.8}$,
+$2 - \num{3.2} = \num{-1.2}$ i tak dalej. (Rachunek różniczkowy mówi, że
+nachylenie $r\,x\,(1 - x)$ to $r\,(1 - 2x)$, a w $x = 1 - 1/r$ jest to
+dokładnie $2 - r$.) Przy $r = \num{2.8}$ przesunięcie przy każdym kroku
+zmienia stronę i maleje, więc orbita się zbliża. Przy $\num{3.2}$ zmienia
+stronę i rośnie, więc orbita zostaje odrzucona.
+
+\begin{think}
+Gdy podkręcasz $r$ od $\num{2.8}$ w górę, przy jakiej wartości nachylenie
+$2 - r$ osiąga $-1$, tak że punkt stały przestaje się utrzymywać?
+\end{think}
+\reveal{Przy $r = 3$, bo $2 - 3 = -1$. Poniżej $3$ stan ustalony się
+utrzymuje; powyżej $3$ puszcza.}
+
+\noindent
+To pierwsze miejsce, w którym pokrętło zmienia rodzaj zachowania, i
+znalazłeś je ręcznie. Przejście od dwóch wartości do czterech następuje
+wyżej; rozdział~\ref{ch:bifurcations} znajduje, gdzie, i wzór w tym, gdzie.
+
+\begin{lab}{l05_01_stability}{Gdzie stan ustalony puszcza}
+Napisz \code{fixed\_point}; \code{slope\_at}, która mierzy nachylenie w
+punkcie, przesuwając go w obie strony; oraz \code{holds}, która mówi, czy
+przesunięcie w punkcie stałym maleje. Potem napisz \code{lets\_go}, która
+znajduje, gdzie \code{holds} zmienia się na fałsz między $\num{2.5}$ a
+$\num{3.5}$, dzieląc przedział na pół raz za razem. Wynik powinien się
+zgadzać z odpowiedzią powyżej.
+\end{lab}
+
+\section{Pajęczyna na krzywej}
+\label{sec:ch05-cobweb}
+\index{diagram pajęczynowy}
+
+\noindent
+Rozdział~\ref{ch:iteration} narysował iterację jako pajęczynę na linii
+prostej. Ten sam rysunek działa dla każdej reguły. Narysuj wykres reguły,
+wysokość $r\,x\,(1 - x)$ dla każdego $x$ od $0$ do $1$: garb, najwyższy w
+$x = \tfrac12$. Narysuj przekątną, na której wysokość równa się $x$. Zacznij
+od $x_0$ na dolnej krawędzi i idź w górę do garbu: wysokość, na którą
+dojdziesz, to $x_1$. Idź poziomo do przekątnej, co stawia cię nad $x_1$; w
+górę albo w dół do garbu po $x_2$; znów poziomo; i tak dalej. Garb przecina
+przekątną w punkcie stałym, gdzie następna wartość równa się obecnej.
+Funkcja biblioteki \api{cobweb} wypisuje narożniki tej ścieżki.
+
+\pyregion{code/ch05/cobweb_data.py}{corners}{Narożniki pajęczyny, trzy kroki}{lst:ch05-cobweb}
+
+\transcript{ch05-cobweb}
+
+\noindent
+Każdy ruch \code{up} (w górę) ląduje na garbie w następnej wartości orbity,
+dla pierwszego $\num{2.8} \times \num{0.2} \times \num{0.8} = \num{0.448}$;
+każdy ruch \code{across} (w poprzek) ląduje na przekątnej na tej samej
+wysokości.
+
+\begin{think}
+Przy $r = \num{2.8}$ pajęczyna zwija się spiralnie do punktu przecięcia.
+Przy $r = \num{3.2}$ orbita w końcu bez końca przeskakuje między dwiema
+wartościami. W jaki kształt układa się jej pajęczyna?
+\end{think}
+\reveal{W zamknięty prostokąt z dwoma narożnikami na garbie: w górę do
+jednej wartości, poziomo, w dół do drugiej, poziomo i z powrotem do
+początku.}
+
+\plotfig{ch05-four-cobwebs}{Pajęczyny dla czterech ustawień, każda na
+własnym garbie z przekątną. Przy $r = \num{2.8}$ ścieżka zwija się do
+środka; przy $\num{3.2}$ i $\num{3.5}$ zaczyna tuż obok przecięcia, zostaje
+odepchnięta i układa się w zamkniętą pętlę; przy $\num{3.9}$ nigdy się nie
+zamyka.}{cztery pajęczyny na garbie}
+
+\noindent
+Spójrz, gdzie garb przecina przekątną na
+rysunku~\ref{fig:ch05-four-cobwebs}. Przy $r = \num{2.8}$ opada przez
+punkt przecięcia łagodniej, niż wznosi się przekątna, i spirala się
+zaciska. Przy $\num{3.2}$ opada bardziej stromo i ścieżka zaczęta obok
+przecięcia rozkręca się na zewnątrz, aż zatrzyma się na prostokącie.
+Krzywa opadająca dokładnie tak stromo, jak wznosi się przekątna, ma
+nachylenie $-1$: rysunek i pomiar się zgadzają. Przy $\num{3.5}$ pętla ma cztery
+narożniki na garbie. Przy $\num{3.9}$ ścieżka nigdy się nie zamyka i powoli
+zapełnia cały pas.
+
+\section{Szukanie cyklu, także daremne}
+\label{sec:ch05-period}
+\index{okres}\index{cykl}
+
+\noindent
+Przy tysiącach liczb niech cykl odczyta komputer. Funkcja biblioteki
+\api{period} szuka w ostatnich $128$ wartościach orbity najmniejszej liczby
+całkowitej $p$ takiej, że każda wartość równa się tej o $p$ kroków
+późniejszej, z dokładnością do jednej miliardowej. Zwraca to $p$ albo
+pythonowe słowo oznaczające nic, \code{None}, gdy żadne $p$ do $64$ nie
+pasuje.
+
+\pyregion{code/ch05/periods.py}{detect}{Pytanie o okres po dwóch tysiącach kroków}{lst:ch05-periods}
+
+\transcript{ch05-periods}
+
+\noindent
+Detektor zgadza się z wydrukiem: $1$, potem $2$ i $4$. Przy $r = \num{3.9}$
+i przy $r = 4$, górnym końcu zakresu, nie znajduje nic.
+
+\begin{think}
+Przy $r = \num{3.9}$ detektor nie znalazł na końcu dwóch tysięcy kroków
+żadnego cyklu o długości do $64$ kroków. Przypuśćmy, że puścisz regułę na
+sto tysięcy kroków. Czy powtórzenie w końcu się pojawi?
+\end{think}
+\reveal{Nie. W stu tysiącach kroków nie wraca ani jedna wartość.}
+
+\pyregion{code/ch05/never_repeats.py}{count}{Sto tysięcy kroków w poszukiwaniu wartości, która już była}{lst:ch05-never}
+
+\transcript{ch05-never-repeats}
+
+\noindent
+Zbiór \code{set} w Pythonie przechowuje po jednej kopii każdej różnej
+wartości, więc wartość, która by wróciła, zmniejszyłaby drugą liczbę. Tak
+się nie dzieje: wszystkie \val{ch05.never.values} wartości są różne. To
+rozstrzyga sprawę dla tych \val{ch05.never.steps} kroków, bo gdyby jakaś
+wartość kiedyś wróciła, wróciłaby też następna \dash{} ta sama liczba zawsze
+daje tę samą następną \dash{} i wszystko, co po niej: powstałby cykl. Skoro
+żadna wartość nie wraca, żaden cykl się nie zaczął. Drugi wiersz każdej
+pary przyda się później: ten sam początek, uruchomiony ponownie, daje
+dokładnie te same liczby.
+
+\begin{trapbox}
+\textbf{\enquote{Skoro nie powtórzyło się po tysiącu kroków, to zaraz się
+powtórzy.}} Długie czekanie sprawia, że powtórzenie wydaje się spóźnione,
+tak jak moneta, która pięć razy pokazała orła, zdaje się być winna reszkę.
+Orbita nic ci nie jest winna. Żaden cykl jej nie przyciąga, a dłuższe
+liczenie daje tylko więcej liczb, które nigdy wcześniej się nie pojawiły.
+\end{trapbox}
+
+\begin{rigourbox}
+Przebieg programu to świadectwo, a nie dowód. Dla $r = 4$ można udowodnić,
+że z niemal każdego początku orbita nigdy się nie powtarza; dla
+$r = \num{3.9}$ świadectwem są obliczenia takie jak te. A komputer mieści
+tylko skończenie wiele liczb między $0$ a $1$, więc obliczona orbita musi w
+końcu trafić na wartość, którą już miała, i wejść w cykl \dash{} po większej
+liczbie kroków, niż zrobił ten przebieg. Rozdział~\ref{ch:computers} mówi,
+co to znaczy dla symulacji.
+\end{rigourbox}
+
+\begin{lab}{l05_02_period}{Własny detektor cykli}
+Napisz \code{settle}, która puszcza regułę bez patrzenia, a potem zachowuje
+kilka następnych wartości, oraz \code{period}, która znajduje najmniejsze
+$p$, dla którego każda wartość na liście równa się tej o $p$ miejsc dalej,
+i zwraca \code{None}, gdy żadne $p$ do ustalonej granicy nie pasuje. Testy
+używają wymyślonych list i orbit z tego podrozdziału.
+\end{lab}
+
+\begin{think}
+Detektor znalazł cykl długości cztery przy $r = \num{3.5}$ i nic przy
+$\num{3.9}$. Czego spodziewasz się przy $r = \num{3.83}$, trochę poniżej
+$\num{3.9}$?
+\end{think}
+\reveal{Cyklu o okresie trzy. Po krótkim zamieszaniu orbita bez końca
+obiega \val{ch05.win.a}, \val{ch05.win.b} i \val{ch05.win.c}.}
+\index{okno okresowe}
+
+\plotfig{ch05-window}{Porządek wewnątrz skakania. Przy $r = \num{3.83}$
+orbita przez chwilę się miota, a potem wpada w cykl o długości trzy; przy
+pobliskim $r = \num{3.9}$ nigdy się nie ustala.}{cykl długości trzy wewnątrz
+chaosu}
+
+\noindent
+Zaskakuje to niemal każdego i słusznie. Podkręcanie pokrętła nie czyni
+zachowania coraz dzikszym w równym tempie: wśród ustawień, przy których
+orbity skaczą bez wzoru, są wąskie okna, w których porządek wraca. Gdzie
+leżą i co oznacza cykl o długości trzy, to część pełnego obrazu, który
+rysuje rozdział~\ref{ch:bifurcations}.
+
+\section{Wygląda na losowe, a nie jest}
+\label{sec:ch05-may}
+\index{deterministyczność}\index{chaos!definicja}
+
+\noindent
+Czas na nazwy. Reguła jest \emph{deterministyczna}, gdy teraźniejszość
+całkowicie wyznacza następny stan i nic nie zostaje przypadkowi, więc ten
+sam początek zawsze daje tę samą orbitę. Widziałeś, że odwzorowanie
+logistyczne takie jest: uruchomione dwa razy od $\num{0.2}$, dało te same
+sto tysięcy liczb co do ostatniej cyfry. Orbita jest \emph{chaotyczna}, gdy
+pochodzi z reguły deterministycznej, pozostaje w ograniczonym zakresie,
+nigdy nie wchodzi w spoczynek ani w cykl \dash{} i, czego jeszcze nie
+zmierzyłeś, jest tak wrażliwa na początek, że każda różnica w nim, choćby
+najmniejsza, w końcu rośnie, aż dwie przyszłości nie mają ze sobą nic
+wspólnego.
+
+\plotfig{ch05-two-starts}{Dwa przebiegi przy $r = \num{3.9}$, od
+$\num{0.2}$ i od $\num{0.200001}$, o jedną milionową wyżej. Przez chwilę
+linie leżą jedna na drugiej; potem rozchodzą się na dobre.}{dwa bliskie
+początki przy jednym ustawieniu}
+
+\noindent
+Ta ostatnia część to pomiar z rozdziału~\ref{ch:butterfly};
+rysunek~\ref{fig:ch05-two-starts} jest tylko zapowiedzią. Razem dają najdziwniejszy jak dotąd fakt w tej książce. Orbita
+przy $r = \num{3.9}$ wygląda na losową, a nie jest: każda liczba w niej
+została dokładnie wyznaczona przez poprzednią. A jednak nie przewidzisz jej
+daleko naprzód, jeśli nie znasz jej początku dokładniej, niż ktokolwiek zna
+cokolwiek.
+
+\index{May, Robert}
+W 1976 roku Robert May, fizyk, który przeszedł do ekologii, opublikował w
+\emph{Nature} artykuł przeglądowy, którego tytuł mówi to, co pokazał ten
+rozdział: \emph{Simple mathematical models with very complicated dynamics},
+czyli proste modele matematyczne o bardzo skomplikowanej dynamice. Napisał
+go dla biologów.
+
+\begin{think}
+Ekolog co lato przez dwadzieścia lat liczy owady na polu. Liczebności
+skaczą w górę i w dół bez wzoru, którego ktokolwiek potrafiłby się
+dopatrzyć. Co to mówi o przyczynie?
+\end{think}
+\reveal{Mniej, niż się wydaje. Może to sprawiać pogoda albo błędy w
+liczeniu \dash{} albo wyłącznie własna reguła wzrostu populacji.}
+
+\noindent
+Ta trzecia możliwość była sednem argumentu Maya. Nieregularne liczby z
+terenu zwykle odczytywano jako ślad niespokojnego środowiska albo
+niedokładnego liczenia; odwzorowanie logistyczne pokazuje, że jedno
+pokolenie na rok i jedna prosta reguła wzrostu mogą dać taką samą
+nieregularność bez żadnego zakłócenia. May zakończył apelem, który sięga
+poza ekologię: żeby uczniowie poznawali to równanie wcześnie, bo intuicja
+wyćwiczona wyłącznie na regułach prostoliniowych zostawia ludzi
+nieprzygotowanymi na to, co robią reguły zakrzywione. Ty już je poznałeś.
+
+\begin{trapbox}
+\textbf{\enquote{Nieregularny wynik wymaga przypadkowej albo skomplikowanej
+przyczyny.}} Wiersz dla $r = \num{3.9}$ w podrozdziale~\ref{sec:ch05-knob}
+powstał z tej samej linijki arytmetyki co wiersze nad nim, bez żadnej
+losowości. Nieregularny wynik może pochodzić z przypadku, ze
+skomplikowanego mechanizmu albo z prostej reguły deterministycznej, a sam
+wynik nie mówi, z którego. Rozdział~\ref{ch:life} uczy, jak je od siebie
+odróżnić.
+\end{trapbox}
+
+\begin{worldbox}
+Nauka o rybołówstwie spotyka to samo zachowanie w innym wzorze. Model
+zależności stado--rekrutacja Williama Rickera z 1954 roku, wiążący liczbę
+ryb, które odbyły tarło w danym roku, z liczbą młodych, jakie wydały, to
+jednolinijkowa reguła tego samego rodzaju: wzrost, który zwalnia, gdy
+liczebność rośnie, pokolenie po pokoleniu. Podkręć w nim tempo wzrostu, a
+przejdzie, w tej samej kolejności co odwzorowanie logistyczne, od stałego
+stada przez naprzemienne lata obfitości i nędzy do nieregularnych wahań.
+Połów, który waha się z roku na rok, sam w sobie nie dowodzi, że winna jest
+pogoda.
+\end{worldbox}
+
+\noindent
+Jedna linijka, jedno pokrętło: stan ustalony, cykle długości dwa i cztery,
+orbity, które nigdy się nie powtarzają, i wyspy porządku między nimi.
+Brakuje jeszcze miary tego, jak nieprzewidywalny jest ten chaos.
+Rozdział~\ref{ch:butterfly} liczy kroki, po których dwa bliskie początki
+się rozchodzą, rozdział~\ref{ch:lyapunov} zamienia to w jedną liczbę, a
+rozdział~\ref{ch:bifurcations} rysuje każde ustawienie pokrętła na jednym
+obrazie.
+
+\begin{summarybox}
+\begin{itemize}
+\item \textbf{Odwzorowanie logistyczne}, $x_{n+1} = r\,x_n\,(1 - x_n)$, to
+  reguła prostoliniowa z jednym dodatkowym mnożeniem, sprzężeniem zwrotnym
+  $1 - x_n$. Dla $r$ nie większego niż $4$ liczba $x$ pozostaje między $0$
+  a $1$.
+\item Kręcenie $r$ daje \textbf{stan ustalony} przy $\num{2.8}$,
+  \textbf{cykl o okresie dwa} przy $\num{3.2}$, cykl o okresie cztery przy
+  $\num{3.5}$, a przy $\num{3.9}$ orbitę, która nigdy się nie ustala ani
+  nie powtarza.
+\item \textbf{Punkt stały} to $x^{*} = 1 - 1/r$, a \textbf{nachylenie} w
+  nim wynosi $2 - r$, więc stan ustalony utrzymuje się dla $r$ poniżej $3$.
+\item \textbf{Pajęczyna} zwija się do punktu stałego, który się utrzymuje,
+  zostaje odepchnięta od takiego, który się nie utrzymuje, układa się w
+  zamkniętą pętlę dla cyklu, a przy $\num{3.9}$ nigdy się nie zamyka.
+\item \textbf{Detektor cykli} podaje $1$, $2$, $4$, a potem \code{None}, co
+  znaczy \enquote{nie znaleziono}, nigdy \enquote{udowodniono chaos}. W stu
+  tysiącach kroków nie wraca żadna wartość; przy $\num{3.83}$ \textbf{okno}
+  kryje cykl o długości trzy.
+\item \textbf{Deterministyczny}: ten sam początek, ta sama orbita, za
+  każdym razem. \textbf{Chaotyczny}: deterministyczny, ograniczony, nigdy
+  się nieustalający, wrażliwy na początek. Wygląda na losowy, a nie jest
+  \dash{} przestroga Maya z 1976 roku.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Dla $r = 3$ i $x_0 = \num{0.5}$ ile wynoszą $x_1$ i $x_2$?
+  \answerto{$x_1 = 3 \times \num{0.5} \times \num{0.5} = \num{0.75}$, a
+  $x_2 = 3 \times \num{0.75} \times \num{0.25} = \num{0.5625}$.}
+\item Gdzie leży niezerowy punkt stały dla $r = \num{2.5}$ i czy się
+  utrzymuje?
+  \answerto{$1 - 1/\num{2.5} = \num{0.6}$. Nachylenie wynosi tam
+  $2 - \num{2.5} = \num{-0.5}$, między $-1$ a $1$, więc się utrzymuje.}
+\item Przy $r = \num{3.2}$ punkt stały leży w \val{ch05.fp.32}, a jednak
+  orbita w nim nie zostaje. Dlaczego?
+  \answerto{Nachylenie wynosi tam $2 - \num{3.2} = \num{-1.2}$: przesunięcie
+  przy każdym kroku zmienia stronę i rośnie, więc orbita zostaje
+  odepchnięta, w cykl długości dwa.}
+\item Pajęczyna układa się w zamkniętą pętlę z czterema narożnikami na
+  garbie. Co robi orbita?
+  \answerto{Obiega cykl o okresie cztery; narożniki to cztery wartości,
+  które odwiedza po kolei.}
+\item Detektor cykli zwraca \code{None}. Co możesz stwierdzić, a czego nie?
+  \answerto{Że w badanym odcinku nie znalazł cyklu o długości do sprawdzanej
+  granicy. Nie to, że orbita jest chaotyczna: dłuższy cykl albo orbita,
+  która wciąż się ustala, też dają \code{None}.}
+\item Roczne liczebności populacji zwierząt skaczą bez wzoru. Wymień trzy
+  możliwe przyczyny.
+  \answerto{Pogoda albo inny przypadek; błędy w liczeniu; oraz własna
+  deterministyczna reguła wzrostu populacji, jak w odwzorowaniu
+  logistycznym przy $r = \num{3.9}$.}
+\item Co znaczy, że odwzorowanie logistyczne jest deterministyczne, i jak
+  jego wynik może mimo to wyglądać na losowy?
+  \answerto{Ten sam początek zawsze daje dokładnie tę samą orbitę. Przy
+  $r = \num{3.9}$ nigdy się nie ustala ani nie powtarza, więc nie widać w
+  niej wzoru, choć każda wartość jest wyznaczona przez poprzednią.}
+\end{checkpoint}

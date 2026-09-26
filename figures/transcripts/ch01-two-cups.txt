@@ -1,0 +1,4 @@
+minute  0: gap 1.0000 C
+minute 10: gap 0.3487 C
+minute 20: gap 0.1216 C
+minute 30: gap 0.0424 C

@@ -1,0 +1,480 @@
+%% ch05 --- One line of algebra, every kind of behaviour
+%%
+%% Written September 2026. The book's hinge: the chapter in which the reader
+%% SEES chaos appear from one line of arithmetic, x -> r*x*(1 - x), as the
+%% knob r is turned from 2.8 to 3.9. Every number the reader cannot do in
+%% their head comes from code/measure/ch05.py, which imports the functions
+%% the listings print (code/ch05/), so the page and the listings cannot
+%% disagree. The map uses only multiplication and subtraction, so even the
+%% values taken from a chaotic orbit are identical on every machine.
+%%
+%% WHAT THIS CHAPTER MAY NOT SAY. That nearby starts separate is shown once,
+%% in a teaser figure with no number on it: counting the steps is Chapter 6's
+%% measurement, the rate is Chapter 7's Lyapunov exponent, and the whole
+%% picture of r against behaviour (period doubling, Feigenbaum's constant,
+%% where the windows sit and what period three implies) is Chapter 8's. The
+%% period-3 window at r = 3.83 is shown as a surprise and handed on.
+%%
+%% Twin: chapters/pl/ch05-logistic-map.tex. Section for section, macro for
+%% macro, number for number; tools/parity.py compares them.
+
+\chapter{One line of algebra, every kind of behaviour}
+\label{ch:logistic}
+\index{logistic map}\index{chaos}
+
+\noindent
+Here is a rule you could teach a child. Take a number between $0$ and $1$.
+Multiply it by one minus itself, then multiply the answer by a fixed number
+$r$. That is the next number. Do the same to it, and again, and again. No
+dice, no measurement, no outside world: each step is fixed exactly by the
+one before.
+
+Make a guess before you read on. If you turn the rule's one knob, $r$,
+slowly upwards, how many different kinds of behaviour do you expect: one,
+two, a handful? This chapter turns the knob and watches. By the end you will
+have seen a list of numbers that never settles and never repeats, looks as
+if it came off a roulette wheel, and was produced by nothing but that line.
+
+\begin{outcomes}
+\outcome{iterate the logistic map by hand for a step or two, and in Python
+  for as many steps as you like}
+\outcome{find the map's steady state for a given $r$, and say from the slope
+  there whether it holds}
+\outcome{draw a cobweb diagram on a curved rule and read from it what an
+  orbit will do}
+\outcome{tell a steady state, a cycle and a never-repeating orbit apart, and
+  say what a program that looks for cycles can and cannot conclude}
+\outcome{say what \emph{deterministic} and \emph{chaotic} mean, and why
+  looking random is not the same as being random}
+\end{outcomes}
+
+\section{The rule and its one knob}
+\label{sec:ch05-rule}
+\index{logistic map!rule}
+
+\noindent
+Chapter~\ref{ch:feedback} ended with a population whose growth slows near
+its limit: at a gentle rate it settled, and at a faster one it overshot and
+swung. This chapter writes a rule of that kind in the form that made it
+famous. Let $x$ be the population as a fraction of the largest it can be, a
+number between $0$ and $1$. Write $x_n$, read \enquote{$x$ sub $n$}, for its
+value after $n$ steps, so that $x_0$ is the start. The rule is
+\[ x_{n+1} = r\, x_n\, (1 - x_n). \]
+In words: the next value is $r$ times the present value times one minus the
+present value. The factor $x_n$ says that more parents make more young; the
+factor $1 - x_n$ is the feedback, the room left, which shrinks as the
+population grows. The number $r$ is the growth knob. A rule that takes a
+number to the next number is called a \emph{map}, and this one is the
+\emph{logistic map}. Beside the rules of Chapter~\ref{ch:iteration},
+$x_{n+1} = a\,x_n + b$, it has one extra multiplication, by $1 - x_n$, and
+everything in this chapter comes from that one factor.
+
+The product $x\,(1 - x)$ is largest at $x = \tfrac12$, where it is
+$\tfrac12 \times \tfrac12 = \tfrac14$, so the next value is never more than
+$r/4$. For $r$ up to $4$, then, $x$ never leaves the range from $0$ to $1$.
+
+\begin{think}
+Take $r = \num{2.8}$ and start at $x_0 = \num{0.5}$. What is $x_1$? And
+$x_2$? The first you can do in your head; the second needs a pencil at most.
+\end{think}
+\reveal{$x_1 = \num{2.8} \times \num{0.5} \times \num{0.5} = \num{0.7}$, and
+$x_2 = \num{2.8} \times \num{0.7} \times \num{0.3} = \num{0.588}$.}
+
+\noindent
+That is all there is to it, and a computer does millions of steps a second.
+Here is the rule as the book's code writes it.
+
+\pyregion{code/ch05/four_rates.py}{rule}{The logistic map: one line of arithmetic}{lst:ch05-rule}
+
+\noindent
+Multiplication and subtraction are rounded in exactly the same way by every
+computer, so the numbers in this chapter come out the same to the last digit
+on any machine. For a rule whose whole interest, as you are about to see,
+lies in its digits, that matters.
+
+\section{Turning the knob}
+\label{sec:ch05-knob}
+\index{logistic map!four behaviours}
+
+\noindent
+Start every run at $x_0 = \num{0.2}$. Let the rule take $200$ steps without
+looking, so that the \emph{orbit} \dash{} the list of values a rule produces
+from a start \dash{} has time to settle into whatever it will do, then write
+down the next eight values. Do that at four settings of the knob:
+$r = \num{2.8}$, $\num{3.2}$, $\num{3.5}$ and $\num{3.9}$.
+
+\begin{think}
+Chapter~\ref{ch:feedback} found that a gentle growth rate settles and a
+faster one overshoots and swings. These four settings run from moderate to
+fast. After $200$ steps, what do you expect at $r = \num{3.9}$: one value
+repeated, a swing between a few values, or something else?
+\end{think}
+\reveal{Something else. At $r = \num{3.9}$ the values never settle, and
+never fall into a pattern.}
+
+\pyregion{code/ch05/four_rates.py}{run}{Two hundred steps without looking, then eight more, at four settings}{lst:ch05-run}
+
+\transcript{ch05-four-rates}
+
+\noindent
+Each row is a different kind of behaviour. At $r = \num{2.8}$ the population
+has come to rest at \val{ch05.fp.28}: a \emph{steady state}. At
+$r = \num{3.2}$ it alternates for ever between \val{ch05.two.lo} and
+\val{ch05.two.hi}, high year, low year: a \emph{cycle of period two}. At
+$r = \num{3.5}$ it goes round four values, from \val{ch05.four.lo} to
+\val{ch05.four.hi}, and round the same four again: a cycle of period four.
+At $r = \num{3.9}$ the numbers jump about with no pattern you can see, and,
+as you will check below, none turns up however long you wait.
+
+\plotfig{ch05-four-series}{The four settings over the first sixty steps,
+all from $x_0 = \num{0.2}$. Look at how each panel ends: resting,
+alternating, going round four values, and still jumping.}{four time series
+of the logistic map}
+
+\noindent
+In Figure~\ref{fig:ch05-four-series} every panel starts with a scramble,
+and three of the four soon find their rhythm. The fourth never does.
+
+\begin{trapbox}
+\textbf{\enquote{A simple rule gives simple behaviour.}} All four panels
+come from the same line of arithmetic; only $r$ changed, from $\num{2.8}$
+to $\num{3.9}$. The behaviour went from one resting value to numbers that
+never repeat. How complicated a system's behaviour looks tells you very
+little about how complicated its rule is.
+\end{trapbox}
+
+\section{The steady state, and when it lets go}
+\label{sec:ch05-fixed}
+\index{fixed point}\index{fixed point!stability}
+
+\noindent
+A \emph{fixed point} is a value the rule leaves unchanged, and a steady state
+is a fixed point the orbit has settled on. The logistic map always has one at
+$x = 0$: no population stays no population. For the other, ask when
+$r\,x\,(1 - x)$ equals $x$. Divide both sides by $x$ to get
+$r\,(1 - x) = 1$, so $1 - x = 1/r$, and
+\[ x^{*} = 1 - \frac{1}{r}. \]
+The star is the usual mark for a fixed point.
+
+\begin{think}
+For $r = 2$ the formula gives $x^{*} = \tfrac12$. Check that the rule really
+leaves $\tfrac12$ unchanged. What does the formula give for $r = 4$, and
+does that check out too?
+\end{think}
+\reveal{$2 \times \tfrac12 \times \tfrac12 = \tfrac12$. For $r = 4$ it gives
+$\tfrac34$, and $4 \times \tfrac34 \times \tfrac14 = \tfrac34$.}
+
+\noindent
+At $r = \num{2.8}$ the formula gives \val{ch05.fp.28}, exactly where the
+printout came to rest. At $r = \num{3.2}$ it gives \val{ch05.fp.32}
+\dash{} and the orbit swings round it instead, from \val{ch05.two.lo} to
+\val{ch05.two.hi}. The fixed point exists; the orbit will not stay on it.
+
+Chapter~\ref{ch:feedback} explained why with a measurement. Nudge the state
+a tiny amount off the fixed point and take one step: the nudge comes back
+multiplied by the \emph{slope} of the rule there. Between $-1$ and $1$,
+nudges shrink and the fixed point holds; beyond, they grow and the orbit is
+pushed away. A negative slope also flips the nudge to the other side at
+every step. The library's \api{slope} measures it by nudging $x$ a millionth
+each way.
+
+\pyregion{code/ch05/fixed_point.py}{fixed}{The fixed point, and the slope of the rule there}{lst:ch05-fixed}
+
+\transcript{ch05-fixed-point}
+
+\noindent
+Each slope is $2 - r$: $2 - \num{2.8} = \num{-0.8}$,
+$2 - \num{3.2} = \num{-1.2}$, and so on. (With calculus, the slope of
+$r\,x\,(1 - x)$ is $r\,(1 - 2x)$, and at $x = 1 - 1/r$ that is exactly
+$2 - r$.) At $r = \num{2.8}$ a nudge flips and shrinks at every step, and
+the orbit closes in. At $\num{3.2}$ it flips and grows, and the orbit is
+thrown off.
+
+\begin{think}
+As you turn $r$ up from $\num{2.8}$, at what value does the slope $2 - r$
+reach $-1$, so that the fixed point stops holding?
+\end{think}
+\reveal{At $r = 3$, where $2 - 3 = -1$. Below $3$ the steady state holds;
+above $3$ it lets go.}
+
+\noindent
+That is the first place where the knob changes the kind of behaviour, and
+you found it by hand. The change from two values to four comes further up;
+Chapter~\ref{ch:bifurcations} finds where, and a pattern in where.
+
+\begin{lab}{l05_01_stability}{Where the steady state lets go}
+Write \code{fixed\_point}; \code{slope\_at}, which measures the slope at a
+point by nudging it each way; and \code{holds}, which says whether a nudge
+at the fixed point shrinks. Then write \code{lets\_go}, which finds where
+\code{holds} turns false between $\num{2.5}$ and $\num{3.5}$ by halving the
+interval again and again. It should agree with the answer above.
+\end{lab}
+
+\section{The cobweb on a curve}
+\label{sec:ch05-cobweb}
+\index{cobweb diagram}
+
+\noindent
+Chapter~\ref{ch:iteration} drew iteration as a cobweb on a straight line.
+The same drawing works for any rule. Draw the rule's graph, the height
+$r\,x\,(1 - x)$ for every $x$ from $0$ to $1$: a hump, highest at
+$x = \tfrac12$. Draw the diagonal, where the height equals $x$. Start at
+$x_0$ on the bottom edge and go up to the hump: the height you reach is
+$x_1$. Go across to the diagonal, which puts you above $x_1$; up or down to
+the hump for $x_2$; across again; and so on. The hump crosses the diagonal
+at the fixed point, where the next value equals the present one. The
+library's \api{cobweb} lists the corners of the path.
+
+\pyregion{code/ch05/cobweb_data.py}{corners}{The corners of a cobweb, three steps long}{lst:ch05-cobweb}
+
+\transcript{ch05-cobweb}
+
+\noindent
+Each \code{up} lands on the hump at the next value of the orbit,
+$\num{2.8} \times \num{0.2} \times \num{0.8} = \num{0.448}$ for the first;
+each \code{across} lands on the diagonal at the same height.
+
+\begin{think}
+At $r = \num{2.8}$ the cobweb spirals in to the crossing. At $r = \num{3.2}$
+the orbit ends up alternating between two values for ever. What shape does
+its cobweb settle into?
+\end{think}
+\reveal{A closed rectangle with two corners on the hump: up to one value,
+across, down to the other, across, and back to the start.}
+
+\plotfig{ch05-four-cobwebs}{Cobwebs for the four settings, each on its own
+hump with the diagonal. At $r = \num{2.8}$ the path spirals in; at
+$\num{3.2}$ and $\num{3.5}$ it starts right beside the crossing, is pushed
+away and settles on a closed loop; at $\num{3.9}$ it never
+closes.}{four cobwebs on the logistic map}
+
+\noindent
+Look at where the hump crosses the diagonal in
+Figure~\ref{fig:ch05-four-cobwebs}. At $r = \num{2.8}$ it falls
+through the crossing less steeply than the diagonal climbs, and the spiral
+tightens. At $\num{3.2}$ it falls more steeply, and a path started beside
+the crossing spirals outwards until it is caught on the rectangle. A curve
+falling exactly as steeply as the diagonal climbs has slope $-1$: the
+drawing and the measurement agree. At $\num{3.5}$ the loop has four corners on the hump. At
+$\num{3.9}$ the path never closes, and slowly fills a whole band.
+
+\section{Counting the cycle, and failing to}
+\label{sec:ch05-period}
+\index{period}\index{cycle}
+
+\noindent
+For thousands of numbers, let the computer read the cycle. The library's
+\api{period} looks at the last $128$ values of an orbit for the smallest
+whole number $p$ such that every value equals the one $p$ steps later, to
+within a billionth. It returns that $p$, or Python's word for nothing,
+\code{None}, when no $p$ up to $64$ fits.
+
+\pyregion{code/ch05/periods.py}{detect}{Asking for the period after two thousand steps}{lst:ch05-periods}
+
+\transcript{ch05-periods}
+
+\noindent
+The detector agrees with the printout: $1$, then $2$ and $4$. At
+$r = \num{3.9}$, and at $r = 4$, the top of the range, it finds nothing.
+
+\begin{think}
+At $r = \num{3.9}$ the detector found no cycle up to $64$ steps long at the
+end of two thousand steps. Suppose you ran the rule for a hundred thousand
+steps instead. Would a repeat turn up eventually?
+\end{think}
+\reveal{No. In a hundred thousand steps not a single value comes back.}
+
+\pyregion{code/ch05/never_repeats.py}{count}{A hundred thousand steps, looking for any value seen before}{lst:ch05-never}
+
+\transcript{ch05-never-repeats}
+
+\noindent
+A Python \code{set} keeps one copy of each different value, so a value that
+came back would make the second count smaller. It does not: all
+\val{ch05.never.values} values are different. That settles the question for
+these \val{ch05.never.steps} steps, because if a value ever did come back,
+the one after it would too \dash{} the same number always produces the same
+next number \dash{} and so would everything after that: a cycle. No value
+returning means no cycle has begun. The second line of each pair matters
+later: the same start, run again, gives the same numbers exactly.
+
+\begin{trapbox}
+\textbf{\enquote{If it has not repeated after a thousand steps, it is about
+to.}} A long wait makes a repeat feel overdue, as a coin that has shown heads
+five times seems to owe you tails. The orbit owes you nothing. No cycle is
+pulling it in, and running longer only produces more numbers that have
+never appeared before.
+\end{trapbox}
+
+\begin{rigourbox}
+A run is evidence, not proof. For $r = 4$ it can be proved that from almost
+every start the orbit never repeats; for $r = \num{3.9}$ the evidence is
+computation like this. And a computer holds only finitely many numbers
+between $0$ and $1$, so a computed orbit must eventually meet a value it has
+had before, and cycle \dash{} after more steps than this run took.
+Chapter~\ref{ch:computers} says what that means for a simulation.
+\end{rigourbox}
+
+\begin{lab}{l05_02_period}{A cycle detector of your own}
+Write \code{settle}, which runs the rule without looking and then keeps the
+next few values, and \code{period}, which finds the smallest $p$ for which
+every value in a list equals the one $p$ places on, and returns \code{None}
+when no $p$ up to a limit fits. The tests use made-up lists and this
+section's orbits.
+\end{lab}
+
+\begin{think}
+The detector found a cycle of four at $r = \num{3.5}$ and nothing at
+$\num{3.9}$. What do you expect it to find at $r = \num{3.83}$, a little
+below $\num{3.9}$?
+\end{think}
+\reveal{A cycle of period three. After a short scramble the orbit goes round
+\val{ch05.win.a}, \val{ch05.win.b} and \val{ch05.win.c} for ever.}
+\index{periodic window}
+
+\plotfig{ch05-window}{Order inside the jumping. At $r = \num{3.83}$ the
+orbit scrambles for a while, then locks onto a cycle of three; at
+$r = \num{3.9}$, close by, it never settles.}{a cycle of three inside the
+chaos}
+
+\noindent
+This surprises almost everyone, and it should. Turning the knob up does not
+make the behaviour steadily wilder: among the settings where orbits jump
+without pattern there are narrow windows where order comes back. Where they
+sit, and what a cycle of three implies, belong to the whole picture that
+Chapter~\ref{ch:bifurcations} draws.
+
+\section{Random-looking, and not random}
+\label{sec:ch05-may}
+\index{deterministic}\index{chaos!definition}
+
+\noindent
+Now the names. A rule is \emph{deterministic} when the present fixes the next
+state completely, with nothing left to chance, so the same start always gives
+the same orbit. You watched the logistic map be so: run twice from
+$\num{0.2}$, it gave the same hundred thousand numbers to the last digit. An
+orbit is \emph{chaotic} when it comes from a deterministic rule, stays within
+bounds, never settles into rest or a cycle \dash{} and, the part not yet
+measured, is so sensitive to its start that any difference there, however
+small, eventually grows until the two futures have nothing in common.
+
+\plotfig{ch05-two-starts}{Two runs at $r = \num{3.9}$, from $\num{0.2}$ and
+from $\num{0.200001}$, a millionth higher. For a while the lines lie on top
+of each other; then they part for good.}{two nearby starts at one setting}
+
+\noindent
+That last part is Chapter~\ref{ch:butterfly}'s measurement;
+Figure~\ref{fig:ch05-two-starts} is only a preview. Together they make the strangest fact in this book so far. The
+orbit at $r = \num{3.9}$ looks random, and is not: every number in it was
+fixed exactly by the one before. Yet you cannot foretell it far ahead
+without knowing its start more precisely than anyone knows anything.
+
+\index{May, Robert}
+In 1976 Robert May, a physicist who had moved into ecology, published a
+review in \emph{Nature} whose title says what this chapter has shown:
+\emph{Simple mathematical models with very complicated dynamics}. He wrote
+it for biologists.
+
+\begin{think}
+An ecologist counts the insects in a field every summer for twenty years.
+The counts jump up and down with no pattern anyone can find. What does that
+tell you about the cause?
+\end{think}
+\reveal{Less than it seems. The weather might do it, or errors in counting
+\dash{} or nothing but the population's own rule of growth.}
+
+\noindent
+That third possibility was May's point. Irregular numbers from the field
+were usually read as the mark of a noisy environment or of imperfect
+counting; the logistic map shows that one generation a year and one simple
+rule of growth can produce the same irregularity with no disturbance at all.
+May ended with a plea that reaches beyond ecology: that students should
+meet this equation early, because an intuition trained only on straight-line
+rules leaves people unprepared for what curved ones do. You have now met it.
+
+\begin{trapbox}
+\textbf{\enquote{Irregular output needs a random or complicated cause.}}
+The $r = \num{3.9}$ row in Section~\ref{sec:ch05-knob} came from the same
+line of arithmetic as the rows above it, with no randomness anywhere.
+Irregular output can come from chance, from a complicated mechanism, or from
+a simple deterministic rule, and the output alone does not say which.
+Chapter~\ref{ch:life} teaches how to tell them apart.
+\end{trapbox}
+
+\begin{worldbox}
+Fisheries science meets the same behaviour in a different formula. William
+Ricker's stock-and-recruitment model of 1954, which relates the fish
+spawning in one year to the young they produce, is a one-line rule of the
+same kind: growth that slows as numbers rise, a generation at a time. Turn
+up its growth rate and it passes, in the same order as the logistic map,
+from a steady stock through alternating booms and busts to irregular swings.
+A catch that swings from year to year does not, by itself, prove that the
+weather did it.
+\end{worldbox}
+
+\noindent
+One line, one knob: a steady state, cycles of two and four, orbits that
+never repeat, and islands of order among them. What is still missing is a
+measure of how unpredictable the chaos is. Chapter~\ref{ch:butterfly}
+counts the steps until two nearby starts part, Chapter~\ref{ch:lyapunov}
+turns that into one number, and Chapter~\ref{ch:bifurcations} draws every
+setting of the knob in one picture.
+
+\begin{summarybox}
+\begin{itemize}
+\item The \textbf{logistic map}, $x_{n+1} = r\,x_n\,(1 - x_n)$, is a
+  straight-line rule with one extra multiplication, the feedback $1 - x_n$.
+  For $r$ up to $4$, $x$ stays between $0$ and $1$.
+\item Turning $r$ gives a \textbf{steady state} at $\num{2.8}$, a
+  \textbf{cycle of period two} at $\num{3.2}$, one of period four at
+  $\num{3.5}$, and at $\num{3.9}$ an orbit that never settles or repeats.
+\item The \textbf{fixed point} is $x^{*} = 1 - 1/r$ and the \textbf{slope}
+  there is $2 - r$, so the steady state holds for $r$ below $3$.
+\item A \textbf{cobweb} spirals in to a fixed point that holds, is pushed
+  off one that does not, settles on a closed loop for a cycle, and at
+  $\num{3.9}$ never closes.
+\item A \textbf{cycle detector} reports $1$, $2$, $4$, then \code{None},
+  which means not found, never proved chaotic. No value comes back in a
+  hundred thousand steps; at $\num{3.83}$ a \textbf{window} holds a cycle of
+  three.
+\item \textbf{Deterministic}: same start, same orbit, every time.
+  \textbf{Chaotic}: deterministic, bounded, never settling, sensitive to the
+  start. It looks random and is not \dash{} May's 1976 warning.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item With $r = 3$ and $x_0 = \num{0.5}$, what are $x_1$ and $x_2$?
+  \answerto{$x_1 = 3 \times \num{0.5} \times \num{0.5} = \num{0.75}$ and
+  $x_2 = 3 \times \num{0.75} \times \num{0.25} = \num{0.5625}$.}
+\item What is the fixed point other than zero when $r = \num{2.5}$, and does
+  it hold?
+  \answerto{$1 - 1/\num{2.5} = \num{0.6}$. The slope there is
+  $2 - \num{2.5} = \num{-0.5}$, between $-1$ and $1$, so it holds.}
+\item At $r = \num{3.2}$ the fixed point is \val{ch05.fp.32}, yet the orbit
+  does not stay there. Why not?
+  \answerto{The slope there is $2 - \num{3.2} = \num{-1.2}$: a nudge flips
+  side and grows at every step, so the orbit is pushed off, onto a cycle of
+  two.}
+\item A cobweb settles on a closed loop with four corners on the hump. What
+  is the orbit doing?
+  \answerto{Going round a cycle of period four; the corners are the four
+  values it visits in turn.}
+\item A cycle detector returns \code{None}. What can you conclude, and what
+  can you not?
+  \answerto{That no cycle up to the length it checked was found in the
+  stretch it looked at. Not that the orbit is chaotic: a longer cycle, or an
+  orbit still settling, gives \code{None} too.}
+\item Yearly counts of an animal population jump about with no pattern.
+  Name three possible causes.
+  \answerto{The weather or other chance; errors in counting; and the
+  population's own deterministic rule of growth, as in the logistic map at
+  $r = \num{3.9}$.}
+\item What does it mean that the logistic map is deterministic, and how can
+  its output still look random?
+  \answerto{The same start always gives exactly the same orbit. At
+  $r = \num{3.9}$ it never settles or repeats, so it shows no pattern,
+  although every value is fixed by the one before.}
+\end{checkpoint}

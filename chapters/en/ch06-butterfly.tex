@@ -1,0 +1,461 @@
+%% ch06 --- The butterfly effect, measured
+%%
+%% Written September 2026, on the pattern of Chapter 1. Every number the
+%% reader cannot do in their head comes from code/measure/ch06.py, which
+%% imports the SAME functions the listings print (code/ch06/). The logistic
+%% map at r = 4 and the doubling map use only +, - and *, so every count of
+%% steps on this page is the same on every machine.
+%%
+%% WHAT THIS CHAPTER MAY NOT SAY. It measures that errors GROW, shows the
+%% doubling on a log scale, explains it with the doubling map's binary digits
+%% and counts what a digit of the start is worth. It does NOT give the single
+%% number for that growth (the Lyapunov exponent, ln 2 at r = 4) or the
+%% horizon formula: both are Chapter 7's. It does not show Lorenz's equations
+%% (Chapter 9), and it says one sentence, no more, about computer rounding
+%% (Chapter 16). Telling chaotic data from noise is Chapter 15's.
+%%
+%% Twin: chapters/pl/ch06-butterfly.tex. Section for section, macro for macro,
+%% number for number; tools/parity.py compares them.
+
+\chapter{The butterfly effect, measured}
+\label{ch:butterfly}
+\index{butterfly effect}\index{sensitive dependence on initial conditions}
+
+\noindent
+Chapter~\ref{ch:models} ended on a question it answered only for gentle
+models. If the rule is exact, is the future known? For the cooling tea the
+answer was nearly yes: two cups that started a degree apart grew closer
+every minute, so a thermometer that was slightly wrong at the start hardly
+mattered later.
+
+This chapter asks the same question of the one-line rule from
+Chapter~\ref{ch:logistic}, and measures the answer. Start the rule twice,
+from two numbers that differ in the tenth decimal place \dash{} closer than
+any thermometer, ruler or kitchen scale could ever tell apart \dash{} and let
+both run. How long do they stay together? The answer is a count of steps,
+it is the same on every computer, and it is short.
+
+\begin{outcomes}
+\outcome{run one rule from two nearby starts and read the runs side by side}
+\outcome{measure the gap between two runs step by step, and read it on a
+  logarithmic scale}
+\outcome{say what sensitive dependence on initial conditions means, in terms
+  of something you can measure}
+\outcome{use the doubling map to explain why a forecast runs out}
+\outcome{say, for a given error in the start, roughly how many steps a
+  prediction stays useful}
+\outcome{tell determinism from predictability, and retell Lorenz's discovery
+  accurately}
+\end{outcomes}
+
+\section{Two starts, one part in ten billion}
+\label{sec:ch06-twins}
+\index{logistic map}
+
+\noindent
+Chapter~\ref{ch:logistic}'s rule is $x_{n+1} = r\,x_n(1 - x_n)$. In words:
+take the number $x_n$ you have after $n$ steps, multiply it by $1 - x_n$
+and by the knob $r$, and the result is the next number, $x_{n+1}$. In this
+chapter the knob is turned to $r = 4$, the largest value that keeps every
+$x$ between $0$ and $1$.
+
+Take two starts: \val{ch06.start}, and \num{0.2000000001}. They differ by
+one ten-billionth, $10^{-10}$: a decimal point, nine zeros and a one.
+Call the two runs that follow from them the twins.
+
+\begin{think}
+Run the rule from both starts. For roughly how many steps will the two runs
+stay within \val{ch06.tol} of each other: about ten, about thirty, about three
+thousand, or for ever?
+\end{think}
+\reveal{About thirty. The two runs first differ by more than \val{ch06.tol} at
+step \val{ch06.twins.apart}.}
+Most people guess thousands, or for ever, because a difference in the tenth
+decimal place feels like no difference at all. For the tea it would have
+been none. Here is the program that settles it.
+
+\pyregion{code/ch06/twins.py}{twins}{Two runs of one rule from two nearby starts}{lst:ch06-twins}
+
+\noindent
+\code{logistic(4.0)} is Chapter~\ref{ch:logistic}'s rule with the knob at
+$4$, taken from \pkg{chaoslab}, the small library every chapter's programs
+share. \code{twin\_runs} keeps two lists, \code{a} and \code{b}, and at every
+step feeds the last number of each back into the same rule. The program then
+prints both lists every fifth step:
+
+\transcript{ch06-twins}
+
+\noindent
+Read down the two columns. Until step \val{ch06.twins.million} the runs
+differ by less than a millionth, and anyone who stopped reading there would
+call them the same run. By step~20 they differ by about a ten-thousandth. By
+step~\val{ch06.twins.apart} they do not agree even in the first decimal place,
+and from then on they are two unrelated lists of numbers.
+
+\plotfig{ch06-peel}{The two runs of the listing, step by step. They trace one
+path until about step \val{ch06.twins.apart} (the dotted line) and two
+unrelated paths after it.}{two runs peeling apart}
+
+\section{The gap doubles}
+\label{sec:ch06-gap}
+\index{exponential growth!of an error}
+
+\noindent
+In Chapter~\ref{ch:models} you watched the gap between two cups. Do the same
+here. The program below runs the two starts, records the distance between
+the runs after every step, and prints beside it what the gap would be if it
+doubled exactly every step. First a question you can answer with
+Chapter~\ref{ch:iteration}'s doubling arithmetic.
+
+\begin{think}
+If a gap doubles every step, how many steps does it take to grow a
+thousandfold? And a billionfold?
+\end{think}
+\reveal{Ten steps for a thousandfold, since $2^{10} = 1024$. Thirty for a
+billionfold, since a billion is a thousand times a thousand times a
+thousand.}
+From one ten-billionth to a tenth is exactly a billionfold. So if the gap
+doubles each step, the twins should part at about step thirty, which is
+where they did. Check it step by step:
+
+\pyregion{code/ch06/gap.py}{gap}{The gap between the twins, beside a gap that doubles exactly}{lst:ch06-gap}
+
+\transcript{ch06-gap}
+
+\noindent
+Up to step~30 the two columns keep pace. Step by step the measured gap is
+ragged \dash{} some steps multiply it by nearly four, a few shrink it \dash{}
+but over many steps it doubles, on average. Growth by the same factor every
+step is the exponential growth of Chapter~\ref{ch:iteration}, the law of
+compound interest. There it was your savings that grew. Here it is your
+error.
+
+This is the property the chapter is named after. A rule has
+\emph{sensitive dependence on initial conditions} when it pushes nearby
+starts apart, the gap growing by roughly the same factor at each step until
+the two runs have nothing to do with each other. The closer the starts, the
+longer that takes, but never for ever. Chapter~\ref{ch:models}'s tea
+multiplied its gap by \num{0.9} every minute; the logistic map at $r = 4$
+multiplies it, on average, by two. One factor smaller than one, one larger:
+that is the whole difference between a model that forgives you and one that
+does not.
+
+\begin{think}
+The doubling column goes on growing after step~35, past one and past a
+hundred. Why does the measured gap stop following it?
+\end{think}
+\reveal{Every $x$ lies between $0$ and $1$, so two of them can never be more
+than $1$ apart. Once the gap is the size of the whole range it can grow no
+further: it wanders, averaging about \val{ch06.ceiling}.}
+On a logarithmic scale, where each step up is a factor of ten, the story is
+a straight line and a ceiling. Set it beside the tea's picture in
+Chapter~\ref{ch:models}: there the straight line went down, here it goes up.
+
+\plotfig{ch06-gap-log}{The gap between the two runs on a logarithmic scale.
+It climbs, raggedly, along the dashed line of doubling until it reaches the
+size of the whole range and can climb no further.}{a gap that grows, then a
+ceiling}
+
+\begin{projectbox}
+\pkg{chaoslab} carries two functions for this chapter. \api{separation} runs
+a rule from two starts and returns their distance after every step, which is
+what the listing above printed; \api{steps\_until\_apart} returns the first
+step at which the distance exceeds a tolerance you choose. The lab below
+asks you to write both yourself before you trust them.
+\end{projectbox}
+
+\begin{lab}{l06_01_apart}{When do two runs part company?}
+Write \code{gaps}, which runs a rule from two starts and keeps the distance
+between them at every step, and \code{first\_apart}, which returns the first
+step at which that distance exceeds a tolerance, or \code{None} if it never
+does. Both take the rule as a function, so the test tries them on
+Chapter~\ref{ch:models}'s tea as well: its two cups never part company. For the twins, with a
+tolerance of \val{ch06.tol}, your answer must be step \val{ch06.twins.apart}.
+\end{lab}
+
+\section{Where the doubling comes from}
+\label{sec:ch06-digits}
+\index{doubling map}\index{binary digits}
+
+\noindent
+Why should a gap double? For the logistic map the answer takes some algebra,
+and Chapter~\ref{ch:lyapunov} gives it. There is a simpler rule where the
+answer can be seen at a glance: the \emph{doubling map}. Double the number,
+and if the result is $1$ or more, take $1$ away. It is written
+$x_{n+1} = 2x_n \bmod 1$, where $\bmod 1$ means \enquote{keep only the part
+after the point}.
+
+\begin{think}
+Start at \num{0.625}. Write down 1 if the number is in the upper half
+(\num{0.5} or more) or 0 if it is in the lower half, then apply the doubling
+map, and repeat until you have written three digits.
+\end{think}
+\begin{revealblock}
+\num{0.625} is in the upper half: 1. Doubled it is \num{1.25}, and taking $1$
+away leaves \num{0.25}, in the lower half: 0. Doubled again it is \num{0.5},
+in the upper half: 1. You wrote 1, 0, 1.
+\end{revealblock}
+Now write \num{0.625} in \emph{binary}. In the decimals you learnt at school
+the digits after the point count tenths, hundredths and thousandths. In
+binary they count halves, quarters and eighths, and each digit is $0$ or
+$1$. Since \num{0.625} is $\tfrac12 + \tfrac18$, in binary it is written
+\num{0.101}: the three digits you have just written down.
+
+That is no coincidence. Doubling a binary number moves every digit one place
+to the left, as multiplying by ten does to decimal digits, and taking $1$
+away drops the digit that has crossed the point. The first digit after the
+point says which half the number is in. So the doubling map reads out the
+binary digits of its start, one per step: its whole future is written, in
+advance, in ever finer digits of the present. The program below checks
+this for the chapter's two starts.
+
+\pyregion{code/ch06/digits.py}{digits}{Binary digits worked out directly, and read out by the doubling map}{lst:ch06-digits}
+
+\transcript{ch06-digits}
+
+\noindent
+For each start the digits and the doubling map's record of upper and lower
+halves are the same string. The two starts share their first
+\val{ch06.digits.shared} binary digits, so the map keeps them on the same side
+for exactly \val{ch06.digits.shared} steps, and after that the digits that
+tell them apart start to be read.
+
+Here is sensitive dependence with nothing hidden. A measurement tells you the
+first so many digits of the state; the rule uses up one digit per step; once
+the measured digits are used up, the forecast depends on digits nobody
+measured. Ten is a little more than $2 \times 2 \times 2 = 8$, so one decimal
+digit carries a little more than three binary ones, and ten decimal places
+carry a little over thirty. A computer, too, stores only so many binary digits of
+each number; what that does to a chaotic calculation is
+Chapter~\ref{ch:computers}'s subject.
+
+\mermaidfig{ch06-digits}{Why a chaotic forecast runs out. The start is known
+to some digits and the rule consumes them one step at a time; once they are
+used up, the forecast rests on digits nobody measured.}{digits in, steps out}
+
+\begin{lab}{l06_02_digits}{Digits known, steps predicted}
+Write \code{shared\_digits}, which counts how many leading binary digits two
+numbers have in common, and \code{steps\_together}, which runs the doubling
+map on both and counts the steps before they land on different sides of one
+half. The test checks that the two counts agree for many pairs, and that
+for the chapter's two starts both are \val{ch06.digits.shared}.
+\end{lab}
+
+\section{What a digit is worth}
+\label{sec:ch06-worth}
+\index{prediction!how long it lasts}
+
+\noindent
+The doubling map says that each correct binary digit of the start buys one
+more step of forecast. The logistic map at $r = 4$ is not the doubling map,
+but you have seen that its gap doubles on average, so the same bargain
+should hold for it, roughly. That can be measured.
+
+\begin{think}
+The twins, whose starts agreed to ten decimal places, stayed within
+\val{ch06.tol} of each other for about thirty steps. An instrument a hundred
+times more precise would give you twelve decimal places. About how many
+steps then: about thirty-seven, or about sixty?
+\end{think}
+\reveal{About thirty-seven. A hundred is about $2^{7} = 128$, so an error a
+hundred times smaller needs about seven more doublings to catch up.}
+Twice the digits does not buy twice the forecast. The program below checks
+the arithmetic on a thousand starts spread evenly between $0$ and $1$, since
+any one start can be lucky or unlucky: for each size of error it counts the
+steps before the forecast is more than \val{ch06.tol} out, and averages.
+
+\pyregion{code/ch06/worth.py}{worth}{Steps a forecast survives, averaged over a thousand starts}{lst:ch06-worth}
+
+\transcript{ch06-worth}
+
+\noindent
+Each pair of decimal places adds about seven steps, so each one adds about
+\val{ch06.worth.per}, which is the doubling map's arithmetic: a decimal digit
+is worth a little more than three binary ones. Read the table the other way
+round and it answers the question a forecaster asks. Measure the start to
+two decimal places and the forecast lasts about \val{ch06.worth.two} steps;
+measure it to ten and it lasts about \val{ch06.worth.ten}; heroic precision,
+twelve places, buys \val{ch06.worth.twelve}. Chapter~\ref{ch:lyapunov} turns
+this table into one number for any chaotic system and a formula for how far
+ahead it can be predicted. Here it is enough that you can measure it.
+
+\section{Lorenz's printout}
+\label{sec:ch06-lorenz}
+\index{Lorenz, Edward}
+
+\noindent
+In 1961 the meteorologist Edward Lorenz, at the Massachusetts Institute of
+Technology, was running a small computer model of the weather. Wanting to
+look at one stretch of a run again, he restarted it from the middle, typing
+in the numbers from a printout of the earlier run. The printout showed three
+decimal places, \num{0.506}, where the machine had held six,
+\num{0.506127}. The new run followed the old one for a while, then drifted
+away, until the two forecasts had nothing in common. The difference between
+the starts, about one part in four thousand, was the kind of error he had
+assumed would not matter.
+
+The logistic map can replay the accident. Run it from the full number, run
+it again from the full number, and run it once from the printout.
+
+\begin{think}
+Suppose Lorenz had typed all six decimal places, \num{0.506127}, the very
+number the machine had held. Would his second run have matched the first?
+\end{think}
+\reveal{Yes, digit for digit and step for step. There is no chance in the
+rule: the same start always gives the same future.}
+
+\pyregion{code/ch06/printout.py}{printout}{Lorenz's printout, replayed on the logistic map}{lst:ch06-printout}
+
+\transcript{ch06-printout}
+
+\noindent
+The column \code{again} is the first run repeated, and the program compares
+every number of it with the first run and prints \code{True}. The column
+\code{rounded} starts \num{0.000127} away and differs by more than
+\val{ch06.tol} at step \val{ch06.lorenz.apart}, sooner than the twins, because
+its error started out far larger.
+
+\begin{trapbox}
+\textbf{\enquote{If I run a chaotic model again, I will get something
+different.}} Not from the same start. A chaotic rule is a machine like any
+other: the same input gives the same output, every digit of it, as the
+\code{again} column shows. What changes the future is a changed start,
+however small. If you rerun a computer model and get a different answer,
+something changed \dash{} the start, the rule or the arithmetic \dash{} and
+Chapter~\ref{ch:computers} is about the last of those.
+\end{trapbox}
+
+\noindent
+In 1972 Lorenz gave a talk whose title asked whether the flap of a
+butterfly's wings in Brazil could set off a tornado in Texas. The phrase
+stuck, and sensitive dependence on initial conditions has been called the
+\emph{butterfly effect} ever since. His own equations, and the shape they
+draw, are Chapter~\ref{ch:lorenz}'s.
+
+\begin{think}
+A tornado strikes Texas. Suppose you could rerun the atmosphere from two
+weeks earlier with one butterfly's flap removed. Would the tornado be gone?
+\end{think}
+\reveal{Perhaps, perhaps not, and nobody could say in advance. The rerun is a
+different atmosphere: it might have no tornado, a tornado somewhere else, or
+one in Texas anyway.}
+
+\begin{trapbox}
+\textbf{\enquote{The butterfly causes the tornado.}} Lorenz's question was
+about prediction, not about power. The storm's energy comes from the
+atmosphere, not from the insect. Remove the flap and the weather takes a
+different path, which may or may not contain a tornado; every other flap,
+gust and breath does the same, so no single one of them is the cause. In
+the replay above, the three dropped digits did not make the rounded run what
+it became: the rule acting on the whole start did. What the butterfly shows
+is that weather two weeks away depends on details nobody can measure.
+\end{trapbox}
+
+\section{Deterministic, and still unpredictable}
+\label{sec:ch06-determinism}
+\index{determinism}\index{predictability}
+
+\noindent
+Two words have been doing two different jobs in this chapter, and they need
+names. A rule is \emph{deterministic} when the same start always gives the
+same future: no dice, no chance. A system is \emph{predictable}, over some
+span, when a start you can actually measure pins down its future over that
+span. The tea is both. The logistic map at $r = 4$ is deterministic \dash{}
+checked above, digit for digit \dash{} and still unpredictable beyond a few
+dozen steps, because no measured start has enough digits.
+
+\begin{think}
+The logistic map at $r = 4$ jumps about with no pattern the eye can see, and
+nobody can forecast it for long. Is its output random?
+\end{think}
+\reveal{No. Every number follows exactly from the one before, and you can
+compute the whole list again and get every digit back. What cannot be had is
+the start, not the rule.}
+
+\begin{trapbox}
+\textbf{\enquote{Chaos means random.}} Chaos is the opposite of chance. A
+chaotic system obeys its rule exactly at every step; what looks like
+randomness is the rule reading out, one step at a time, digits of the start
+that nobody knows. A random sequence has no rule at all. A chaotic one has a
+rule you cannot outrun. How to tell the two apart when all you have is data
+is Chapter~\ref{ch:life}'s question.
+\end{trapbox}
+
+\begin{worldbox}
+A coin toss is used to settle things because nobody can predict it, and yet
+a spinning coin obeys Newton's laws like a stone. The statistician Persi
+Diaconis and colleagues had a machine built that launches a coin the same
+way every time, and it lands the same way up every time. A thumb cannot
+repeat its launch that closely, so the outcome of a real toss depends on
+differences too small to control. The coin is deterministic, and in your
+hand it is unpredictable.
+\end{worldbox}
+
+\noindent
+Laplace's demon, from Chapter~\ref{ch:models}, needed the rule and the
+present exactly. This chapter has priced the word \emph{exactly}. For the
+logistic map every step forward costs one more binary digit of the present,
+so seeing for ever needs infinitely many, and an instrument that is merely
+excellent sees a few dozen steps and then nothing. The clockwork is intact.
+It is the clock face that cannot be read finely enough.
+
+\begin{summarybox}
+\begin{itemize}
+\item Two runs of the logistic map at $r = 4$ that start one ten-billionth
+  apart agree to a millionth for \val{ch06.twins.million} steps and differ by
+  more than \val{ch06.tol} from step \val{ch06.twins.apart}: counted exactly,
+  the same on every computer.
+\item Their gap roughly \textbf{doubles each step}, which is exponential
+  growth of the error, until it reaches the size of the whole range. That is
+  \textbf{sensitive dependence on initial conditions}: a straight line up on a
+  logarithmic scale, then a ceiling.
+\item The \textbf{doubling map} reads out the binary digits of its start, one
+  per step, so its future is written in digits of the present that no
+  measurement has.
+\item Each correct decimal digit of the start buys only about
+  \val{ch06.worth.per} more steps of forecast: twice the digits is not twice
+  the forecast.
+\item Lorenz's rounded restart, replayed on the logistic map: the full start
+  reruns identically, the rounded one parts company. The \textbf{butterfly
+  effect} is about prediction, not about causes.
+\item A rule can be \textbf{deterministic} and still \textbf{unpredictable}:
+  chaos is not chance, and rerunning the same start gives the same future.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Two runs of the logistic map at $r = 4$ start at \num{0.2} and
+  \num{0.2000000001}. Roughly when do they first differ by more than
+  \num{0.1}?
+  \answerto{At step \val{ch06.twins.apart}. Until step
+  \val{ch06.twins.million} they differ by less than a millionth.}
+\item A gap of one millionth doubles every step. After how many steps is it
+  larger than $1$?
+  \answerto{After $20$ steps: $2^{20}$ is a little over a million, while
+  $2^{19}$ is only about half a million.}
+\item Why does the gap between two runs of the logistic map stop growing?
+  \answerto{Because every $x$ lies between $0$ and $1$, so two values can
+  never be more than $1$ apart. Once the gap reaches the size of the whole
+  range it wanders, averaging about \val{ch06.ceiling}.}
+\item Write \num{0.75} in binary, and write down which half it is in for
+  three steps of the doubling map.
+  \answerto{$\tfrac12 + \tfrac14$, so \num{0.11} in binary. The halves are
+  upper, upper, lower: \num{0.75}, then \num{0.5}, then $0$. The map reads out
+  the digits 1, 1, 0.}
+\item A forecast from a start known to ten decimal places lasts about
+  \val{ch06.worth.ten} steps. About how long for fourteen decimal places?
+  \answerto{About $44$ steps. Each decimal digit adds a little over three
+  steps, so four more add about thirteen.}
+\item Lorenz restarted from \num{0.506} instead of \num{0.506127}. What
+  would he have seen had he typed all six digits, and why?
+  \answerto{The first run again, digit for digit, because the rule is
+  deterministic: the same start always gives the same future.}
+\item Is the logistic map at $r = 4$ random? What is the difference between
+  deterministic and predictable?
+  \answerto{No: every value follows exactly from the one before. It is
+  deterministic, because the same start gives the same future; it is not
+  predictable for long, because no measured start has enough digits for the
+  rule to use.}
+\end{checkpoint}

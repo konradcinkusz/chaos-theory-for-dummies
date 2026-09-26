@@ -1,0 +1,5 @@
+r = 2.8:  exponent -0.22   errors shrink
+r = 3.2:  exponent -0.92   errors shrink
+r = 3.5:  exponent -0.87   errors shrink
+r = 4.0:  exponent +0.69   errors grow
+exact value at r = 4:  ln 2 = 0.6931

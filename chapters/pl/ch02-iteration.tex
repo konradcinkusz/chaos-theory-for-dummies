@@ -1,0 +1,541 @@
+%% ch02 --- Reguła następnego kroku
+%%
+%% Napisany we wrześniu 2026 według wzoru rozdziału 1. Każda liczba, której
+%% czytelnik nie policzy w pamięci, pochodzi z code/measure/ch02.py, który
+%% importuje TE SAME reguły, które drukują listingi (code/ch02/), oraz
+%% funkcje `linear` i `orbit` z chaoslab, których te listingi używają.
+%%
+%% CZEGO TEN ROZDZIAŁ NIE MOŻE POWIEDZIEĆ. Uczy iteracji na regułach
+%% LINIOWYCH, których całą przyszłość da się odczytać bez iterowania, i
+%% wprowadza nachylenie jako czynnik, przez który mały błąd mnoży się w
+%% jednym kroku. Mierzy nachylenie jednej krzywej reguły i na tym poprzestaje:
+%% co robi orbita reguły krzywej, która w jednych miejscach rozciąga błędy,
+%% a w innych je zmniejsza, zostaje zadane jako pytanie, bez odpowiedzi.
+%% Sprzężenie zwrotne i reguła krzywa należą do rozdziału 3, odwzorowanie
+%% logistyczne i pajęczyna na krzywej do rozdziału 5, a wykładniczy wzrost
+%% błędów do rozdziału 6. Nic w tym rozdziale nie jest chaotyczne.
+%%
+%% Bliźniak: chapters/en/ch02-iteration.tex. Podrozdział za podrozdziałem,
+%% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
+
+\chapter{Reguła następnego kroku}
+\label{ch:iteration}
+\index{iteracja}\index{reguła!następnego kroku}
+
+\noindent
+Lekarz przepisuje ci jedną tabletkę każdego ranka. Każda tabletka wprowadza
+do krwi 100 miligramów leku, a do następnego ranka organizm usuwa połowę
+tego, co w niej było. Bierzesz jedną dziennie przez miesiąc, rok, dziesięć
+lat: czy ilość leku we krwi rośnie tak długo, jak długo bierzesz tabletki?
+
+Zapamiętaj swoją odpowiedź. To pytanie dotyczy reguły stosowanej raz za
+razem \dash{} połowa, tabletka; połowa, tabletka \dash{} a reguły tego
+samego rodzaju rządzą kontami oszczędnościowymi, stygnącą herbatą,
+populacjami, kredytami i hotelowym prysznicem. Rozdział~\ref{ch:models}
+nazwał wiersz \code{temp = next\_minute(temp)} najważniejszym wierszem tej
+książki. Ten rozdział mówi o tym, co ten wiersz robi, gdy puścisz go w
+nieskończoność, a kończy się tym, że potrafisz powiedzieć, co cała rodzina
+reguł zrobi na dłuższą metę, wcale ich nie uruchamiając.
+
+\begin{outcomes}
+\outcome{zapisać regułę następnego kroku w notacji tej książki i wyznaczyć
+  jej orbitę, ręcznie i w Pythonie}
+\outcome{rozpoznać regułę liniową, która stoi za oszczędnościami, lekami i
+  stygnięciem, i odczytać jej zachowanie na dłuższą metę z jednej liczby}
+\outcome{odpowiedzieć logarytmem na pytanie \enquote{ile kroków, zanim\ldots}}
+\outcome{znaleźć stan, w którym reguła stoi w miejscu, i rozstrzygnąć, czy
+  zostaje w nim po lekkim pchnięciu}
+\outcome{zmierzyć nachylenie reguły w punkcie i odczytać diagram
+  pajęczynowy}
+\end{outcomes}
+
+\section{Dziś, jutro, pojutrze}
+\label{sec:ch02-rule}
+\index{stan}\index{orbita}
+
+\noindent
+Wpłać 1000 złotych na konto oprocentowane na 5 procent rocznie i nie ruszaj
+ich. Po roku bank dopisze 50, czyli 5 procent z 1000, i będziesz mieć 1050.
+Po drugim roku dopisze 5 procent od 1050 i będziesz mieć
+\val{ch02.save.two}; po trzecim \val{ch02.save.three}. Co roku to samo
+dzieje się z tym, co jest na koncie.
+
+Oznacz stan konta po $n$ latach przez $x_n$, co czytamy \enquote{$x$ z
+indeksem $n$}: małe $n$ mówi, który to rok, i niczego nie mnoży. Tak więc
+$x_0 = 1000$ to punkt wyjścia, $x_1 = 1050$ to stan rok później, a reguła
+banku to
+\[ x_{n+1} = \num{1.05}\, x_n , \]
+czyli stan w przyszłym roku to \num{1.05} razy stan w tym roku, co roku.
+
+Każda reguła krokowa w tej książce ma taki kształt. Jest \emph{stan},
+liczba $x$ mówiąca, jak jest teraz; jest \emph{reguła} $f$, która oznacza
+\enquote{cokolwiek robisz ze stanem, żeby dostać następny}; i jest
+następny stan, czyli $f$ zastosowane do obecnego:
+\[ x_{n+1} = f(x_n) . \]
+Gdy numer kroku nie ma znaczenia, regułę zapisuje się ze strzałką,
+$x \mapsto \num{1.05}\,x$, co czytamy \enquote{$x$ przechodzi w \num{1.05}
+razy $x$}. Lista $x_0, x_1, x_2, \ldots$ to \emph{orbita} punktu $x_0$, a
+wytwarzanie jej, przez podawanie każdej odpowiedzi z powrotem jako
+następnego pytania, to \emph{iteracja}.
+
+\mermaidfig{ch02-feed-back}{Iteracja. Reguła zamienia obecny stan w
+następny, który staje się obecnym stanem; na każdym kroku działa ta sama
+reguła.}{pętla iteracji}
+
+\begin{think}
+Weź regułę $x \mapsto 2x + 1$: podwój, potem dodaj jeden. Zaczynając od
+$x_0 = 1$, ile wynoszą $x_1$, $x_2$ i $x_3$?
+\end{think}
+\reveal{$3$, $7$ i $15$. Dwa razy $1$ plus jeden to $3$; dwa razy $3$ plus
+jeden to $7$; dwa razy $7$ plus jeden to $15$.}
+Do $x_3$ nie da się dojść inaczej niż przez $x_1$ i $x_2$: sto kroków
+naprzód to sto kroków, żmudnych na papierze i bez wysiłku dla maszyny.
+
+\begin{projectbox}[unbreakable]
+Biblioteka książki, \pkg{chaoslab}, robi te kroki za ciebie. Jej
+\code{orbit} to pętla z rozdziału~\ref{ch:models} z rachunkowością
+załatwioną raz na zawsze:
+
+\pyregion{code/src/chaoslab/iterate.py}{orbit}{Zastosuj regułę $n$ razy i zachowaj każdy stan}{lst:ch02-orbit}
+
+\noindent
+Jej partnerka \code{linear(a, b)} zwraca regułę $x \mapsto a\,x + b$,
+gotową do podania funkcji \code{orbit}.
+\end{projectbox}
+
+\section{Jedna prosta, trzy losy}
+\label{sec:ch02-fates}
+\index{reguła liniowa}\index{reguła!liniowa}
+
+\noindent
+Reguła oszczędności tylko mnoży. Wiele reguł mnoży, a potem dodaje:
+
+\begin{itemize}
+\item \textbf{Herbata} z rozdziału~\ref{ch:models} traci co minutę jedną
+  dziesiątą swojej różnicy do pokoju o temperaturze 20 stopni: z $x$
+  przechodzi w $x - \num{0.1}(x - 20)$, co po uporządkowaniu daje
+  $\num{0.9}\,x + 2$.
+\item \textbf{Tabletki}: połowa, potem dodaj 100, czyli
+  $x \mapsto \num{0.5}\,x + 100$.
+\item \textbf{Populacja}, w której urodzenia co roku przewyższają zgony o
+  jedną piątą: $x \mapsto \num{1.2}\,x$.
+\item \textbf{Plotka}, którą każdy, kto ją zna, przekazuje dziennie jednej
+  nowej osobie: $x \mapsto 2x$.
+\end{itemize}
+
+\noindent
+Wszystkie mają jeden kształt, $x \mapsto a\,x + b$: pomnóż przez stałą
+liczbę $a$, potem dodaj stałą liczbę $b$. Jej wykres, z obecnym stanem na
+osi poziomej i następnym na pionowej, jest linią prostą, dlatego nazywa się
+ją regułą \emph{liniową} \dash{} choć, jak zaraz zobaczysz, to, co robi w
+czasie, jest przeważnie krzywe. Uruchom cztery takie reguły z tego samego
+miejsca:
+
+\pyregion{code/ch02/fates.py}{rules}{Cztery reguły liniowe iterowane obok siebie z tego samego startu}{lst:ch02-fates}
+
+\transcript{ch02-fates}
+
+\noindent
+Pierwsza kolumna podwaja się w nieskończoność, a druga maleje o połowę ku
+zeru. Trzecia skrada się do $10$ od dołu. Czwarta też ustala się na $10$,
+ale skacząc z jednej strony na drugą, a każdy skok jest mniejszy od
+poprzedniego: to trzecia kolumna w lustrzanym odbiciu. Oto trzy losy reguły
+liniowej \dash{} rosnąć bez ograniczeń, zanikać do zera albo się ustalić
+\dash{} a ujemny mnożnik dodaje naprzemienność, ale nie czwarty los.
+
+\plotfig{ch02-three-fates}{Trzy losy reguły liniowej przy tym samym
+starcie. Jedna rośnie bez ograniczeń, jedna zanika, a dwie ustalają się na
+tej samej liczbie: jedna się do niej skrada, druga skacze z boku na
+bok.}{trzy reguły liniowe i ich trzy losy}
+
+\begin{think}
+Wróćmy do konta oszczędnościowego. Chcesz znać stan po dziesięciu latach,
+nie robiąc dziesięciu kroków. Jakie jedno obliczenie go daje?
+\end{think}
+\reveal{Pomnóż 1000 przez \num{1.05} dziesięć razy z rzędu: $x_{10} =
+\num{1.05}^{10} \times 1000$, co daje \val{ch02.save.ten}.}
+Małe uniesione $10$ to \emph{potęga}: $\num{1.05}^{10}$ to \num{1.05}
+pomnożone przez siebie dziesięć razy. Gdy reguła tylko mnoży, $x \mapsto
+a\,x$, jej orbita ma wzór, $x_n = a^n x_0$, i można przeskoczyć do
+dowolnego kroku. Wzrost, w którym każdy krok mnoży przez tę samą liczbę,
+nazywa się \emph{wykładniczym}; jego malejący bliźniak, z $a$ między $0$ a
+$1$, to \emph{zanik wykładniczy}.
+
+\section{Powolne eksplozje i liczenie kroków}
+\label{sec:ch02-until}
+\index{wzrost wykładniczy}\index{czas podwojenia}\index{logarytm}
+\index{okres półtrwania}
+
+\noindent
+Słowo \enquote{wykładniczy} stało się synonimem słowa \enquote{szybki}. Oto
+test tego przekonania.
+
+\begin{think}
+Dwa konta oszczędnościowe zaczynają od 1000. Konto A co roku dopisuje 50.
+Konto B rośnie o 2 procent rocznie, czyli wykładniczo. Które jest do przodu
+po trzydziestu latach?
+\end{think}
+\reveal{Konto A, z $1000 + 30 \times 50 = 2500$ wobec
+\val{ch02.acc.grows.thirty} na koncie B. B wyprzedza A dopiero w roku
+\val{ch02.acc.cross}.}
+Jeśli wybrałeś B, rozumowałeś na podstawie słowa, a nie reguły: 2 procent z
+1000 to 20, mniej niż 50 konta A, a B potrzebuje dziesięcioleci wzrostu na
+własnym wzroście, żeby je dogonić.
+
+\begin{trapbox}
+\textbf{\enquote{Wzrost wykładniczy to szybki wzrost.}} To wzrost
+proporcjonalny do tego, co już jest, a mnożnik może być bardzo bliski
+jedności. Przy 1 procencie rocznie suma podwaja się po mniej więcej
+\val{ch02.dbl.one.log} latach. Wzrost wykładniczy gwarantuje nie szybkość,
+tylko nieuchronność: jakkolwiek mała byłaby stopa, prześcignie każdy
+wzrost, który dodaje stałą kwotę \dash{} w końcu, a to \enquote{w końcu}
+może trwać całe życie.
+\end{trapbox}
+
+\plotfig{ch02-two-accounts}{Dodawanie stałej kwoty wobec wzrostu o stały
+ułamek. Konto wykładnicze jest z tyłu przez większą część stulecia, a potem
+już nie.}{wzrost liniowy wobec wykładniczego}
+
+\noindent
+Pożyteczne pytanie o wzrost wykładniczy brzmi \enquote{ile kroków, zanim
+się podwoi?}, a odpowiedź nie zależy od punktu startu.
+
+\begin{think}
+Przy 7 procentach rocznie po mniej więcej ilu latach suma się podwaja: po
+około 5, około 10 czy około 14?
+\end{think}
+\reveal{Po około 10. Licząc pełne lata, 1000 po raz pierwszy przekracza
+2000 w roku \val{ch02.dbl.seven.count}; dokładna odpowiedź to
+\val{ch02.dbl.seven.log} roku.}
+Jest na to przycisk. Pytanie brzmi: dla jakiego $n$ zachodzi
+$\num{1.07}^n = 2$? Na dokładnie takie pytania odpowiada \emph{logarytm}.
+Kalkulator ma przycisk oznaczony \code{ln}, logarytm naturalny, a jedyne,
+co musisz o nim wiedzieć, to co robi z potęgą:
+\[ \ln (a^n) = n \ln a . \]
+Zamienia \enquote{pomnóż przez $a$, $n$ razy} na \enquote{dodaj $\ln a$, $n$
+razy}. Zlogarytmuj obie strony równania $a^n = 2$, a dostaniesz
+$n \ln a = \ln 2$, czyli
+\[ n = \frac{\ln 2}{\ln a} : \]
+liczba kroków to logarytm tego, jak daleko chcesz dojść, podzielony przez
+logarytm jednego kroku. Skoro $\ln 2 = \val{ch02.ln.two}$, a
+$\ln \num{1.07} = \val{ch02.ln.seven}$, wychodzi \val{ch02.dbl.seven.log}.
+
+\pyregion{code/ch02/doubling.py}{count}{Po ilu latach stan konta się podwoi: liczone i z logarytmu}{lst:ch02-doubling}
+
+\transcript{ch02-doubling}
+
+\noindent
+Liczba kroków to logarytm zaokrąglony w górę. Przy 2 procentach to
+\val{ch02.dbl.two.log} wobec \val{ch02.dbl.two.count}: po 35 latach na
+koncie jest \val{ch02.dbl.two.short} raza tyle, ile wpłacono, o włos mniej
+niż podwojenie. Ostatnia kolumna, \emph{reguła 70}, dzieli 70 przez liczbę
+procent; działa, bo logarytm jednego kroku jest bliski samej małej stopie
+($\ln \num{1.07}$ to prawie \num{0.07}), a $100 \times \ln 2$ to mniej
+więcej 70.
+
+Z maleniem jest tak samo. Lek, z którego organizm co godzinę usuwa jedną
+piątą, zachowuje co godzinę \num{0.8}, a czas, po którym zostaje połowa,
+jego \emph{okres półtrwania}, wynosi $\ln \num{0.5} / \ln \num{0.8}$, czyli
+około \val{ch02.half.fifth} godziny.
+
+\begin{lab}{l02_01_until}{Ile kroków do celu?}
+Napisz \code{steps\_until}, która liczy kroki reguły $x \mapsto a\,x$ od
+$1$, aż $x$ osiągnie cel, oraz \code{time\_until}, która zadaje to samo
+pytanie logarytmowi, dla wzrostu i dla zaniku. Potem napisz
+\code{half\_life}. Logarytm naturalny w Pythonie to \code{math.log}.
+\end{lab}
+
+\section{Gdzie reguła stoi w miejscu}
+\label{sec:ch02-fixed}
+\index{punkt stały}
+
+\noindent
+Teraz pytanie z początku rozdziału. Stanem jest ilość leku we krwi zaraz po
+porannej tabletce, w miligramach: $x \mapsto \num{0.5}\,x + 100$, od
+$x_0 = 100$.
+
+\begin{think}
+Policz kilka pierwszych poranków: $100$, potem połowa tego plus $100$ i tak
+dalej. Czy ilość leku rośnie tak długo, jak długo bierzesz tabletki?
+\end{think}
+\reveal{Nie. Idzie $100$, $150$, $175$, \num{187.5}, \num{193.75} i dalej,
+zbliżając się do $200$, ale nigdy go nie osiągając.}
+Dlaczego $200$? Bo reguła zostawia $200$ bez zmian: połowa z $200$ to
+$100$, a tabletka od razu dokłada $100$ z powrotem. Stan, którego reguła nie
+zmienia, to \emph{punkt stały}, a znajdujesz go, pytając, które $x$ spełnia
+\[ x = f(x) . \]
+Dla tabletek to $x = \num{0.5}\,x + 100$; odejmij $\num{0.5}\,x$ od obu
+stron, a dostaniesz $\num{0.5}\,x = 100$, czyli $x = 200$. Dla każdej
+reguły liniowej te same kroki dają
+\[ x^{*} = \frac{b}{1 - a} , \]
+gdzie gwiazdka oznacza punkt stały. (Jeśli $a$ wynosi dokładnie $1$,
+reguła tylko dodaje i nigdzie nie stoi w miejscu.) Punkt stały reguły
+herbaty leży w $2 / \num{0.1} = 20$ stopniach: w temperaturze pokoju.
+
+\pyregion{code/ch02/drug.py}{tablets}{Jedna tabletka co rano i odległość od punktu stałego}{lst:ch02-drug}
+
+\transcript{ch02-drug}
+
+\noindent
+Niedobór w prawej kolumnie co rano maleje o połowę, bo organizm usuwa
+połowę tego, co jest, a tabletka zawsze dokłada tych samych $100$. Po
+\val{ch02.drug.within} dniach od $200$ dzieli cię mniej niż jeden miligram,
+a dokładnie tam nie dotrzesz nigdy. Ilość leku nie rośnie w nieskończoność;
+wyrównuje się w punkcie stałym.
+
+\begin{worldbox}
+Farmakolodzy nazywają ten punkt stały \emph{stanem stacjonarnym}, a
+praktyczna reguła, której uczy się lekarzy i farmaceutów, mówi, że lek
+przyjmowany w regularnych odstępach osiąga go po czterech lub pięciu
+okresach półtrwania. To tabela powyżej: po czterech okresach półtrwania
+niedobór zmalał o połowę cztery razy, co daje poziom \val{ch02.drug.four}
+procent stanu stacjonarnego, a po pięciu \val{ch02.drug.five}. Gdy lek jest
+potrzebny od razu w pełnej sile, lekarz może podać większą pierwszą dawkę,
+\emph{dawkę nasycającą}, która zaczyna orbitę w punkcie stałym, a nie
+poniżej niego.
+\end{worldbox}
+
+\section{Zostać na miejscu albo uciec}
+\label{sec:ch02-stability}
+\index{punkt stały!stabilny}\index{punkt stały!niestabilny}\index{stabilność}
+
+\noindent
+Oto punkt stały innego charakteru. Masz \num{10000} długu oprocentowanego
+na 1 procent miesięcznie i spłacasz 100 miesięcznie, więc co miesiąc dług
+przechodzi w $\num{1.01}\,x - 100$.
+
+\begin{think}
+Co dzieje się z długiem przez lata? A co, jeśli jesteś winien \num{11000},
+przy tym samym oprocentowaniu i tej samej racie?
+\end{think}
+\reveal{Przy \num{10000} nic, nigdy: odsetki wynoszą dokładnie 100, a twoje
+100 je znosi. Przy \num{11000} odsetki wynoszą 110, twoje 100 ich nie
+pokrywa i po dziesięciu latach jesteś winien \val{ch02.loan.up}.}
+Punktem stałym tej reguły jest \num{10000}, ale reguła wcale cię do niego
+nie przyciąga. Zacznij tysiąc powyżej, a dług ucieka w górę; zacznij tysiąc
+poniżej, od \num{9000}, a ucieka w dół, do zera, spłacony po
+\val{ch02.loan.payoff} miesiącach, czyli po mniej więcej
+\val{ch02.loan.years} latach.
+
+\begin{trapbox}
+\textbf{\enquote{Punkt stały to miejsce, w którym układ w końcu się
+znajdzie.}} To miejsce, w którym układ pozostaje, jeśli jest w nim
+dokładnie. Czy układ w pobliżu zbliża się do niego, czy się oddala, to
+osobne pytanie, a punkt stały kredytu odpycha każdy inny stan długu. Punkt
+stały, który przyciąga pobliskie stany, jest \emph{stabilny}; taki, który
+je odpycha, jest \emph{niestabilny}. Znalezienie punktu stałego mówi ci,
+gdzie szukać; dopiero jego stabilność mówi, czy cokolwiek tam będzie.
+\end{trapbox}
+
+\noindent
+Różnicę robi jedna liczba. Prześledź przez jeden krok odległość między
+stanem $x$ a punktem stałym $x^{*}$:
+\[ f(x) - x^{*} = (a\,x + b) - (a\,x^{*} + b) = a\,(x - x^{*}) . \]
+Pierwszy znak równości korzysta z tego, że $x^{*}$ jest stały, więc
+$a\,x^{*} + b$ równa się $x^{*}$. Wyraz $b$ się skraca, a to, co zostaje,
+mówi: \textbf{każdy krok mnoży odległość przez $a$}. Tabletki ją połowią;
+kredyt powiększa ją o 1 procent miesięcznie; herbata, z $a = \num{0.9}$,
+to powód, dla którego dwa kubki z rozdziału~\ref{ch:models} zbliżały się
+do siebie co minutę o jedną dziesiątą.
+
+Liczy się wielkość $a$, zapisywana $\abs{a}$, która pomija znak:
+$\abs{\num{-0.5}} = \num{0.5}$. Poniżej 1 odległość maleje i punkt stały
+jest stabilny; powyżej 1 rośnie i punkt stały jest niestabilny. Znak mówi
+tylko, czy odległość zostaje po tej samej stronie, czy przeskakuje na
+drugą.
+
+Ujemne $a$ czułeś pod hotelowym prysznicem. Chcesz 38 stopni, woda ma 30, a
+ty przesadzasz: każdy obrót kurka zmienia temperaturę o półtora raza tyle,
+ile wynosi błąd, w przeciwną stronę. Reguła to $x \mapsto x - \num{1.5}(x -
+38)$, czyli $x \mapsto \num{-0.5}\,x + 57$. Z 30 przechodzisz do 42, 36, 39,
+\num{37.5}: za gorąco, za zimno, za gorąco, a każde pudło jest o połowę
+mniejsze od poprzedniego. Szarpnij kurkiem o dwa i pół raza tyle, ile
+wynosi błąd, a $a = \num{-1.5}$: 30, 50, 20, 65, za każdym razem gorzej.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXX@{}}
+\toprule
+mnożnik $a$ & pchnięcie od $x^{*}$ & orbita \\
+\midrule
+powyżej $1$ & rośnie & ucieka, po jednej stronie \\
+między $0$ a $1$ & maleje & zbliża się, z jednej strony \\
+między $-1$ a $0$ & maleje, zmieniając stronę & ustala się, przeskakując \\
+poniżej $-1$ & rośnie, zmieniając stronę & ucieka, w coraz szerszych
+wahaniach \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{lab}{l02_02_fixed}{Gdzie się zatrzyma i czy tam zostanie?}
+Dla reguły $x \mapsto a\,x + b$ napisz \code{fixed\_point};
+\code{is\_stable}, która rozstrzyga, czy pchnięcie od punktu stałego maleje
+(spróbuj: zacznij trochę obok, zrób jeden krok, porównaj odległości); oraz
+\code{steps\_to\_settle}.
+\end{lab}
+
+\section{Nachylenie: ile razy mnoży się pchnięcie}
+\label{sec:ch02-slope}
+\index{nachylenie}
+
+\noindent
+Mnożnik $a$ ma drugą nazwę, której używa reszta książki. Narysuj regułę
+tabletek jako wykres, z obecnym stanem na osi poziomej i następnym na
+pionowej: to prosta $y = \num{0.5}\,x + 100$. Przesuń się wzdłuż osi
+poziomej ze 150 do 151, o jedną jednostkę, a prosta wzniesie się ze 175 do
+\num{175.5}, o pół jednostki. \emph{Nachylenie} wykresu w punkcie to
+właśnie to: \textbf{o ile przesuwa się wynik na każdą jednostkę
+przesunięcia wejścia}. Prosta ma wszędzie to samo nachylenie, a dla
+$x \mapsto a\,x + b$ to nachylenie wynosi $a$. Zatem odkrycie z
+poprzedniego podrozdziału, w słowach, których używa reszta książki,
+brzmi: \emph{mały błąd jest na każdym kroku mnożony przez nachylenie}.
+
+Krzywa też ma nachylenie, ale zmienia się ono od punktu do punktu, tak jak
+zbocze jest w jednym miejscu strome, a w innym prawie płaskie. Mierzysz je
+w punkcie, pchając: przesuń wejście o maleńką wielkość $h$ w obie strony od
+$x$, zobacz, o ile przesunął się wynik, i podziel,
+\[ \text{nachylenie w } x \approx \frac{f(x + h) - f(x - h)}{2h} , \]
+gdzie $\approx$ znaczy \enquote{prawie równe}. W funkcji \code{slope} z
+\pkg{chaoslab} pchnięcie $h$ to jedna milionowa: przyrost w górę podzielony
+przez przyrost w bok, na odcinku zbyt krótkim, by krzywa zdążyła się
+wygiąć.
+
+\pyregion{code/ch02/slope.py}{measure}{Nachylenie zmierzone pchnięciem, na prostej i na krzywej}{lst:ch02-slope}
+
+\transcript{ch02-slope}
+
+\noindent
+Nachylenie prostej wynosi \num{0.5}, gdziekolwiek je zmierzysz; krzywa
+reguła $x \mapsto x \times x$ jest tym bardziej stroma, im dalej w prawo.
+
+\begin{think}
+Reguła kwadratu ma nachylenie $3$ w punkcie \num{1.5}. Chciałeś podać jej
+\num{1.5}, a podałeś \num{1.501}, z błędem \num{0.001}. O ile mniej więcej
+pomyli się wynik?
+\end{think}
+\reveal{O mniej więcej \num{0.003}: błąd mnoży się przez nachylenie.
+Dokładnie: $\num{1.501} \times \num{1.501} - \num{2.25} =
+\val{ch02.nudge.exact}$.}
+To fakt, który stoi za każdą odległością w tym rozdziale, teraz na
+krzywej: błąd mnoży się przez nachylenie w miejscu, w którym akurat jest.
+Na prostej ten czynnik się nie zmienia i dlatego ten rozdział może wszystko
+przewidzieć. W regule kwadratu się zmienia: między $0$ a \num{0.5}
+nachylenie jest mniejsze niż 1 i błędy maleją, powyżej \num{0.5} jest
+większe niż 1 i rosną. Oto więc pytanie, na które ten rozdział nie odpowie.
+Co robi orbita, jeśli jej reguła jest krzywa, tak że orbita wciąż
+przechodzi z miejsc, które zmniejszają błędy, do miejsc, które je
+rozciągają? Rozdział~\ref{ch:feedback} wygina prostą, a
+rozdział~\ref{ch:logistic} śledzi orbitę, która robi dokładnie to.
+
+\section{Zobaczyć to: diagram pajęczynowy}
+\label{sec:ch02-cobweb}
+\index{diagram pajęczynowy}
+
+\noindent
+Iterację można oglądać na wykresie samej reguły, z ołówkiem i bez
+rachunków. Narysuj prostą reguły i przekątną $y = x$, której wysokość
+zawsze równa się położeniu na osi poziomej. Potem:
+
+\begin{enumerate}
+\item Od $x_0$ na osi poziomej idź w górę lub w dół do prostej. Wysokość,
+  na którą dojdziesz, to $x_1$.
+\item Idź poziomo do przekątnej, gdzie wysokość równa się położeniu:
+  stoisz teraz nad $x_1$, gotowym do użycia jako następne wejście.
+\item W górę lub w dół do prostej daje $x_2$; w bok do przekątnej i tak
+  dalej.
+\end{enumerate}
+
+\noindent
+Narożniki tej ścieżki to narysowana orbita. Funkcja \code{cobweb} z
+\pkg{chaoslab} je wypisuje; dla tabletek, zaczynając od pustego krwiobiegu:
+
+\pyregion{code/ch02/cobweb_steps.py}{corners}{Narożniki pajęczyny dla tabletek}{lst:ch02-cobweb}
+
+\transcript{ch02-cobweb}
+
+\noindent
+Narożniki na przekątnej niosą orbitę, każdą liczbę dwa razy: $0$, $100$,
+$150$, $175$. Ścieżka może się zatrzymać tylko tam, gdzie prosta przecina
+przekątną, bo tam $x = f(x)$: przecięcie to punkt stały, który widać.
+
+\begin{think}
+Prosta kredytu, $y = \num{1.01}\,x - 100$, jest bardziej stroma niż
+przekątna. Czy ścieżka, która zaczyna trochę z boku przecięcia, wspina się
+ku przecięciu, czy się od niego oddala?
+\end{think}
+\reveal{Oddala się. Każdy krok mnoży odległość od przecięcia przez
+\num{1.01}, więc ścieżka ląduje za każdym razem trochę dalej, po tej
+stronie, po której zaczęła.}
+
+\plotfig{ch02-cobweb}{Pajęczyny na trzech prostych, które przecinają
+przekątną w $200$. Nachylenie o wielkości mniejszej niż jeden wciąga
+ścieżkę do przecięcia \dash{} jako schodki, gdy nachylenie jest dodatnie,
+jako pajęczynę, gdy ujemne \dash{} a nachylenie większe niż jeden ją
+wypycha.}{pajęczyna na prostej}
+
+\noindent
+Gdy nachylenie jest ujemne, ścieżka owija się wokół przecięcia i to od tej
+pajęczyny diagram wziął nazwę. Trzy panele to narysowana tabela z
+podrozdziału~\ref{sec:ch02-stability}.
+
+Masz więc coś rzadkiego w tej książce: pełną zdolność przewidywania. Mając
+$x \mapsto a\,x + b$ i punkt startu, możesz bez robienia choćby jednego
+kroku powiedzieć, co reguła będzie robić zawsze \dash{} ustali się w
+$b/(1 - a)$, jeśli $\abs{a} < 1$, ucieknie, jeśli $\abs{a} > 1$, będzie się
+wahać naprzemiennie, jeśli $a$ jest ujemne \dash{} i jak długo to potrwa.
+Tę pewność odbiera reszta książki: wygnij prostą, a reguła długości jednej
+linijki potrafi robić rzeczy, których nie przewidzi żaden wzór z tego
+rozdziału.
+
+\begin{summarybox}[unbreakable]
+\begin{itemize}
+\item \textbf{Reguła następnego kroku} zamienia obecny stan w następny,
+  $x_{n+1} = f(x_n)$. Powtarzanie jej to \textbf{iteracja}; lista stanów to
+  \textbf{orbita}.
+\item Oszczędności, stygnięcie i dawkowanie leków podlegają
+  \textbf{regule liniowej}, $x \mapsto a\,x + b$: rośnie bez ograniczeń,
+  zanika do zera albo się ustala; ujemne $a$ sprawia, że
+  \textbf{oscyluje naprzemiennie}.
+\item Wzrost \textbf{wykładniczy} jest proporcjonalny, niekoniecznie
+  szybki. \textbf{Logarytm} mówi, ile kroków zajmuje zmiana o czynnik $r$,
+  $\ln r / \ln a$: stąd czas podwojenia i okres półtrwania.
+\item \textbf{Punkt stały} to stan, którego reguła nie zmienia: rozwiąż
+  $x = f(x)$, co dla reguły liniowej daje $b/(1 - a)$.
+\item Każdy krok mnoży odległość od punktu stałego przez $a$: punkt jest
+  \textbf{stabilny}, gdy $\abs{a} < 1$, a \textbf{niestabilny}, gdy
+  $\abs{a} > 1$, i w niestabilnym nic nie kończy.
+\item \textbf{Nachylenie}, czyli o ile przesuwa się wynik na jednostkę
+  przesunięcia wejścia, to czynnik, przez który mały błąd mnoży się w
+  jednym kroku. Nachylenie krzywej zmienia się od punktu do punktu.
+\item \textbf{Diagram pajęczynowy} rysuje orbitę na wykresie reguły; na
+  prostej zbliża się do przecięcia z przekątną, gdy nachylenie ma wielkość
+  mniejszą niż jeden.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Dla reguły $x \mapsto 3x - 2$ i startu $x_0 = 2$ ile wynoszą $x_1$,
+  $x_2$ i $x_3$?
+  \answerto{$4$, $10$ i $28$.}
+\item Herbata traci co minutę jedną piątą różnicy do pokoju o temperaturze
+  20 stopni. Zapisz jej regułę w postaci $x \mapsto a\,x + b$.
+  \answerto{$x \mapsto x - \num{0.2}(x - 20)$, czyli $\num{0.8}\,x + 4$.}
+\item Miasto rośnie o 3 procent rocznie. Oszacuj czas podwojenia regułą
+  70, a potem powiedz, co daje liczenie pełnych lat.
+  \answerto{Około $70 / 3$, czyli 23 lata. Licząc lata, liczba mieszkańców
+  po raz pierwszy przekracza podwojenie w roku \val{ch02.dbl.three.count};
+  logarytm daje \val{ch02.dbl.three.log}.}
+\item Znajdź punkt stały reguły $x \mapsto \num{0.8}\,x + 4$. Czy jest
+  stabilny?
+  \answerto{$\num{0.2}\,x = 4$, więc $x = 20$, temperatura pokoju;
+  stabilny, bo $\abs{\num{0.8}} < 1$.}
+\item Reguła $x \mapsto 3x - 2$ ma punkt stały w $1$. Czy jest stabilny? Co
+  pokazuje pierwsze pytanie?
+  \answerto{Niestabilny: każdy krok potraja odległość. Orbita z $2$ jest o
+  jeden od punktu stałego, potem o $3$, $9$ i $27$: $4$, $10$, $28$.}
+\item Reguła prysznica $x \mapsto \num{-0.5}\,x + 57$ ma nachylenie
+  \num{-0.5}. Jest ci o 2 stopnie za zimno. Gdzie jesteś po jednym obrocie
+  kurka?
+  \answerto{1 stopień za gorąco: błąd zmalał o połowę i zmienił stronę.}
+\end{checkpoint}

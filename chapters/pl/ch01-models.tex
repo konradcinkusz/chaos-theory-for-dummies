@@ -1,0 +1,406 @@
+%% ch01 --- Model to maszyna do przewidywania
+%%
+%% Napisany we wrześniu 2026 jako wzorzec dla wszystkich kolejnych rozdziałów.
+%% Każda liczba, której czytelnik nie policzy w pamięci, pochodzi z
+%% code/measure/ch01.py, który importuje TE SAME reguły, które drukują listingi
+%% (code/ch01/), więc strona i listing nie mogą się rozejść.
+%%
+%% Bliźniak: chapters/en/ch01-models.tex. Podrozdział za podrozdziałem, makro
+%% za makrem, liczba za liczbą; tools/parity.py je porównuje.
+
+\chapter{Model to maszyna do przewidywania}
+\label{ch:models}
+\index{model}
+
+\noindent
+Korzystasz z modeli matematycznych codziennie, nawet jeśli tak ich nie
+nazywasz. Aplikacja, która mówi, że pociąg przyjedzie za siedem minut, liczy
+jakiś model. Tak samo minutnik w piekarniku, tablica pływów, dawkowanie na
+ulotce leku i cichy głos, który podpowiada, że trzeba wyjść dziesięć po
+ósmej, żeby zdążyć na dziewiątą. Każdy z nich bierze kilka liczb o tym, co
+jest teraz, stosuje regułę i podaje ci liczbę o tym, co będzie później.
+
+Ta książka opowiada o tym, co dzieje się z tą obietnicą. Pierwsze cztery
+rozdziały pokazują, jak dobrze działa \dash{} jak linijka algebry potrafi
+powiedzieć, gdzie będzie kamień, jak gorąca będzie twoja herbata i kiedy
+wróci kometa. Reszta książki pokazuje, gdzie się łamie, dlaczego łamie się
+nawet wtedy, gdy reguła jest doskonała, i co wciąż da się przewidzieć, gdy
+to się stanie. To ostatnie jest powodem, by ją przeczytać: to pęknięcie nie
+jest porażką matematyki, a znajomość jego kształtu zmienia to, w co
+powinieneś wierzyć przy każdej prognozie, jaką ktoś ci poda.
+
+\begin{outcomes}
+\outcome{nazwać stan, regułę i przewidywanie każdego modelu, który ktoś ci
+  pokaże}
+\outcome{uruchomić model napisany w Pythonie i przeczytać to, co wypisuje}
+\outcome{powiedzieć, co znaczy, że model jest błędny, i dlaczego błędny
+  model wciąż może być użyteczny}
+\outcome{powiedzieć, co dzieje się z małym błędem stanu początkowego w dwóch
+  modelach z tego rozdziału}
+\outcome{przytoczyć zegarmistrzowskie twierdzenie Laplace'a z 1814 roku i
+  pytanie, które reszta książki mu zadaje}
+\end{outcomes}
+
+\section{Trzy części każdego modelu}
+\label{sec:ch01-parts}
+\index{model!stan}\index{model!reguła}\index{model!przewidywanie}
+
+\noindent
+Upuść kamień z mostu. Ile przeleci w ciągu trzech sekund?
+
+Fizyk odpowie wzorem, który możesz pamiętać ze szkoły: kamień spadający
+swobodnie przy powierzchni Ziemi pokonuje drogę
+\[ d = \tfrac{1}{2}\, g\, t^{2} \]
+w ciągu $t$ sekund, gdzie $g$ to mniej więcej \val{ch01.g} metra na sekundę
+na sekundę. Ta jedna linijka to kompletny model i ma trzy części, które
+znajdziesz w każdym modelu w tej książce.
+
+\begin{itemize}
+\item \textbf{Stan}: liczby, które mówią, jak jest teraz. Tutaj to jedna
+  liczba \dash{} czas $t$ od chwili puszczenia kamienia.
+\item \textbf{Reguła}: jak te liczby zamieniają się w to, co chcesz wiedzieć.
+  Tutaj to wzór.
+\item \textbf{Przewidywanie}: to, co mówi reguła. Tutaj \dash{} droga.
+\end{itemize}
+
+\begin{think}
+Podstaw do wzoru $t = 3$. Mniej więcej ile przeleciał kamień: około $10$
+metrów, około $30$, czy około $45$?
+\end{think}
+\reveal{Około \val{ch01.stone.three} metra: połowa z \val{ch01.g}, razy
+$3 \times 3 = 9$.}
+Jeśli odpowiedziałeś dziesięć albo trzydzieści, jesteś w dobrym
+towarzystwie: większość ludzi zaniża, bo kamień nie spada ze stałą
+prędkością. Ciągle przyspiesza, więc droga rośnie z \emph{kwadratem} czasu.
+Trzy razy dłuższy lot to dziewięć razy dłuższa droga.
+
+To pierwsza rzecz, którą daje ci model: łapie intuicję, która miała cię
+zmylić. Nikt nie ma wyczucia dla $t^{2}$. Wzór go nie potrzebuje.
+
+\begin{trapbox}
+\textbf{\enquote{Model to kopia rzeczywistości.}} Nie jest, i nic w
+powyższym wzorze nie przypomina kamienia. Model to maszyna do odpowiadania
+na pytania: wkładasz liczby, dostajesz liczby, a jedyny uczciwy test polega
+na tym, czy te liczby zgadzają się z tym, co potem zmierzysz. Mapa nie jest
+terenem, a model nie jest nawet mapą \dash{} to mapa, która dodatkowo mówi
+ci, o której dojedziesz.
+\end{trapbox}
+
+\section{Twoje laboratorium}
+\label{sec:ch01-lab}
+\index{Python}\index{laboratorium}
+
+\noindent
+Każdą liczbę w tej książce, której nie dało się policzyć w pamięci, policzył
+mały program, a każdy z tych programów leży w repozytorium książki w
+katalogu \code{code/}. Nie musisz być programistą, żeby je czytać. Są
+krótkie, napisane tak, żeby dało się je czytać, i każdy jest objaśniony przy
+pierwszym pojawieniu się. Oto kamień.
+
+\pyregion{code/ch01/falling_stone.py}{model}{Spadający kamień jako model: jedna stała, jedna reguła}{lst:ch01-stone}
+
+\noindent
+Czytaj go tak, jak czytasz wzór. Wiersz zaczynający się od \code{G =}
+ustala stałą. Wiersze zaczynające się od \code{def distance} definiują
+regułę: podaj jej czas \code{t}, a zwróci \code{0.5 * G * t * t}, czyli wzór
+z rozpisanymi mnożeniami. Tekst w potrójnych cudzysłowach to notatka dla
+czytelnika, a wszystko po znaku \code{\#} to komentarz. Potem program
+zadaje regule pytanie dla każdej pełnej sekundy od $0$ do $5$:
+
+\pyregion{code/ch01/falling_stone.py}{table}{Sześć pytań zadanych modelowi}{lst:ch01-table}
+
+\noindent
+\code{for t in range(6)} znaczy \enquote{wykonaj następny wiersz z
+\code{t} równym $0$, potem $1$ i tak dalej aż do $5$}. Uruchom go z katalogu
+\code{code/} poleceniem \code{uv run python ch01/falling\_stone.py}, a
+wypisze:
+
+\transcript{ch01-falling-stone}
+
+\noindent
+Spójrz na prawą kolumnę. W pierwszej sekundzie kamień spada około pięciu
+metrów, a w pięć sekund \val{ch01.stone.five} metra. Jeśli kiedykolwiek
+upuściłeś coś z wysokości i liczyłeś, ta druga liczba wydaje się za duża,
+a wcale taka nie jest.
+
+\begin{note}
+Materiał wstępny mówi, jak zainstalować laboratorium: jedno narzędzie,
+\pkg{uv}, które instaluje dokładnie tę wersję Pythona, na której sprawdzono
+książkę (\pypatch), i każdy pakiet w dokładnie tej wersji, którą podaje
+strona redakcyjna. Potem \code{uv run python} z nazwą pliku uruchamia
+dowolny listing z książki. Jeśli wolisz niczego nie uruchamiać, wynik
+każdego listingu jest wydrukowany obok; uruchamianie ich to sposób, żeby
+przekonać się, że książka nie prosi cię o wiarę na słowo.
+\end{note}
+
+\begin{lab}{l01_01_stone}{Kamień w obie strony}
+Model odpowiada na pytania w więcej niż jednym kierunku. Podaj mu czas, a
+poda drogę; podaj drogę, a poda czas; podaj zmierzony spadek, a powie, ile
+musi wynosić grawitacja. Plik startowy zawiera trzy funkcje z opisami i bez
+treści. Uzupełnij je, aż test przejdzie. Druga potrzebuje pierwiastka
+kwadratowego, który w Pythonie nazywa się \code{math.sqrt}.
+\end{lab}
+
+\section{Model, który robi kroki}
+\label{sec:ch01-steps}
+\index{model!krokowy}\index{prawo stygnięcia Newtona}
+
+\noindent
+Wzór na kamień pozwala przeskoczyć od razu do dowolnej chwili. Większość
+modeli na to nie pozwala. Nalej herbatę o temperaturze
+\val{ch01.tea.start}\,°C w pokoju, w którym jest \val{ch01.tea.room}\,°C.
+Isaac Newton opisał w 1701 roku, jak stygnie, a w postaci, której używa ta
+książka, jego reguła mówi: \emph{co minutę herbata traci stały ułamek
+różnicy między sobą a pokojem}. Niech ten ułamek wynosi \val{ch01.tea.k},
+czyli jedną dziesiątą.
+
+\begin{think}
+Na początku różnica wynosi $90 - 20 = 70$ stopni. Jaka będzie temperatura
+minutę później?
+\end{think}
+\reveal{\val{ch01.tea.one}\,°C. Jedna dziesiąta różnicy to $7$, a
+$90 - 7 = 83$.}
+Żeby znać temperaturę po dwóch minutach, robisz to samo jeszcze raz, z
+$83$: różnica wynosi teraz $63$, jedna dziesiąta z niej to \num{6.3}, a
+herbata ma \num{76.7}. Nie ma skrótu, który powinieneś znać. Reguła mówi, jak
+przejść od jednej minuty do następnej, a żeby dojść gdziekolwiek indziej,
+robisz krok po kroku.
+
+\pyregion{code/ch01/cooling_cup.py}{rule}{Reguła następnej minuty}{lst:ch01-rule}
+
+\noindent
+Funkcja \code{next\_minute} to cały model. Dostaje temperaturę teraz i zwraca
+temperaturę minutę później. Żeby zobaczyć przyszłość, wywołujesz ją raz za
+razem, podając jej z powrotem każdą odpowiedź:
+
+\pyregion{code/ch01/cooling_cup.py}{run}{Każda odpowiedź wraca na wejście, trzydzieści razy}{lst:ch01-run}
+
+\transcript{ch01-cooling-cup}
+
+\noindent
+Wiersz \code{temp = next\_minute(temp)} to najważniejszy wiersz tej książki i
+zobaczysz go w każdym rozdziale pod inną nazwą. Zastępuje stan następnym
+stanem. Robienie tego raz za razem nazywa się \emph{iteracją}, a
+rozdział~\ref{ch:iteration} jest wyłącznie o niej.
+
+\begin{think}
+Z wydruku wynika, że herbata ma więcej niż $60$\,°C w minucie $5$. Czy
+ma mniej niż $60$ w minucie $6$? Co trzeba zrobić, żeby mieć pewność?
+\end{think}
+\reveal{Tak: pierwszy raz spada poniżej $60$ w minucie
+\val{ch01.tea.drinkable}. Żeby mieć pewność, robisz regułą jeszcze jeden
+krok albo prosisz program o każdą minutę zamiast co piątej.}
+Tak zadaje się pytanie modelowi krokowemu: robisz kroki, aż pojawi się
+odpowiedź. Dlatego też modele krokowe były rzadkie przed komputerami, a
+teraz są wszędzie. Maszynie nie przeszkadza milion kroków.
+
+\plotfig{ch01-two-models}{Dwa modele tego samego rodzaju pytania. Wzór na
+kamień podaje dowolną chwilę od razu; reguła herbaty podaje następną minutę,
+a krzywa to jej kroki połączone ze sobą.}{wzór i reguła krokowa}
+
+\begin{lab}{l01_02_cooling}{Kiedy da się to wypić?}
+Napisz \code{cool}, które stosuje regułę przez zadaną liczbę minut i
+zapamiętuje każdą temperaturę, oraz \code{minutes\_until}, które odpowiada na
+pytanie, jakie człowiek naprawdę zadaje. Twoja odpowiedź dla kubka o
+$90$\,°C, pokoju o $20$ i ułamka \num{0.1} powinna się zgadzać z tą powyżej.
+\end{lab}
+
+\section{Błędny i użyteczny}
+\label{sec:ch01-wrong}
+\index{model!błąd}
+
+\noindent
+Żaden z tych modeli nie jest prawdziwy. Wzór na kamień pomija powietrze, a
+piórko upuszczone obok kamienia pokazuje, jak bardzo może to mieć znaczenie.
+Reguła herbaty pomija kubek, spodek, parę i twoją łyżeczkę. Zmierz dokładnie,
+a przekonasz się, że oba są błędne.
+
+\begin{think}
+Skoro wzór na kamień pomija powietrze, a powietrze oczywiście ma znaczenie,
+to czy ten wzór jest bezużyteczny?
+\end{think}
+\reveal{Nie. Dla kamienia spadającego kilka sekund jest dokładny co do
+szerokości dłoni; dla piórka myli się bardzo. Model jest użyteczny do pytań,
+na które odpowiada wystarczająco dobrze, a twoim zadaniem jest wiedzieć,
+które to pytania.}
+
+\begin{trapbox}
+\textbf{\enquote{Model, który jest błędny, jest bezużyteczny.}} Każdy model
+jest błędny, bo każdy coś pomija \dash{} właśnie dlatego jest dość mały, żeby
+go używać. Często cytowane zdanie statystyka George'a Boxa mówi to samo
+krócej: wszystkie modele są błędne, ale niektóre są użyteczne. Użyteczne
+pytanie nigdy nie brzmi \enquote{czy jest prawdziwy?}, tylko \enquote{czy
+jest wystarczająco dobry do tego pytania, w tym zakresie?}. Zapamiętaj to
+pytanie. Część~II tej książki dotyczy zakresu, w którym model bez żadnego
+błędu w regule przestaje być wystarczająco dobry, a powód nie jest tym,
+czego byś się spodziewał.
+\end{trapbox}
+
+\noindent
+Model można sprawdzić pomiarem, i to w obie strony. Upuść kamień z
+dziesięciometrowego muru, a wzór powie, że wyląduje po
+\val{ch01.stone.ten.time} sekundy. Zmierz prawdziwy spadek, dostań trochę
+inną liczbę, a możesz odwrócić wzór i zapytać, ile musiałoby wynosić $g$. To
+trzecia funkcja z pierwszego laboratorium powyżej i tak model zdobywa
+zaufanie: formułując przewidywania na tyle ostre, że mogłyby okazać się
+błędne \dash{} i nie okazując się.
+
+\section{Co dzieje się z małym błędem?}
+\label{sec:ch01-error}
+\index{błąd!stanu początkowego}
+
+\noindent
+Oto pytanie, na którym opiera się cała książka, zadane najłagodniejszemu z
+jej modeli. Nigdy nie znasz stanu początkowego dokładnie. Termometr pokazuje
+$90$\,°C, a herbata ma naprawdę $91$. O ile pomylisz się pół godziny później?
+
+\begin{think}
+Dwa kubki zaczynają z różnicą jednego stopnia i stygną według tej samej
+reguły. Po trzydziestu minutach różnica między nimi jest większa niż jeden
+stopień, wciąż równa jednemu stopniowi, czy mniejsza?
+\end{think}
+\reveal{Mniejsza: około \val{ch01.gap.thirty}\,°C. Co minutę różnica jest
+mnożona przez \val{ch01.gap.factor}, bo każdy kubek traci jedną dziesiątą
+własnej odległości od temperatury pokoju.}
+
+\pyregion{code/ch01/two_cups.py}{gap}{Dwa kubki różniące się o jeden stopień}{lst:ch01-gap}
+
+\transcript{ch01-two-cups}
+
+\noindent
+Błąd nie tylko pozostaje mały; znika. Co minutę jest mnożony przez
+\val{ch01.gap.factor}, więc po dziesięciu minutach wynosi mniej więcej
+trzecią część stopnia, a po \val{ch01.gap.hundredth} minutach mniej niż
+setną część. W skali logarytmicznej, w której każdy krok w dół to
+dziesięciokrotność, różnica spada wzdłuż linii prostej:
+
+\plotfig{ch01-gap-shrinks}{Różnica między dwoma kubkami, które zaczęły z
+różnicą jednego stopnia. W skali logarytmicznej spada wzdłuż linii prostej:
+co minutę znika ten sam ułamek.}{błąd, który zanika}
+
+\noindent
+Zapamiętaj tę prostą. Model, którego błędy maleją, wybacza ci, że nie znasz
+stanu początkowego. Model kamienia jest prawie równie łaskawy: pomyl się o
+jedną dziesiątą sekundy co do chwili puszczenia, a twoje przewidywanie
+będzie przesunięte o stały czas na zawsze, nigdy o więcej. Większość
+matematyki, którą poznałeś w szkole, opisuje takie układy i dlatego myśl,
+że przyroda jest przewidywalna, wydaje się zdrowym rozsądkiem.
+
+\begin{worldbox}
+Dawkowanie na ulotce leku opiera się na modelu tego rodzaju. Większość leków
+jest usuwana z krwi w mniej więcej stałym ułamku na godzinę, dokładnie tak,
+jak herbata traci stały ułamek swojej różnicy (alkohol to słynny wyjątek),
+więc dawka przyjęta trochę za późno albo trochę za duża zostawia błąd, który
+maleje, a nie rośnie. Ta wyrozumiałość sprawia, że schemat dawkowania w ogóle
+da się wydrukować na opakowaniu.
+\end{worldbox}
+
+\section{Mechanizm zegara}
+\label{sec:ch01-clockwork}
+\index{demon Laplace'a}\index{kometa Halleya}\index{wszechświat jak zegar}
+
+\noindent
+W XVIII wieku modele takie jak te dokonały czegoś zdumiewającego. Edmond
+Halley, korzystając z Newtonowskich praw ruchu i grawitacji, dowodził, że
+komety widziane w latach 1531, 1607 i 1682 to jeden obiekt na jednej
+orbicie, i przewidział, że wróci około 1758 roku. Zmarł w 1742. Kometę
+zobaczono ponownie w noc Bożego Narodzenia 1758 roku i od tamtej pory nosi
+jego imię.
+
+Reguła na papierze sięgnęła siedemdziesiąt sześć lat w przyszłość i miała
+rację. Pierre-Simon Laplace wyciągnął z tego wniosek w 1814 roku, we
+fragmencie, który w wolnym przekładzie brzmi:
+
+\begin{quote}
+Umysł, który w danej chwili znałby wszystkie siły ożywiające przyrodę i
+wzajemne położenie wszystkich tworzących ją bytów \dash{} umysł dość
+rozległy, by poddać te dane analizie \dash{} objąłby jednym wzorem ruchy
+największych ciał wszechświata i najlżejszego atomu; nic nie byłoby dla
+niego niepewne, a przyszłość, tak jak przeszłość, stałaby mu przed oczami.
+\end{quote}
+
+\noindent
+Ten wyobrażony umysł nazywa się \emph{demonem Laplace'a}, a obraz, który za
+nim stoi, \emph{wszechświatem jak mechanizm zegara}: znaj regułę i
+teraźniejszość, a przyszłość wynika z nich tak pewnie jak ruch wskazówek
+zegara. W 1960 roku fizyk Eugene Wigner pisał o \enquote{niepojętej
+skuteczności matematyki w naukach przyrodniczych} i miał na myśli to samo
+zdumienie: reguły spisane przez ludzi przy biurkach wciąż okazują się mieć
+rację co do świata.
+
+\mermaidfig{ch01-model-loop}{Każdy model w tej książce ma ten kształt. Stan
+wchodzi, reguła zamienia go w przewidywanie, a pomiar decyduje, czy mu
+ufać.}{stan, reguła, przewidywanie, sprawdzenie}
+
+\begin{think}
+Załóżmy, że reguła jest dokładna \dash{} nie w przybliżeniu poprawna, tylko
+idealnie poprawna \dash{} i że ją znasz. Czy możesz wtedy przewidywać
+przyszłość dowolnie daleko?
+\end{think}
+\reveal{Tylko jeśli dokładnie znasz też stan początkowy, a nigdy go nie
+znasz. Dla herbaty i kamienia nie ma to prawie znaczenia, bo błąd stanu
+początkowego maleje albo pozostaje taki sam. Czy zawsze zachowuje się tak
+łaskawie \dash{} na to pytanie odpowiada reszta tej książki.}
+
+\noindent
+Większość ludzi odpowiada \enquote{tak}, i tak samo odpowiadała większość
+naukowców przez dwieście lat po Laplace'u. Zapamiętaj swoją odpowiedź. W
+rozdziale~\ref{ch:logistic} poznasz regułę długości jednej linijki, prostszą
+niż reguła herbaty, której błędy wcale nie maleją; w
+rozdziale~\ref{ch:butterfly} zmierzysz, jak szybko rosną; a pod koniec
+książki będziesz umieć powiedzieć, liczbami, które sam policzysz, dlaczego
+niektóre rzeczy da się przewidzieć na sto lat naprzód, a innych nawet na
+dwa tygodnie. To jest teoria chaosu, i nie jest to teoria nieładu. To
+matematyka dokładnie tego pytania.
+
+\begin{summarybox}
+\begin{itemize}
+\item Każdy model ma trzy części: \textbf{stan} (liczby, które mówią, jak
+  jest teraz), \textbf{regułę} (jak się zmieniają albo jak zamieniają się w
+  odpowiedź) i \textbf{przewidywanie} (co mówi reguła).
+\item Niektóre modele to wzory, które da się obliczyć dla dowolnej chwili.
+  Większość to \textbf{reguły krokowe}: mówią, jak przejść od teraz do
+  następnej chwili, a do przyszłości dochodzisz, stosując je raz za razem.
+  To jest iteracja.
+\item Każdy model jest błędny, bo każdy coś pomija. Użyteczne pytanie brzmi:
+  czy jest wystarczająco dobry do tego pytania, w tym zakresie.
+\item W przypadku stygnącej herbaty błąd stanu początkowego \textbf{maleje}
+  co minutę o ten sam czynnik; w przypadku kamienia pozostaje taki sam.
+  Takie modele wybaczają ci, że nie znasz stanu początkowego dokładnie.
+\item Demon Laplace'a to zegarmistrzowskie twierdzenie: znaj dokładnie
+  regułę i teraźniejszość, a przyszłość z nich wynika. Reszta książki je
+  sprawdza.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Nazwij stan, regułę i przewidywanie rozkładu jazdy autobusu.
+  \answerto{Stanem jest aktualna godzina i przystanek, na którym jesteś;
+  regułą jest rozkład (razem z założeniem, że autobus się go trzyma);
+  przewidywaniem jest godzina przyjazdu następnego autobusu.}
+\item Ile przeleci kamień w ciągu pierwszych dwóch sekund, bez oporu
+  powietrza? A w ciągu czterech?
+  \answerto{Około \num{19.6} metra w dwie sekundy i około \num{78.5} w
+  cztery. Dwa razy dłuższy czas, cztery razy dłuższa droga.}
+\item Herbata o $80$\,°C stygnie w pokoju o $20$\,°C, tracąc co minutę
+  jedną dziesiątą różnicy. Jaką ma temperaturę po jednej minucie, a jaką po
+  dwóch?
+  \answerto{$74$\,°C, a potem \num{68.6}\,°C: różnica zmienia się z $60$ na
+  $54$, a potem na \num{48.6}.}
+\item Dwa kubki zaczynają z różnicą dwóch stopni w tym samym pokoju i stygną
+  według tej reguły. O ile różnią się po jednej minucie?
+  \answerto{O \num{1.8} stopnia: każdy kubek traci jedną dziesiątą własnej
+  różnicy do temperatury pokoju, więc ich różnica też traci jedną
+  dziesiątą.}
+\item Dlaczego model, o którym wiadomo, że jest błędny, wciąż może być
+  użyteczny?
+  \answerto{Bo każdy model coś pomija, a użyteczność to kwestia tego, czy
+  jego odpowiedzi są wystarczająco bliskie dla zadawanego pytania, w
+  zakresie, w którym się go używa.}
+\item Co musiałby znać demon Laplace'a, żeby przewidzieć przyszłość, i której
+  z tych rzeczy według reszty książki nigdy nie da się znać dokładnie?
+  \answerto{Regułę i dokładny stan obecny. Regułę można znać dokładnie; stanu
+  obecnego nigdy, bo każdy pomiar ma błąd.}
+\end{checkpoint}

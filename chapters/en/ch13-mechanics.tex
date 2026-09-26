@@ -1,0 +1,434 @@
+%% ch13 --- Pendulums and planets
+%%
+%% Written September 2026. Every number the reader cannot do in their head
+%% comes from code/measure/ch13.py, which imports the SAME functions the
+%% listings print (code/ch13/). The double pendulum calls sin and cos, whose
+%% last binary digit can differ between machines, so nothing is committed
+%% from late in a chaotic run: the parting time is taken long before a
+%% last-digit difference could matter, and the script refuses to write any
+%% printed number that a changed step or a release moved by 1e-12 rad would
+%% change.
+%%
+%% WHAT THIS CHAPTER MAY NOT SAY. The Lyapunov exponent and the horizon
+%% formula are Chapter 7's; they are used here, not derived. The strange
+%% attractor and the idea that statistics survive when paths do not are
+%% Chapter 9's; this chapter only points at them. Shadowing -- whether a
+%% computed chaotic path is near SOME true one -- is Chapter 16's, and the
+%% note in section 3 stops short of it. The three-body problem is told as
+%% history, not simulated.
+%%
+%% Twin: chapters/pl/ch13-mechanics.tex. Section for section, macro for
+%% macro, number for number; tools/parity.py compares them.
+
+\chapter{Pendulums and planets}
+\label{ch:mechanics}
+\index{double pendulum}\index{solar system}
+
+\noindent
+A grandfather clock keeps time because a pendulum is the most regular thing
+most people will ever own: let it go and it swings at the same beat for as
+long as the clock is wound. Chapter~\ref{ch:motion} showed why: a pendulum's
+state is two numbers, and without friction they go round the same closed loop
+for ever. The clockwork universe of Chapter~\ref{ch:models} was built on this
+kind of mechanics.
+
+Now hang a second pendulum from the bottom of the first, with a hinge where
+the two meet, and let go of it from high up. The rule is still Newton's, it
+is still exact, and nothing in it is random. What does it do? This chapter
+answers with a measurement, then follows the same question from a pendulum on
+a desk to the planets round the Sun, where it was first asked.
+
+\begin{outcomes}
+\outcome{step a double pendulum with RK4 and read its state from a printout}
+\outcome{check a simulation of a system without friction by watching its
+  energy, and say what that check does and does not prove}
+\outcome{measure how far apart two nearly identical releases drift, and
+  test whether the answer depends on the size of the step}
+\outcome{tell a gentle release from a wild one, and say what keeping its
+  energy does and does not decide about a system's future}
+\outcome{separate what has been measured about the solar system's chaos from
+  what is folklore}
+\end{outcomes}
+
+\section{A pendulum on a pendulum}
+\label{sec:ch13-double}
+\index{double pendulum!state}
+
+\noindent
+Take two rods a metre long and hinge the second to the end of the first. Put
+a one-kilogram bob at the hinge and another at the far end; the bobs carry
+all the weight and the rods count as weightless. Hold both arms up,
+120° from hanging straight down, and let go.
+
+\begin{think}
+One pendulum swings with perfect regularity. Do you expect two, one hanging
+from the other, to settle into some pattern that repeats \dash{} more
+complicated than one pendulum's, but regular all the same?
+\end{think}
+\reveal{No. Let go from high up, the double pendulum does not settle into any
+repeating pattern you can find: the lower arm whips round, sometimes right
+over the top, and the motion goes on changing. Nothing random is involved.}
+The difference is the number of numbers. One pendulum's state is two: its
+angle and how fast the angle is changing. A double pendulum's state is four,
+two angles and two rates of change, and Chapter~\ref{ch:motion} said that a
+smooth rule needs at least three numbers to be chaotic.
+
+Newton's laws give a rule of change for the four numbers: given the state
+now, it says how fast each is changing. It is about fifteen lines of
+arithmetic with sines and cosines, and you need not read it to use it; it is
+\api{double\_pendulum} in the book's library, \pkg{chaoslab}.
+Chapter~\ref{ch:motion}'s RK4 steps it a thousandth of a second at a time:
+
+\pyregion{code/ch13/release.py}{setup}{The release: four numbers, and the size of one step}{lst:ch13-setup}
+
+\noindent
+\code{math.radians} turns degrees into radians, the unit Python's sine and
+cosine expect. A full turn is $2\pi$ radians, a little over six, so one
+radian is about 57°. The listing then steps the state for ten seconds and
+prints it every two:
+
+\pyregion{code/ch13/release.py}{run}{Ten seconds of a double pendulum, printed every two}{lst:ch13-run}
+
+\transcript{ch13-release}
+
+\noindent
+Read the arms first. A negative angle is a swing to the other side, and an
+angle beyond 360° means the arm has gone right round: 758° at ten seconds is
+two whole turns and 38° more. The lower arm is whirling. Now read the last
+column.
+
+\section{The number that must not move}
+\label{sec:ch13-energy}
+\index{energy}\index{simulation!energy check}
+
+\noindent
+A pendulum with no friction cannot gain or lose energy: nothing pushes it and
+nothing slows it. Its energy has two parts. Energy of height: each one-kilogram
+bob contributes $g \times h$, where $g$ is \num{9.81} and the height $h$ is
+measured upwards from the pivot. Energy of motion: half of each bob's speed
+squared. As the pendulum falls, height turns into speed, and back again; the
+total stays exactly the same.
+
+\begin{think}
+Suppose you let go of the pendulum with both arms horizontal, pointing the
+same way, at 90°. What is its energy, with heights measured from the pivot?
+\end{think}
+\reveal{Zero. Both bobs are level with the pivot, so both heights are zero,
+and both are still, so there is no energy of motion either.}
+Heights below the pivot count as negative, so a pendulum hanging at rest has
+negative energy; only changes in energy mean anything. For the release in the
+printout, a little geometry puts the upper bob half a metre above the pivot
+and the lower bob a whole metre, so the energy is $\num{9.81} \times
+(\num{0.5} + 1)$, about \val{ch13.energy.start} joules, where the energy
+column starts. Read down that column: over ten seconds of whirling it changes
+by one unit in its eighth decimal place, a hundred-millionth of a joule.
+
+That is the check, and it is the most useful habit in simulating mechanics. A
+computer does not solve the rule; it takes small steps, each slightly wrong.
+The true pendulum keeps its energy exactly, so any change in the simulated
+energy is the stepper's error, measured.
+
+\begin{lab}{l13_01_energy}{The number that must not move}
+Write the double pendulum's energy yourself: \code{heights} gives the height
+of each bob above the pivot, and \code{energy} gives the total. The starter
+explains the one step that needs care: the lower bob is carried by the upper
+one, so its speed combines two swings. The test compares your energy with the
+library's, and then watches it along a swing in which it must not move.
+\end{lab}
+
+\section{A millionth of a radian}
+\label{sec:ch13-apart}
+\index{sensitive dependence!double pendulum}
+
+\noindent
+Now let go of two double pendulums. The second is the first exactly, except
+that its upper arm starts one millionth of a radian further round: at the end
+of a one-metre arm, a thousandth of a millimetre, far thinner than a hair.
+The two obey the same exact rule, with the same step.
+
+\begin{think}
+Both pendulums keep their energy, as the check showed, and nothing random
+touches either. Will the two still swing together at the end of the ten
+seconds printed above? After a minute? Or will they part, and if so, roughly
+when?
+\end{think}
+\reveal{They part. After \val{ch13.apart.seconds} seconds they differ by more
+than a tenth of a radian, about six degrees, which anyone watching would
+see. A few seconds later they are doing completely different things.}
+
+\pyregion{code/ch13/two_releases.py}{gap}{How far apart two pendulums are}{lst:ch13-gap}
+
+\pyregion{code/ch13/two_releases.py}{run}{Two releases a millionth of a radian apart}{lst:ch13-pair}
+
+\transcript{ch13-two-releases}
+
+\noindent
+Python writes \code{7e-05} for $7 \times 10^{-5}$, seven hundred-thousandths.
+The gap does not grow smoothly: it rises and falls as the arms swing. But the
+trend is relentless. From a millionth to a tenth is five factors of ten in
+about ten seconds, so on average the gap is multiplied by ten every two
+seconds: Chapter~\ref{ch:butterfly}'s butterfly effect, in a machine you could
+build on a workbench.
+
+\plotfig{ch13-two-releases}{Two double pendulums let go a millionth of a
+radian apart. Above: the lower arm of each, indistinguishable for about ten
+seconds. Below: the gap between them on a logarithmic scale, climbing
+unevenly until it is large enough to see.}{two releases parting}
+
+\noindent
+Here is the doubt that should occur to you. Every step is a little wrong:
+what if the parting is made by those errors and not by the pendulum? Then a
+more accurate stepper would move it. So run the same two releases with four
+step sizes, watching the energy as well:
+
+\pyregion{code/ch13/step_check.py}{parting}{The same pair, with any step size}{lst:ch13-parting}
+
+\transcript{ch13-step-check}
+
+\noindent
+Each halving of the step divides the energy error by about
+\val{ch13.energy.shrink}, as Chapter~\ref{ch:motion}'s RK4 recipe promised,
+and the moment the pair parts does not move by a hundredth of a second. At
+the book's step of \val{ch13.dt} seconds the energy has moved by about
+\val{ch13.energy.moved} joule before the pair parts: about one part in
+\val{ch13.energy.parts}. The parting is the pendulum's, not the computer's.
+
+\plotfig{ch13-energy-error}{How far the simulated energy wanders from its
+true, constant value, for four step sizes. Each halving of the step lowers
+the whole curve by about the same factor, and the dotted line marks the moment
+the two releases part, which is the same for all four.}{the energy check}
+
+\begin{note}
+The check has a limit. Compute one single release twice, with the book's step
+and with half of it, and the two computations part too, after about
+\val{ch13.stepper.apart} seconds. Each step's tiny error is a nudge, and chaos
+grows it like any other. It starts far smaller than a millionth of a radian,
+which is why our pair parts first and every step size agrees on when.
+Chapter~\ref{ch:computers} asks what can still be trusted after that.
+\end{note}
+
+\begin{trapbox}
+\textbf{\enquote{A pendulum that keeps its energy, with no friction and
+nothing random in it, cannot be chaotic.}} It needs neither friction nor
+chance. Keeping its energy pins a pendulum down only partly. One pendulum's
+state is two numbers; fixing the energy leaves one direction to move in,
+round one closed loop, which is why it repeats. A double pendulum's state is
+four numbers; fixing the energy leaves three directions, and three is enough
+for chaos. The energy check proves the simulation honest. It does not make the
+motion predictable.
+\end{trapbox}
+
+\begin{lab}{l13_02_apart}{When do two releases part?}
+Turn the listing into a function. \code{seconds\_until\_apart} steps two
+pendulums side by side and returns the first moment they differ by more than a
+tolerance, or \code{None} if they are still together when time runs out. Then
+use it: how much longer do releases a billionth of a radian apart take to
+part than releases a millionth apart? Compare your answer with
+Chapter~\ref{ch:lyapunov}'s arithmetic of horizons.
+\end{lab}
+
+\section{Gentle swings and wild ones}
+\label{sec:ch13-islands}
+\index{KAM theorem}\index{islands of regular motion}
+
+\noindent
+Everything so far was a release from high up, with a lot of energy. A double
+pendulum can also be let go gently.
+
+\begin{think}
+Release the same pendulum with both arms at 10° instead of 120°: same rule,
+same machine, same nudge of a millionth of a radian. Does the gap still grow
+to something anyone could see within twenty seconds?
+\end{think}
+\reveal{No. At 10° the two stay within a few millionths of a radian of each
+other: the nudge barely grows. The same machine is calm at small swings and
+wild at large ones.}
+
+\pyregion{code/ch13/gentle_wild.py}{fate}{What a pair does, released at one angle}{lst:ch13-fate}
+
+\transcript{ch13-gentle-wild}
+
+\noindent
+Up to \val{ch13.calm.upto}°, every pair is still together after
+\val{ch13.window} seconds, and even at \val{ch13.calm.upto}° the largest gap
+is \val{ch13.calm.gap} radians: the nudge has grown several times over,
+not a hundred thousand times. From \val{ch13.wild.from}° on, every pair parts. The
+plot fills in the angles between.
+
+\plotfig{ch13-gentle-wild}{Each dot is a release of both arms at one angle,
+with a copy a millionth of a radian further round. Small releases stay
+together for twenty seconds; large ones part, and the change comes over a
+few degrees.}{calm and wild releases}
+
+\noindent
+This is how chaos lives in a system without friction. With little energy the
+double pendulum is nearly two simple swings, the arms moving together or
+against each other, and its motion is regular. Let it go from higher up and
+chaos appears; higher still, and chaos takes over, with regular motion
+surviving only in pockets: a chaotic sea with islands of regular motion in it.
+
+\begin{rigourbox}
+This book does not prove that the double pendulum is chaotic; it measures
+sensitivity at a handful of releases. The theorem behind the sea and its
+islands is called KAM, after Andrey Kolmogorov, who announced it in 1954, and
+Jürgen Moser and Vladimir Arnold, who proved versions of it in 1962 and 1963.
+It says
+that when a regular, friction-free system is disturbed a little, most of its
+regular motions survive, slightly bent, and chaos is confined to thin layers
+between them; as the disturbance grows, the layers widen. Its proof is
+graduate mathematics, found in books on the mechanics of such systems.
+\end{rigourbox}
+
+\noindent
+One more difference from Chapter~\ref{ch:lorenz}. Lorenz's equations have
+friction in them, and friction squeezes every start onto one attractor. The
+double pendulum has none: every start keeps its own energy for ever, and
+there is no attractor. There is a fence instead. The energy says which states
+can ever be reached, and the motion, however wild, stays inside.
+
+\section{Two bodies, three bodies}
+\label{sec:ch13-three}
+\index{three-body problem}\index{Poincaré, Henri}
+
+\noindent
+The clockwork of Chapter~\ref{ch:models} was the solar system, and its
+triumph was the problem of two bodies: one planet and the Sun. Johannes
+Kepler found early in the seventeenth century that planets move on ellipses,
+and Isaac Newton showed in 1687 that his law of gravity makes two bodies do
+exactly that. Two bodies have a formula: an ellipse, traced for ever. Every
+question about them has an answer you can write down.
+
+Add a third body and there is no formula of that kind at all. In 1889 Henri
+Poincaré won a prize offered in the name of King Oscar II of Sweden for work
+on the problem of several bodies moving under their own gravity. While his
+prize memoir was being prepared for publication, an error was found in it.
+Correcting it, Poincaré found that the orbits near a simple, repeating motion
+of three bodies can wind about it in a tangle so intricate that he later
+wrote he would not even try to draw it. The corrected memoir appeared in
+1890, and what it describes is recognised today as the first glimpse of
+chaos: a rule as exact as Newton's, followed by motion that no formula
+follows.
+
+In 1908, writing for the general reader, Poincaré put the lesson in words
+this book has been measuring: a cause too small to notice can decide an effect
+we cannot miss, and then prediction becomes impossible.
+
+\mermaidfig{ch13-bodies}{Two bodies have a formula; three have none; the
+planets are chaotic over tens of millions of years and yet stay where they
+are.}{two bodies, three bodies, the planets}
+
+\section{Is the solar system a clock?}
+\label{sec:ch13-solar}
+\index{Laskar, Jacques}\index{Hyperion}
+
+\noindent
+For two centuries the solar system was the model of a perfect clock. In the
+late eighteenth century Joseph-Louis Lagrange and Pierre-Simon Laplace
+calculated, to the accuracy their methods allowed, that the sizes of the
+planets' orbits wobble but do not drift. Laplace's demon in
+Chapter~\ref{ch:models} had the planets as its evidence.
+
+In 1989 Jacques Laskar computed the slow wobbles of the planets' orbits over
+two hundred million years and found the motion of the inner planets
+\dash{} Mercury, Venus, Earth and Mars \dash{} chaotic. The Lyapunov time he
+found, in the sense of Chapter~\ref{ch:lyapunov}, was about five million
+years: an error in where the planets are is multiplied by $e$, about
+\num{2.7}, every five million years.
+
+\begin{think}
+A hundred million years is twenty of those Lyapunov times. By roughly how
+much is an error multiplied over twenty of them: a hundred times, a million
+times, or a billion times?
+\end{think}
+\reveal{About \val{ch13.solar.factor} times: nearer a billion than a million.
+At that rate, an error of one metre in where Earth is today would grow to
+\val{ch13.solar.km} kilometres, more than the distance to the Moon.}
+
+\begin{trapbox}
+\textbf{\enquote{The solar system is a perfect clock.}} Over a few thousand
+years it is as good a clock as anything we have: eclipses are predicted
+centuries ahead. Over tens of millions of years it cannot be read. No
+measurement and no computer can say where Earth will be on its orbit a
+hundred million years from now. The rule is exact; the start is not.
+\end{trapbox}
+
+\noindent
+Unpredictable is not the same as unstable. Laskar's result is not that the
+planets fly apart, and longer computations since, over billions of years,
+find them keeping to orbits of much the same size and shape in almost every
+run. We cannot say where Earth will be on its orbit in a hundred million
+years; we can say it will very probably be on an orbit much like this one.
+That is Chapter~\ref{ch:lorenz}'s lesson in a new place: the path cannot be
+predicted, and the region it moves in can.
+
+Chaos shows itself faster in some corners of the solar system. Saturn's moon
+Hyperion is a lumpy body on a stretched orbit, and calculations predict that
+its spin cannot settle into a steady rotation but tumbles chaotically, tugged
+one way and then another by Saturn. Observations from the Voyager and
+Cassini spacecraft fit that prediction: Hyperion has no steady day.
+
+\begin{worldbox}
+Geologists date layers of sediment by the climate rhythms written into them.
+Slow cycles in the shape of Earth's orbit and the tilt of its axis, named
+after Milutin Milanković, change how sunlight falls on the planet, and the
+climate leaves matching bands in the rock. To turn bands into dates you need
+Earth's orbit far into the past, and geologists take it from computations by
+Laskar's group. Those computations are trusted, cycle by cycle, back to about
+fifty million years and not further, because of the chaos in this section.
+\end{worldbox}
+
+\begin{summarybox}
+\begin{itemize}
+\item A \textbf{double pendulum}'s state is four numbers, two angles and two
+  rates of change. Its rule is Newton's, exact and without chance, and RK4
+  steps it.
+\item Without friction the \textbf{energy} cannot change, so a simulation's
+  energy measures the stepper's error: at the book's step, about one part in
+  \val{ch13.energy.parts}.
+\item Releases a millionth of a radian apart part after
+  \val{ch13.apart.seconds} seconds at every step size: the \textbf{parting is
+  physics}. Keeping energy does not prevent chaos.
+\item Gentle releases are \textbf{regular} and wild ones chaotic: a sea with
+  islands, as the KAM theorem describes. With no friction there is no
+  attractor; the energy fences the motion in.
+\item Two bodies have a formula and three do not. \textbf{Poincaré}'s
+  corrected prize memoir of 1890 was the first glimpse of chaos.
+\item Laskar found the inner planets chaotic, with a \textbf{Lyapunov time}
+  of about five million years: their positions cannot be predicted a hundred
+  million years ahead, yet their orbits stay much as they are.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Why can a double pendulum be chaotic when a single pendulum cannot,
+  though neither loses energy?
+  \answerto{Fixing the energy of a single pendulum's two-number state leaves
+  one direction, round a closed loop. Fixing it for the double pendulum's four
+  numbers leaves three, which is enough for chaos.}
+\item A double pendulum is let go from rest with both arms pointing straight
+  up. What is its energy, measuring heights from the pivot?
+  \answerto{The bobs are one and two metres up, so $\num{9.81} \times
+  (1 + 2)$, about \num{29.4} joules.}
+\item Your simulation of a machine without friction loses a tenth of its
+  energy in a minute. What do you conclude?
+  \answerto{The stepper's error is too large to trust. Shrink the step until
+  the energy holds, then check that your answer survives halving it again.}
+\item Two releases part after ten seconds. You halve the step and they now
+  part after three. What does that tell you?
+  \answerto{That the parting was made at least partly by the stepper's errors,
+  so neither number can be trusted. A parting that is physics does not move
+  when the step changes.}
+\item The double pendulum has no attractor. What keeps its motion from going
+  anywhere at all?
+  \answerto{Its energy, which never changes and decides which states can ever
+  be reached.}
+\item With a Lyapunov time of five million years, by roughly what factor is
+  an error multiplied in ten million?
+  \answerto{By $e$ twice: $\num{2.7} \times \num{2.7}$, a little over seven.}
+\item Does the chaos of the solar system mean the planets will fly apart?
+  \answerto{No. Their positions cannot be predicted beyond some tens of
+  millions of years, but computations over billions of years find their
+  orbits keeping much the same size and shape in almost every run.}
+\end{checkpoint}

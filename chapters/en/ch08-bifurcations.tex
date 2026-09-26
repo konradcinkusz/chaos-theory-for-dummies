@@ -1,0 +1,477 @@
+%% ch08 --- The road to chaos, and a number nobody expected
+%%
+%% Written September 2026. Every number the reader cannot do in their head
+%% comes from code/measure/ch08.py, which imports the SAME functions the
+%% listings print (code/ch08/), so the page and the listings cannot disagree.
+%% The logistic map's forks and landmarks use only + - * and /, so their
+%% digits are the same on every machine; the sine map calls math.sin, so
+%% what the page prints from it is rounded to two decimals (four for where
+%% its doublings end) and checked to sit clear of a rounding boundary.
+%%
+%% WHAT THIS CHAPTER MAY NOT SAY. The four behaviours of the logistic map and
+%% the fixed point's loss of stability at r = 3 are Chapter 5's; they are
+%% recalled here, not taught. The Lyapunov exponent across r is Chapter 7's.
+%% That the whole bifurcation diagram lies along a line through the
+%% Mandelbrot set -- and the conversion between r and c -- is Chapter 12's
+%% payoff: this chapter points at it in one sentence and computes nothing of
+%% it. The flour-beetle experiment is Chapter 15's.
+%%
+%% Twin: chapters/pl/ch08-bifurcations.tex. Section for section, macro for
+%% macro, number for number; tools/parity.py compares them.
+
+\chapter{The road to chaos, and a number nobody expected}
+\label{ch:bifurcations}
+\index{bifurcation diagram}\index{Feigenbaum's constant}
+
+\noindent
+Chapter~\ref{ch:logistic} turned one knob, $r$, to four positions and found
+four behaviours. At $r = \num{2.8}$ the logistic map settled on one value; at
+\num{3.2} it alternated between two; at \num{3.5} it cycled through four; at
+\num{3.9} it never repeated at all. Four photographs of one machine. What
+happens between them? Does order turn into chaos at one setting of the knob,
+the way water boils at a hundred degrees, or along a road?
+
+The answer is one picture, among the most reproduced in science, and hidden
+in it is a number nobody put there. It comes out of other equations too, it
+has been measured in liquid helium, and by the end of the chapter you will
+have computed it to five figures with nothing but addition, subtraction,
+multiplication and division.
+
+\begin{outcomes}
+\outcome{read a bifurcation diagram and say what the map does at any value
+  of the knob it shows}
+\outcome{locate a period doubling by watching runs of the map, and say what
+  limits how precisely that can be done}
+\outcome{find a superstable parameter by bisection, using nothing but
+  $+$, $-$, $\times$ and $\div$}
+\outcome{compute the ratio of successive gaps between doublings, and estimate
+  where the doublings run out}
+\outcome{run the same search on a second rule and say what the comparison
+  shows}
+\outcome{find a window of order inside the chaotic range, and state what Li
+  and Yorke proved about period three}
+\end{outcomes}
+
+\section{One picture for every setting of the knob}
+\label{sec:ch08-picture}
+\index{bifurcation diagram}\index{transient}
+
+\noindent
+To see every $r$ at once you need a recipe that turns a whole run into a few
+dots, and then you draw the dots of thousands of runs side by side.
+
+\begin{enumerate}
+\item Choose a value of $r$ and start the map at $x = \num{0.5}$.
+\item Run it for a thousand steps and throw them away. That stretch is the
+  \emph{transient}: the orbit finding its way to wherever it is going.
+\item Run it for three hundred more, and draw a dot above $r$ at the height
+  of each value.
+\end{enumerate}
+
+\pyregion{code/ch08/bifurcation.py}{longrun}{The recipe: let the orbit settle, then keep what it visits}{lst:ch08-longrun}
+
+\noindent
+\code{orbit} is the book's library function that applies a rule over and
+over and keeps every value; \code{xs[burn + 1:]} keeps the ones after the
+transient.
+
+\begin{think}
+At $r = \num{2.8}$ the map settles on the fixed point $1 - 1/r$ that
+Chapter~\ref{ch:logistic} found. Once the transient has been thrown away, how
+many different dots does the recipe draw above $r = \num{2.8}$?
+\end{think}
+\reveal{One. All three hundred values are \val{ch08.fixed} to four decimals,
+which is $1 - 1/\num{2.8}$, so the dots land on top of each other.}
+A two-cycle draws two dots, a four-cycle four, and an orbit that never
+repeats draws three hundred different ones, a short vertical smear. The rest
+of the listing asks at six values of $r$:
+
+\transcript{ch08-bifurcation}
+
+\noindent
+Two rows are new: at \num{3.56} the orbit cycles through eight values, and
+at \num{3.567} through sixteen. Now run the recipe for thousands of values of
+$r$ between \num{2.8} and $4$ and draw every dot at once.
+
+\plotfig{ch08-diagram}{The bifurcation diagram of the logistic map. Above
+each value of $r$ the dots show where $x$ spends its time once the transient
+is over: one line where it settles, two where it alternates, a smear where it
+never repeats.}{the bifurcation diagram}
+
+\noindent
+This is the \emph{bifurcation diagram}, the whole of
+Chapter~\ref{ch:logistic} in one frame. Read it from left to right, as a
+journey along the knob. One line up to $r = 3$; there it splits in two; near
+\num{3.45} each branch splits again; then everything dissolves into a smear
+streaked with pale stripes. A \emph{bifurcation} (from the Latin for a
+two-pronged fork) is a value of the knob at which the kind of long-run
+behaviour changes. Every split here is a \emph{period doubling}: each value
+the orbit visited becomes two, so the cycle takes twice as long to come
+round.
+
+\begin{think}
+Look at the picture between $r = \num{3.5}$, where the orbit has period
+four, and the smear. Does order give way to chaos at one value of $r$, like a
+switch?
+\end{think}
+\reveal{It looks like a switch, and it is not. Magnify the stretch before the
+smear and each branch splits again, and again: periods $8$, $16$, $32$ and
+on without end, all fitting in before $r = \val{ch08.end}$. The table has
+already caught two of them.}
+
+\begin{trapbox}
+\textbf{\enquote{The change from order to chaos is a sudden switch.}} Not on
+this road. Order breaks down in an infinite \emph{cascade} of doublings, each
+arriving sooner than the one before, and chaos begins where the cascade runs
+out. The smear looks sudden only because its last splits are too close
+together to draw. Other systems reach chaos by other roads; this one, the
+\emph{period-doubling cascade}, is the road a single hump takes.
+\end{trapbox}
+
+\section{Forks that crowd together}
+\label{sec:ch08-cascade}
+\index{period doubling}\index{bisection}
+
+\noindent
+Where exactly is each split? The table brackets them: period one at
+\num{2.8}, period two at \num{3.2}, so the first split lies between. Try the
+middle of the bracket, see which period the map settles into there, keep the
+half that still contains the change, and repeat. Twenty rounds shrink the
+bracket a millionfold. This is \emph{bisection}, and all it needs is a way to
+ask \enquote{is it still period $p$ here?}
+
+\pyregion{code/ch08/doublings.py}{fork}{Pinning down a split by halving the bracket}{lst:ch08-fork}
+
+\noindent
+\code{settled\_period} runs the map for twenty thousand steps and asks the
+library's \code{period} function what repeats. The listing runs \code{fork}
+on the four brackets the table provides.
+
+\begin{think}
+The first two splits turn out to be \val{ch08.gap.one} apart in $r$, and the
+next two \val{ch08.gap.two} apart. How many times smaller is the second gap?
+If the next gap shrinks by the same factor, how long will it be?
+\end{think}
+\reveal{About \val{ch08.ratio.one} times smaller:
+$\val{ch08.gap.one} \div \val{ch08.gap.two}$. The same factor again would
+make the next gap about \num{0.02}.}
+
+\transcript{ch08-doublings}
+
+\noindent
+The third gap is \val{ch08.gap.three}; the second divided by the third is
+\val{ch08.ratio.two}. So each gap is a little under five times the next, and
+the gaps still to come (the last one divided by \num{4.7}, then by \num{4.7}
+again, and so on) add up to the last gap divided by $\num{4.7} - 1$, a little
+over a quarter of it. Infinitely many splits fit in a finite stretch of the
+knob: the cascade ends a short way beyond \val{ch08.fork.four}.
+
+\begin{think}
+The first split is known exactly. Chapter~\ref{ch:logistic} found that the
+fixed point loses its grip at $r = 3$, where its slope, $2 - r$, passes
+$-1$. The table says \val{ch08.fork.one}. What went wrong?
+\end{think}
+\reveal{Nothing in the rule: the measurement ran out of patience. At
+$r = \num{2.9998}$ each step multiplies a small nudge by
+$2 - r = \num{-0.9998}$, so the nudge shrinks by a fiftieth of a per cent per
+step, and after twenty thousand steps the orbit is still visibly flipping
+from side to side. \code{settled\_period} calls it a two-cycle.}
+Every split measured by watching comes out early for the same reason: close
+to a split, the cycle that is losing its grip settles very slowly.
+
+\begin{note}
+The second split can be found exactly. Once round the two-cycle, a nudge is
+multiplied by the slope at each of its two points, and a page of school
+algebra shows that the product is $4 + 2r - r^{2}$. That reaches $-1$ when
+$r^{2} - 2r - 5 = 0$, at $r = 1 + \sqrt{6} = \val{ch08.fork.two.exact}$; the
+table's \val{ch08.fork.two} is early, as expected. Later splits have no
+formula this simple.
+\end{note}
+
+\section{The top of the hump}
+\label{sec:ch08-superstable}
+\index{superstable cycle}\index{Feigenbaum, Mitchell}
+
+\noindent
+In 1975 Mitchell Feigenbaum, a physicist at the Los Alamos laboratory in New
+Mexico, was working out where these splits happen on a programmable pocket
+calculator, and noticed the pattern you have just seen: each gap a fixed
+fraction of the one before. To measure that fraction sharply, use a
+better-placed landmark than the split, where a cycle hangs on by its
+fingertips: the point in each stretch where the cycle is held most firmly.
+
+The slope of the logistic map at $x$ is $r(1 - 2x)$, the stretch factor
+Chapter~\ref{ch:feedback} taught you to measure. It is zero at
+$x = \num{0.5}$, the top of the hump. A cycle through $\num{0.5}$ multiplies
+any nudge by that zero once per trip, wiping it out. Such a cycle is called
+\emph{superstable}, and for each period $1, 2, 4, 8, \ldots$ there is exactly
+one value of $r$ on the road where it happens: this chapter calls those
+values \emph{landmarks}. Each is the answer to one equation: start at
+$\num{0.5}$, take as many steps as the period, and arrive back at $\num{0.5}$.
+
+\begin{think}
+For period one: for which $r$ does one step take $\num{0.5}$ straight back to
+$\num{0.5}$? The step is $r \times \num{0.5} \times \num{0.5}$.
+\end{think}
+\reveal{$r = 2$. Half of a half is a quarter, and $2 \times \num{0.25} =
+\num{0.5}$.}
+For longer periods there is no mental shortcut, and bisection needs none.
+\code{from\_top} reports how far from $\num{0.5}$ the orbit ends, which is
+positive on one side of a landmark and negative on the other:
+
+\pyregion{code/ch08/superstable.py}{search}{Start at the top, and halve the bracket until the orbit comes back to it}{lst:ch08-search}
+
+\noindent
+The first two landmarks are bracketed by eye from the picture. After that
+each gap is smaller than the last, so the next landmark is sought between a
+tenth and a half of the last gap further on, a generous bracket for gaps
+shrinking by a factor near five. A \emph{family} is a function that, given
+$r$, builds the rule.
+
+\pyregion{code/ch08/superstable.py}{landmarks}{The landmarks for periods $1, 2, 4, 8, \ldots$, each bracketed from the last}{lst:ch08-landmarks}
+
+\noindent
+The listing finds the first \val{ch08.landmark.count} landmarks, for periods
+$1$ to $1024$, with nothing but $+$, $-$, $\times$ and $\div$, so every digit
+is the same on every computer:
+
+\transcript{ch08-superstable}
+
+\noindent
+Look down the last column, each gap divided by the next. It wobbles for a
+few rows and then stops moving: \val{ch08.delta}. That is
+\emph{Feigenbaum's constant}, written $\delta$ (the Greek letter delta). The
+landmarks give it far more sharply than the splits did, because at a
+landmark the orbit settles at once instead of barely at all. Splits and
+landmarks take turns along the road, one of each per period, so both crowd
+in at the same rate towards the same end, $r = \val{ch08.end}$. The
+period-two landmark, \val{ch08.super.two}, is exactly $1 + \sqrt{5}$, where
+the note's product $4 + 2r - r^{2}$ is zero.
+
+Feigenbaum published in 1978; Pierre Coullet and Charles Tresser in France
+found the same number independently at about the same time. What he did
+next is why the number is famous.
+
+\begin{lab}{l08_01_superstable}{Find a landmark yourself}
+Write \code{from\_top} and \code{bisect}, and put them together in
+\code{superstable}. Check your answer for period two against
+$1 + \sqrt{5}$. Then find the $r$ between \num{3.82} and \num{3.84} at which
+$\num{0.5}$ comes back to itself after \emph{three} steps. You will meet
+that number again.
+\end{lab}
+
+\section{A number that belongs to the road}
+\label{sec:ch08-universal}
+\index{universality}\index{sine map}
+
+\noindent
+Feigenbaum's next step was to try a different rule, the \emph{sine map}
+\[ x_{n+1} = s \sin(\pi x_{n}), \]
+which returns $s$ times the sine of $\pi x$. You need no trigonometry to
+follow it: for $x$ between $0$ and $1$, the sine of $\pi x$ is a smooth hump
+rising from $0$ to $1$ at $x = \num{0.5}$ and falling back to $0$. So the
+sine map shares the logistic map's shape \dash{} one hump, its top at
+$\num{0.5}$ \dash{} and nothing of its formula: no $x(1 - x)$, a different
+knob $s$, a curve that is not a parabola.
+
+\begin{think}
+Run the same landmark search on the sine map. Do you expect its gaps to
+shrink by the logistic map's \val{ch08.delta} again, or by some other number
+that belongs to the sine?
+\end{think}
+\reveal{The same number. The sine map's gaps shrink by \val{ch08.sine.first}
+at first and then close in, landmark by landmark, on \val{ch08.sine.delta},
+where the logistic map's ratios settle too.}
+\plotfig{ch08-ratios}{Each gap between landmarks divided by the next, for two
+rules with nothing in common but a single smooth hump. They start apart and
+end on the same number.}{the ratios for two rules converging}
+
+\noindent
+The listing knows nothing about the sine map but its family and two brackets
+read off its diagram:
+
+\pyregion{code/ch08/two_maps.py}{compare}{The same search on two unrelated rules}{lst:ch08-compare}
+
+\transcript{ch08-two-maps}
+
+\noindent
+The two roads end in different places (the last row: \val{ch08.end} and
+\val{ch08.sine.end}) and start differently, yet they settle on the same ratio
+to every digit printed. The function \code{ratios} divides each gap by the
+next; the second lab asks you to write it.
+
+\begin{trapbox}
+\textbf{\enquote{A different equation gives a different route.}} It gives
+different signposts \dash{} the splits sit at different values of the knob
+\dash{} but the road has the same shape, and its splits crowd together at the
+same rate. That number belongs to the route, not to the equation. This is
+\emph{universality}, and it is why a constant of nature can come out of a
+toy model.
+\end{trapbox}
+
+\noindent
+Why? Each new split is decided by a smaller and smaller stretch of the map
+near the top of its hump, seen through a stronger and stronger magnifying
+glass. Magnify any smooth, rounded hump enough around its top and it looks
+like a parabola; whatever made the sine map a sine has been magnified out of
+sight. The constants of school geometry, like $\pi$, belong to shapes. This
+one belongs to a process.
+
+\mermaidfig{ch08-universal}{Universality in one line: any rule with one
+smooth hump takes the same road, and the road carries its own
+ratio.}{any hump, one route, one ratio}
+
+\noindent
+It was a shock because it predicted something about systems whose equations
+nobody could write down: if one reaches chaos by period doubling, its splits
+should crowd together at Feigenbaum's rate, whatever it is made of.
+
+\begin{worldbox}
+Around 1980 Albert Libchaber and Jean Maurer in Paris heated a tiny box of
+liquid helium from below and recorded the temperature at one point as the
+fluid churned. As they turned up the heat, the temperature's rhythm doubled
+its period, and doubled again. Later experiments on convecting fluids and
+electronic circuits measured the ratio of successive gaps and found numbers
+close to Feigenbaum's: not to four decimals, since a laboratory can resolve
+only the first few doublings, but close enough that nobody takes it for a
+coincidence. In 1986 Feigenbaum and Libchaber shared the Wolf Prize in
+physics.
+\end{worldbox}
+
+\begin{rigourbox}
+Why every smooth hump gives the same $\delta$ is not proved here. Feigenbaum
+explained it with a method from physics, \emph{renormalisation}, which
+compares the map after each doubling with a rescaled copy of itself; Oscar
+Lanford gave a computer-assisted proof in 1982. \emph{Smooth} matters: a hump
+whose top is flatter than a parabola's gives a different constant.
+\end{rigourbox}
+
+\begin{lab}{l08_02_ratio}{Feigenbaum's ratio, and where the doublings end}
+Write \code{ratios}, which divides each gap by the next, and
+\code{where\_it\_ends}, which adds up every gap still to come, assuming each
+is the one before divided by the last ratio. The test feeds your functions
+the landmarks of both maps: one ratio, two different ends.
+\end{lab}
+
+\needspace{10\baselineskip}
+\section{Order inside the chaos}
+\label{sec:ch08-windows}
+\index{periodic window}\index{Li--Yorke theorem}
+
+\noindent
+Past $r = \val{ch08.end}$ the doublings are used up, and the diagram turns
+to smear.
+
+\begin{think}
+From $r = \val{ch08.end}$ to $r = 4$, is the logistic map chaotic at every
+setting of the knob, the way it is at \num{3.9}?
+\end{think}
+\reveal{No. Look at the picture again: the smear is streaked with pale
+stripes, and in each one the orbit is back on a short cycle. The widest,
+near \num{3.83}, is a window of period three.}
+\code{code/ch08/windows.py} walks $r$ across that stripe with the same
+\code{settled\_period}, then runs the landmark search inside it:
+
+\transcript{ch08-windows}
+
+\noindent
+At \num{3.8284} the orbit never repeats; at \num{3.8285} it has settled into
+a three-cycle. The window opens between the two, at exactly
+$r = 1 + \sqrt{8} = \val{ch08.window.open}$. The three-cycle then doubles to
+six and twelve, and by \num{3.85} it has dissolved into smear again. The
+whole road repeats in miniature. The window's first landmark is the $r$ you
+found in the first lab, \val{ch08.super.three}, and its landmarks crowd
+together at a ratio of \val{ch08.window.delta}: Feigenbaum's number once
+more, now from periods $3, 6, 12, \ldots$ instead of $1, 2, 4, \ldots$.
+
+\plotfig{ch08-zoom}{Left: the period-three window. Right: the window's middle
+branch, magnified: a small copy of the whole bifurcation diagram, with its
+own cascade, its own smear and its own windows.}{the period-three window,
+magnified}
+
+\begin{trapbox}
+\textbf{\enquote{Once a system has reached chaos, it is chaotic everywhere
+beyond that point.}} Between $r = \val{ch08.end}$ and $4$ the logistic map
+returns to order infinitely many times, in windows of every period. Turn the
+knob a little and a chaotic system can become perfectly periodic; turn it a
+little further and it is chaotic again. Chapter~\ref{ch:lyapunov}'s exponent
+dips below zero in exactly these stripes.
+\end{trapbox}
+
+\begin{note}
+In 1975 Tien-Yien Li and James Yorke published a paper whose title was its
+result: \emph{Period three implies chaos}. Paraphrased: if a continuous rule
+takes an interval into itself, as the logistic map does from $0$ to $1$, and
+some start comes back to itself after exactly three steps, then the rule has
+cycles of every length, and starts whose orbits never settle into any cycle.
+The paper gave the word \emph{chaos} its mathematical meaning; a stronger
+result had been proved in 1964 by Oleksandr Sharkovsky in Kyiv, little known
+in the West until later. In the window almost every start ends on the
+three-cycle, but the theorem still holds: the other cycles are there,
+unstable, and an orbit may wander among them for a long time before settling.
+\end{note}
+
+\noindent
+The diagram has one more surprise, and it belongs to
+Chapter~\ref{ch:mandelbrot}: this whole picture lies along a line through the
+most famous image in mathematics, with the splits and the window exactly
+where a one-line conversion puts them.
+
+\begin{summarybox}
+\begin{itemize}
+\item The \textbf{bifurcation diagram} shows, for each value of the knob,
+  where the orbit lives once the transient is over. A \textbf{bifurcation} is
+  a value at which the long-run behaviour changes kind; on this road each is
+  a \textbf{period doubling}.
+\item The splits crowd together, each gap a little under five times the next,
+  so infinitely many fit before $r = \val{ch08.end}$. Measured by watching,
+  a split comes out early, because near it the orbit settles very slowly.
+\item At a \textbf{superstable} landmark the cycle passes through the top of
+  the hump, where the slope is zero. Each is one equation, solved by
+  \textbf{bisection} with $+$, $-$, $\times$ and $\div$, and the ratio of
+  their gaps settles on \textbf{Feigenbaum's constant}, \val{ch08.delta}.
+\item The sine map gives the same ratio: the number belongs to the route
+  every smooth one-hump rule takes, not to a formula. That is
+  \textbf{universality}, and it has been measured in fluids and circuits.
+\item Beyond the cascade, chaos is interrupted by \textbf{windows} of order.
+  The widest, of period three, opens at $1 + \sqrt{8}$ and holds a miniature
+  of the whole road; Li and Yorke proved that period three implies chaos.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item What does the column of dots above one value of $r$ in a bifurcation
+  diagram show, and what does it look like for a fixed point, a two-cycle and
+  chaos?
+  \answerto{Where the orbit lives in the long run at that $r$, after the
+  transient: one dot for a fixed point, two for a two-cycle, a smear for
+  chaos.}
+\item Two successive gaps between splits are \num{0.08} and \num{0.017}.
+  Roughly what is their ratio, and how long should the next gap be?
+  \answerto{About \num{4.7}, from $\num{0.08} \div \num{0.017}$; so the next
+  gap should be about $\num{0.017} \div \num{4.7}$, roughly \num{0.0036}.}
+\item Why does a split located by watching the orbit come out slightly early?
+  \answerto{Near a split the cycle losing its grip multiplies a nudge by
+  nearly $-1$ each time round, so it settles extremely slowly, and a finite
+  run still shows it flipping between values.}
+\item What is a superstable landmark, and why can it be found to many digits
+  with $+$, $-$, $\times$ and $\div$ alone?
+  \answerto{The $r$ at which the cycle passes through the top of the hump,
+  $x = \num{0.5}$, where the slope is zero. It solves one equation (start at
+  $\num{0.5}$, take the period's number of steps, be back at $\num{0.5}$),
+  which bisection solves by halving a bracket.}
+\item The sine map's doublings run out at about \val{ch08.sine.end}, the
+  logistic map's at about \val{ch08.end}. Does that contradict universality?
+  \answerto{No. Universality says the ratio of successive gaps tends to the
+  same number, about \val{ch08.delta}, for every rule with one smooth hump;
+  where each road ends depends on the rule.}
+\item Is the logistic map chaotic at $r = \num{3.83}$? What did Li and Yorke
+  prove about period three?
+  \answerto{No: \num{3.83} lies in the period-three window, which opens at
+  $1 + \sqrt{8}$, about \val{ch08.window.open}. Li and Yorke proved that a
+  continuous rule taking an interval into itself, with a point of period
+  three, has cycles of every length and starts that never settle into any
+  cycle.}
+\end{checkpoint}

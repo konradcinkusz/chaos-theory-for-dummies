@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chaos from Zero</title>
+<meta name="description" content="How mathematics describes the world, and where it stops predicting it. A free book in English and Polish, with every number checked by code you can run.">
+<style>
+  :root {
+    --ink: #1a1a1a; --muted: #5a5a5a; --blue: #1f4e79; --violet: #7b4397;
+    --paper: #fbfcfd; --rule: #d8dee4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink: #e8e8e8; --muted: #a8a8a8; --blue: #8fb8e0; --violet: #c49ae0;
+            --paper: #15181b; --rule: #2e343a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font: 17px/1.6 Georgia, "Times New Roman", serif; }
+  main { max-width: 44rem; margin: 0 auto; padding: 3rem 1rem 4rem; }
+  h1 { color: var(--blue); font-size: 2.6rem; line-height: 1.1; margin: 0 0 .3rem; }
+  .sub { color: var(--muted); font-size: 1.2rem; margin: 0 0 2rem; }
+  h2 { color: var(--blue); font-size: 1.25rem; margin: 2.2rem 0 .6rem; }
+  .get { display: flex; flex-wrap: wrap; gap: .8rem; margin: 1.4rem 0; }
+  .get a { display: inline-block; padding: .7rem 1.1rem; border: 1px solid var(--blue);
+           color: var(--blue); text-decoration: none; border-radius: 3px; }
+  .get a:hover { background: var(--blue); color: var(--paper); }
+  ol { padding-left: 1.3rem; }
+  li { margin: .25rem 0; }
+  .part { color: var(--violet); font-style: italic; }
+  code { font-size: .92em; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+           color: var(--muted); font-size: .9rem; }
+  a { color: var(--blue); }
+</style>
+</head>
+<body>
+<main>
+<h1>Chaos from Zero</h1>
+<p class="sub">How mathematics describes the world, and where it stops predicting it</p>
+
+<p>The eclipse of 12&nbsp;August&nbsp;2026 was in the astronomers' tables before anyone who watched
+it was born. Nobody could have told them, a month earlier, whether the sky would be clear.
+Both forecasts use the same kind of mathematics. This book is about why one works for
+millennia and the other for about a week &mdash; and why that difference, called
+<em>chaos</em>, is something everyone who reads a forecast should understand.</p>
+
+<p>It starts from school arithmetic. Every idea is developed step by step, with questions to
+answer before you read on, and every number that you could not work out in your head was
+computed by a short Python program printed in the book, which you can run yourself.</p>
+
+<div class="get">
+  <a href="Chaos-from-Zero.pdf">Read in English (PDF)</a>
+  <a href="Chaos-od-zera.pdf" lang="pl">Czytaj po polsku (PDF)</a>
+  <a href="https://github.com/konradcinkusz/chaos-theory-for-dummies">The source and the code</a>
+</div>
+
+<h2>What is inside</h2>
+<ol>
+  <li><span class="part">The clockwork.</span> Models, rules applied step by step, feedback, and motion.</li>
+  <li><span class="part">Where prediction breaks.</span> One line of algebra that does everything; the butterfly
+      effect measured; a number for chaos; the road from order to chaos and Feigenbaum's constant.</li>
+  <li><span class="part">The shapes of chaos.</span> The Lorenz attractor, strange attractors, fractals, the Mandelbrot set.</li>
+  <li><span class="part">Chaos in the world.</span> Pendulums and planets, weather and climate, living systems
+      and markets, and chaos inside the computer.</li>
+  <li><span class="part">Living with chaos.</span> Controlling chaos, and a field guide to judging any prediction.</li>
+</ol>
+
+<h2>Run the laboratory</h2>
+<p>With <a href="https://docs.astral.sh/uv/">uv</a> installed, from the repository's
+<code>code/</code> directory: <code>uv sync</code>, then
+<code>uv run python ch01/falling_stone.py</code>.</p>
+
+<footer>
+  Konrad Cinkusz &middot; Prose CC&nbsp;BY-NC-SA&nbsp;4.0 &middot; Code MIT &middot;
+  Also in Polish as <em lang="pl">Chaos od zera</em>.
+</footer>
+</main>
+</body>
+</html>

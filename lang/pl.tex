@@ -1,0 +1,84 @@
+% ============================================================
+%  lang/pl.tex --- każdy widoczny dla czytelnika napis w wydaniu polskim
+%
+%  Nic w chapters/pl/ nie może wpisywać na sztywno słowa, które składa też
+%  makro. Jeśli potrzebna jest etykieta, której tu nie ma, dodaj ją tutaj I w
+%  lang/en.tex; CI przerywa build, gdy oba pliki nie definiują tego samego
+%  zbioru makr (C3).
+% ============================================================
+
+% ---------- Tytuły części ----------
+\newcommand{\lblPartI}{Mechanizm zegara: jak matematyka opisuje świat}
+\newcommand{\lblPartII}{Gdzie kończy się przewidywanie}
+\newcommand{\lblPartIII}{Kształty chaosu}
+\newcommand{\lblPartIV}{Chaos w świecie}
+\newcommand{\lblPartV}{Życie z chaosem}
+\newcommand{\lblPartAppendices}{Dodatki}
+
+% ---------- Tytuły ramek ----------
+\newcommand{\lblNote}{Uwaga}
+\newcommand{\lblWarning}{Ostrożnie}
+\newcommand{\lblTrap}{Pułapka}
+\newcommand{\lblWorld}{Gdzie to spotkasz}
+\newcommand{\lblRigour}{Czego tu nie dowodzimy}
+\newcommand{\lblProject}{chaoslab}
+\newcommand{\lblVerify}{Uruchom, zanim zaufasz}
+\newcommand{\lblLab}{Laboratorium}
+
+% ---------- Metoda ----------
+\newcommand{\lblThink}{Zatrzymaj się i pomyśl}
+\newcommand{\lblThinkCue}{Odpowiedz, zanim pójdziesz dalej.}
+\newcommand{\lblAnswerMark}{Odpowiedź.}
+\newcommand{\lblOutcomes}{Czego się nauczysz}
+\newcommand{\lblOutcomesLead}{Po przerobieniu tego rozdziału będziesz umieć:}
+\newcommand{\lblSummary}{Podsumowanie}
+\newcommand{\lblCanYou}{Czy potrafisz?}
+\newcommand{\lblCanYouIntro}{%
+  Oceń się przy każdym punkcie od 1 (nie) do 5 (tak, samodzielnie). Wszystko
+  poniżej 4 nie jest powodem do rozmyślań: wróć do podrozdziału, który tego
+  uczył, i jeszcze raz odpowiedz na jego pytania, zanim pójdziesz dalej.}
+\newcommand{\lblNoOutcomes}{W tym rozdziale nie zadeklarowano celów.}
+\newcommand{\lblCheckpoint}{Punkt kontrolny}
+\newcommand{\lblCheckpointIntro}{%
+  Odpowiedz na te pytania na papierze, zanim zajrzysz do dodatku~A.
+  Sprawdzają to, czego rozdział uczył, w tej kolejności, w jakiej uczył.}
+\newcommand{\lblAnswersIntro}{%
+  Odpowiedzi do punktów kontrolnych wszystkich rozdziałów, w kolejności
+  rozdziałów. Każdą zapisano obok jej pytania, a build zebrał je tutaj, więc
+  odpowiedź nie może odpłynąć od pytania, na które odpowiada.}
+\newcommand{\lblNoAnswers}{Nie zapisano żadnych odpowiedzi. To jest build częściowy.}
+
+% ---------- Stopka laboratorium ----------
+\newcommand{\lblLabStarter}{Plik startowy}
+\newcommand{\lblLabTest}{Test}
+\newcommand{\lblLabRun}{Uruchom}
+
+% ---------- Znaczniki stanu builda ----------
+\newcommand{\lblNotWritten}{JESZCZE NIENAPISANE}
+\newcommand{\lblNotRendered}{DIAGRAM NIEWYRENDEROWANY --- uruchom \texttt{make diagrams}}
+\newcommand{\lblPlotNotRendered}{WYKRES NIEWYRENDEROWANY --- uruchom \texttt{make plots}}
+\newcommand{\lblTranscriptMissing}{TRANSKRYPT NIEWYGENEROWANY --- uruchom \texttt{make numbers}}
+\newcommand{\lblValueMissing}{brak wartości}
+\newcommand{\lblDiagramManifest}{Manifest diagramów}
+\newcommand{\lblPlotManifest}{Manifest wykresów}
+\newcommand{\lblLabManifest}{Manifest laboratoriów}
+
+% ---------- Żywe paginy frontmatter ----------
+\newcommand{\lblHowToUse}{Jak korzystać z tej książki}
+\newcommand{\lblIntroduction}{Wprowadzenie}
+
+% Myślnik interpunkcyjny, pisany \dash{} ze spacją po obu stronach: polskie
+% wydanie składa półpauzę, angielskie pauzę.
+\newcommand{\dash}{--}
+
+% ---------- Odsyłacze w indeksie ----------
+\newcommand{\lblIndexSee}{zob.}
+\newcommand{\lblIndexSeeAlso}{zob.\ też}
+
+% Data ostatniego sprawdzenia faktów i przypiętych wersji.
+\newcommand{\pinnedon}{wrzesień 2026}
+
+% ---------- Metadane PDF ----------
+\newcommand{\lblPdfSubject}{Jak matematyka opisuje świat i gdzie przestaje go przewidywać: teoria chaosu od szkolnej arytmetyki}
+\newcommand{\lblPdfKeywords}{teoria chaosu, układy dynamiczne, odwzorowanie logistyczne, atraktor Lorenza, fraktale, wykładnik Lapunowa, przewidywanie, Python}
+\newcommand{\lblPdfLang}{pl-PL}

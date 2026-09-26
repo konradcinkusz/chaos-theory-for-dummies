@@ -1,0 +1,12 @@
+t =  0.0 s   gap 1e-06 rad
+t =  1.0 s   gap 9e-07 rad
+t =  2.0 s   gap 7e-06 rad
+t =  3.0 s   gap 3e-06 rad
+t =  4.0 s   gap 7e-05 rad
+t =  5.0 s   gap 3e-05 rad
+t =  6.0 s   gap 1e-04 rad
+t =  7.0 s   gap 1e-03 rad
+t =  8.0 s   gap 8e-03 rad
+t =  9.0 s   gap 2e-02 rad
+t = 10.0 s   gap 5e-02 rad
+more than 0.1 rad apart after 10.2 s

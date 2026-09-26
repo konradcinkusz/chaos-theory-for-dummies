@@ -1,0 +1,17 @@
+    r   exponent
+ 3.40      -0.14   errors shrink
+ 3.44      -0.02   errors shrink
+ 3.48      -0.24   errors shrink
+ 3.52      -0.19   errors shrink
+ 3.56      -0.08   errors shrink
+ 3.60      +0.18   errors grow
+ 3.64      +0.23   errors grow
+ 3.68      +0.34   errors grow
+ 3.72      +0.36   errors grow
+ 3.76      +0.39   errors grow
+ 3.80      +0.43   errors grow
+ 3.84      -0.04   errors shrink
+ 3.88      +0.46   errors grow
+ 3.92      +0.53   errors grow
+ 3.96      +0.54   errors grow
+ 4.00      +0.69   errors grow

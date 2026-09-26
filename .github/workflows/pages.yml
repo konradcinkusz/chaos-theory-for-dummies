@@ -1,0 +1,141 @@
+name: Pages
+
+# Builds BOTH editions and publishes the PDFs to GitHub Pages beside a
+# one-page summary, so the book has an address:
+#
+#   https://konradcinkusz.github.io/chaos-theory-for-dummies/
+#   .../Chaos-from-Zero.pdf       .../book-en.pdf
+#   .../Chaos-od-zera.pdf         .../book-pl.pdf
+#
+# It repeats the gates rather than trusting another workflow's: Pages must
+# never publish a PDF that did not build, or numbers that drifted.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build both editions and publish
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      # FIRST, deliberately: a repository with no Pages site yet fails here in
+      # seconds rather than after a build it cannot publish. Creating the
+      # first site is an administrative action no workflow token can be
+      # granted; a repository admin sets Settings -> Pages -> Source to
+      # "GitHub Actions" once, and every push after that publishes.
+      - name: Configure Pages
+        id: configure_pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Explain a Pages-configuration failure
+        if: ${{ failure() && steps.configure_pages.conclusion == 'failure' }}
+        run: |
+          {
+            echo "## Pages failed at Settings, not at the book"
+            echo ""
+            echo "A repository admin must set **Settings -> Pages -> Build and"
+            echo "deployment -> Source** to **GitHub Actions**, once."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: The source gates
+        run: |
+          python3 tools/gen_stubs.py --check
+          python3 tools/gen_traps.py --check
+          python3 tools/parity.py
+          python3 tools/check_structure.py --all
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.13"
+          enable-cache: true
+          cache-dependency-glob: "code/uv.lock"
+
+      - name: Regenerate every number, refuse to publish on drift, draw plots
+        run: |
+          cd code && uv sync --locked
+          for f in measure/*.py; do
+            case "$(basename "$f")" in _*) continue;; esac
+            uv run python "$f"
+          done
+          for f in plots/ch*.py; do uv run python "$f"; done
+          cd ..
+          drift=$(git diff --name-only -- figures/values figures/transcripts)
+          new=$(git ls-files --others --exclude-standard -- figures/values figures/transcripts)
+          if [ -n "$drift" ] || [ -n "$new" ]; then
+            echo "::error::A computed value differs from what code/measure now produces."
+            exit 1
+          fi
+          { echo '% Generated in CI --- do not edit.';
+            for v in figures/values/*.tex; do
+              case "$v" in */all.tex) continue;; esac
+              echo "\\input{${v%.tex}}"
+            done; } > figures/values/all.tex
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Render diagrams
+        run: |
+          shopt -s nullglob
+          SRC=(figures/mermaid/*/*.mmd)
+          [ ${#SRC[@]} -eq 0 ] && exit 0
+          printf '{"args":["--no-sandbox","--disable-dev-shm-usage"]}\n' > .puppeteer.json
+          npm install -g @mermaid-js/mermaid-cli@11
+          for f in "${SRC[@]}"; do
+            lang=$(basename "$(dirname "$f")"); key=$(basename "$f" .mmd)
+            mkdir -p "figures/diagrams/$lang"
+            timeout 180 mmdc -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
+              -p .puppeteer.json -c figures/mermaid/config.json \
+              -b transparent --pdfFit -w 1600
+          done
+
+      - name: Compile the English edition
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main-en.tex
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+      - name: Compile the Polish edition
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main-pl.tex
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+      - name: Refuse to publish a build that only looked like it worked
+        run: python3 tools/checklog.py main-en.log main-pl.log
+
+      - name: Assemble the site
+        run: |
+          mkdir -p _site
+          cp docs/index.html _site/index.html
+          cp main-en.pdf _site/Chaos-from-Zero.pdf
+          cp main-pl.pdf _site/Chaos-od-zera.pdf
+          cp main-en.pdf _site/book-en.pdf
+          cp main-pl.pdf _site/book-pl.pdf
+          ls -la _site
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

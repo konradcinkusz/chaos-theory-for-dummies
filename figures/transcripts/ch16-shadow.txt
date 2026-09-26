@@ -1,0 +1,5 @@
+steps computed with 4x(1-x):     1000
+shadow's start minus 1/10:       -1.1e-17
+farthest its exact orbit strays: 8.6e-15
+fraction of a million steps below 0.1:
+  4x(1-x) 0.205   4x-4xx 0.205   exact 0.205

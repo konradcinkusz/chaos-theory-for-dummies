@@ -1,0 +1,468 @@
+%% ch17 --- Okiełznać chaos: sterowanie i synchronizacja
+%%
+%% Napisany we wrześniu 2026. Druga strona części II: skoro maleńkie
+%% zaburzenie bardzo zmienia przyszłość układu chaotycznego, to maleńkie,
+%% dobrze zgrane w czasie pchnięcie może nim sterować. Każda liczba, której
+%% czytelnik nie policzy w pamięci, pochodzi z code/measure/ch17.py, który
+%% importuje TE SAME funkcje, które drukują listingi (code/ch17/). Przebiegi
+%% logistyczne i synchronizacja Lorenza używają tylko +, -, * i /, więc każda
+%% liczba kroków i każda odległość na stronie jest taka sama na każdej maszynie.
+%%
+%% Czego ten rozdział NIE mówi: nie mierzy ponownie, jak szybko rosną błędy
+%% (to rozdziały 6, 7 i 9), nie rozstrzyga, czy nieregularność samego serca
+%% jest chaosem (to rozdział 15, który nazywa to sprawą sporną), i nie
+%% zamienia książki w porady (to przewodnik z rozdziału 18). Sterowanie
+%% chaosem jest przedstawione jako wynik laboratoryjny, nigdy jako rutynowa
+%% technika kliniczna czy przemysłowa.
+%%
+%% Bliźniak: chapters/en/ch17-taming.tex. Podrozdział za podrozdziałem, makro
+%% za makrem, liczba za liczbą; tools/parity.py je porównuje.
+
+\chapter{Okiełznać chaos: sterowanie i synchronizacja}
+\label{ch:taming}
+\index{sterowanie chaosem}\index{synchronizacja}
+
+\noindent
+Postaw miotłę pionowo na dłoni. Zostawiona sama sobie przewraca się: pion to
+położenie, którego nie potrafi utrzymać. A jednak możesz ją tak trzymać, jak
+długo starczy ci cierpliwości, ruchami dłoni tak drobnymi, że ktoś, kto
+patrzy, mógłby ich nie zauważyć. Nie pokonujesz miotły siłą. Patrzysz, w
+którą stronę zaczyna się przechylać, i robisz małą poprawkę, raz za razem.
+
+Część~II tej książki pokazała, że układ chaotyczny zamienia maleńką różnicę w
+dużą, i zmierzyła, jak szybko. Ten rozdział odwraca to zdanie. Skoro
+maleńkie zaburzenie może bardzo zmienić przyszłość układu chaotycznego, to
+czy maleńkie, dobrze dobrane zaburzenie może ją zmienić tak, jak chcesz? A
+skoro dwa układy chaotyczne zostawione same sobie zawsze się rozchodzą, to
+czy da się sprawić, żeby się zgadzały?
+
+\begin{outcomes}
+\outcome{znaleźć punkt stały odwzorowania logistycznego, którego reguła nie
+  potrafi utrzymać, i policzyć, jak często chaotyczna orbita zbliża się do
+  niego}
+\outcome{obliczyć małą zmianę parametru, która znosi chybienie, jakie
+  zrobiłby jeden krok}
+\outcome{uruchomić sterownik małych pchnięć na chaotycznym odwzorowaniu i
+  zmierzyć, jak długo czeka i jak duże są jego pchnięcia}
+\outcome{napędzać kopię układu Lorenza jedną liczbą z oryginału i zmierzyć,
+  jak z upływem czasu zmienia się odległość między nimi}
+\outcome{powiedzieć, gdzie wykazano, że sterowanie chaosem i synchronizacja
+  działają, i czym one nie są}
+\end{outcomes}
+
+\section{Punkt, którego orbita nie utrzyma}
+\label{sec:ch17-point}
+\index{punkt stały!niestabilny}
+
+\noindent
+Weź odwzorowanie logistyczne z rozdziału~\ref{ch:logistic}, regułę, która
+zamienia $x$ na $r\,x(1 - x)$, przy $r = \num{3.9}$, gdzie orbita nigdy się
+nie ustala i nigdy się nie powtarza. Reguła wciąż ma punkt stały: wartość
+$1 - 1/r$, którą reguła zostawia dokładnie tam, gdzie jest. Przy
+$r = \num{3.9}$ to mniej więcej \val{ch17.point}. Rozdział~\ref{ch:logistic}
+powiedział też, dlaczego orbita tam nie zostaje. W pobliżu punktu stałego
+jeden krok mnoży małe chybienie przez nachylenie reguły w tym punkcie
+\dash{} czynnik rozciągania z rozdziału~\ref{ch:feedback} \dash{} a tutaj
+nachylenie wynosi \val{ch17.stretch}. Chybienie o jedną tysięczną staje się
+prawie dwiema tysięcznymi po drugiej stronie, potem prawie czterema, potem
+prawie siedmioma. Punkt stały to miotła postawiona na sztorc.
+
+\pyregion{code/ch17/hidden.py}{point}{Punkt stały i to, co jeden krok robi tam z chybieniem}{lst:ch17-point}
+
+\noindent
+Wiersz zaczynający się od \code{STRETCH} prosi bibliotekę książki o
+nachylenie reguły w punkcie stałym: o to, ile razy jeden krok mnoży tam małe
+chybienie.
+
+\begin{think}
+Orbita przy $r = \num{3.9}$ jest chaotyczna, a punkt stały odpycha wszystko,
+co się do niego zbliży. Czy orbita, gdy już odejdzie, wraca kiedykolwiek
+na odległość mniejszą niż jedna setna od \val{ch17.point}: nigdy, kilka razy,
+czy raz za razem?
+\end{think}
+\reveal{Raz za razem. W ciągu \num{10000} kroków od $x = \num{0.2}$ jest
+w odległości mniejszej niż jedna setna od punktu stałego w \val{ch17.visits}
+krokach, po raz pierwszy w kroku \val{ch17.first.visit}.}
+Chaotyczna orbita wędruje po całym swoim zakresie i nie pomija żadnej jego
+części: rozdział~\ref{ch:lorenz} pokazał, że to, jak często układ chaotyczny
+odwiedza każdy obszar, jest jedną z rzeczy, które da się o nim przewidzieć.
+Funkcja \api{visits} z listingu liczy kroki, które lądują blisko:
+
+\transcript{ch17-hidden}
+
+\noindent
+Zobacz, jak przychodzą te wizyty: seriami sąsiednich kroków. Gdy orbita
+dotrze blisko, nachylenie \val{ch17.stretch} wyrzuca ją tylko stopniowo,
+prawie podwajając chybienie i zmieniając jego stronę w każdym kroku, więc
+orbita zostaje kilka kroków, zanim zostanie odrzucona.
+
+Punkt stały to tylko najprostsza z rzeczy, których reguła nie potrafi
+utrzymać. Są cykle dwóch wartości, trzech i wielu innych długości, każdy z
+nich niestabilny, a chaotyczna orbita przechodzi kolejno w pobliżu każdego z
+nich. Atraktor chaotyczny nie jest bezkształtną mgłą. To plątanina
+niestabilnych cykli, a orbita bez końca przeskakuje z okolicy jednego do
+okolicy następnego.
+
+\section{Pchnięcie we właściwej chwili}
+\label{sec:ch17-nudge}
+\index{Ott, Grebogi i Yorke}\index{sterowanie chaosem!pchnięcie}
+
+\noindent
+W 1990 roku Edward Ott, Celso Grebogi i James Yorke opublikowali artykuł
+zatytułowany \enquote{Controlling chaos} (\enquote{Sterowanie chaosem}), z
+pomysłem równie przyziemnym jak miotła. Nie walcz z chaosem. Poczekaj, aż
+orbita przejdzie blisko niestabilnej orbity, której potrzebujesz, a potem dawaj
+układowi małe pchnięcia, każde tylko tak duże, jak trzeba, by znieść
+chybienie, które zrobiłby następny krok. Pchnięcia trafiały w
+\emph{parametr}: ustawienie układu, które wolno ci trochę zmieniać. W odwzorowaniu logistycznym tym
+ustawieniem jest $r$.
+
+\begin{think}
+Załóżmy, że możesz zmieniać $r$ w każdym kroku, ale nigdy o więcej niż jeden
+procent: na dowolną wartość między \num{3.861} a \num{3.939}. Pozostawione
+przy \num{3.9} odwzorowanie jest chaotyczne, a jeden procent to prawie żadna
+zmiana. Czy tak małe pchnięcia mogą utrzymać orbitę w \val{ch17.point}?
+\end{think}
+\reveal{Tak. W przebiegu z następnego podrozdziału sterownik, którego
+pchnięcia nigdy nie przekraczają jednego procenta, zostaje włączony w kroku
+$100$, łapie orbitę w kroku \val{ch17.catch} i trzyma ją w punkcie stałym tak
+długo, jak trwa przebieg. Największe pchnięcie, jakie kiedykolwiek robi,
+wynosi \val{ch17.largest.pct} procent wartości $r$.}
+
+\begin{trapbox}
+\textbf{\enquote{Chaosem nie da się sterować.}} Chaos zabrania przewidywania
+na daleką metę: rozdział~\ref{ch:lyapunov} zmierzył, jak mały błąd rośnie,
+aż prognoza traci wartość. Sterownik nigdy nie patrzy daleko naprzód. Patrzy
+o jeden krok naprzód, a na jeden krok reguła chaotyczna jest tak
+przewidywalna jak filiżanka herbaty: chybienie mnoży się przez
+\val{ch17.stretch}, a nie przez milion. Chaos odbiera ci daleki widok, ale
+zostawia bliski, a do sterowania potrzeba tylko bliskiego.
+Chaos wykonuje nawet połowę pracy, bo to on w ogóle doprowadza orbitę w
+pobliże celu.
+\end{trapbox}
+
+\noindent
+Jak duże musi być każde pchnięcie? Rozstrzygają o tym dwa fakty. Pierwszy
+już znasz: jeden krok mnoży chybienie przez \val{ch17.stretch}. Drugi to
+działanie pokrętła. Reguła to $r$ razy $x(1 - x)$, więc podniesienie $r$ o
+małą wartość $c$ na jeden krok podnosi następną wartość o $c$ razy
+$x(1 - x)$. W pobliżu punktu stałego $x(1 - x)$ wynosi mniej więcej
+\val{ch17.lever}; nazwij to \emph{dźwignią}.
+
+\begin{think}
+Orbita jest o \num{0.001} powyżej punktu stałego. Zostawiona sama sobie, w
+następnym kroku znajdzie się $\num{1.9} \times \num{0.001} = \num{0.0019}$
+poniżej. Podniesienie $r$ o $c$ podnosi następną wartość mniej więcej o
+\val{ch17.lever} razy $c$. Jakie $c$ znosi chybienie?
+\end{think}
+\reveal{$c = \num{0.0019} / \val{ch17.lever}$, czyli mniej więcej \num{0.01}:
+podnieś $r$ z \num{3.9} do \num{3.91} na ten jeden krok, o mniej więcej
+ćwierć procenta.}
+Ogólnie zmiana to chybienie razy nachylenie, podzielone przez dźwignię, ze
+zmienionym znakiem: mniej więcej \val{ch17.gain} razy chybienie. To cały
+sterownik.
+
+\pyregion{code/ch17/control.py}{rule}{Sterownik: znieś nadchodzące chybienie albo czekaj}{lst:ch17-rule}
+
+\noindent
+\api{nudge} to reguła, a jej ostatni wiersz to cierpliwość. Jeśli potrzebna
+zmiana jest większa niż \code{largest}, funkcja zwraca zero i odwzorowanie
+działa dalej nietknięte. Gdy \code{largest} wynosi jeden procent $r$,
+sterownik może działać tylko wtedy, gdy orbita jest w odległości mniejszej
+niż \val{ch17.reach} od punktu stałego, i musi czekać, aż chaos ją tam
+doprowadzi.
+
+\mermaidfig{ch17-wait-catch}{Trzy nastroje sterownika. Czeka, dopóki orbita
+jest poza zasięgiem, łapie ją, gdy chaos przyprowadzi ją blisko, i trzyma ją
+pchnięciami; wytrącony, czeka znowu.}{czekaj, złap, trzymaj}
+
+\section{Drobne, a nie siła}
+\label{sec:ch17-small}
+\index{sterowanie chaosem!koszt}
+
+\noindent
+Teraz uruchom sterownik. Poniższy listing zostawia odwzorowanie w spokoju przez
+$100$ kroków od $x = \num{0.2}$, potem włącza sterownik z pchnięciami
+najwyżej o jeden procent i od czasu do czasu wypisuje stan.
+
+\begin{think}
+Gdy orbita zostanie złapana, jak duże muszą być pchnięcia, żeby ją tam
+utrzymać: tak duże jak pierwsze, większe, bo chaos wciąż się odpycha, czy
+mniejsze?
+\end{think}
+\reveal{Mniejsze, a potem prawie żadne. W ciągu \val{ch17.settle} kroków od
+złapania każde pchnięcie jest mniejsze niż miliardowa część $r$, a wszystkie
+pchnięcia przebiegu razem dają \val{ch17.total}.}
+
+\begin{trapbox}
+\textbf{\enquote{Sterować układem to go przemóc.}} Sterownik nie dostarcza
+żadnego ruchu. Punkt stały i wizyty orbity w jego pobliżu należą do
+odwzorowania; sterownik tylko znosi małe chybienia, które widzi z
+wyprzedzeniem, a złapana orbita nie ma już prawie czego znosić. Wybierasz,
+które z własnych zachowań układu zachować, a nie narzucasz mu nowego.
+Dlatego Ott, Grebogi i Yorke mogli trzymać układ chaotyczny na dowolnym z
+jego wielu niestabilnych cykli i przełączać go między nimi za pomocą tych
+samych małych pchnięć.
+\end{trapbox}
+
+\pyregion{code/ch17/control.py}{run}{Chaos przez sto kroków, potem sterownik}{lst:ch17-run}
+
+\transcript{ch17-control}
+
+\noindent
+Python zapisuje $-\num{2.72} \times 10^{-2}$ jako \code{-2.72e-02}, czyli
+$-\num{0.0272}$. Czytaj wydruk z góry na dół. Przez $100$ kroków orbita
+wędruje. Sterownik zostaje włączony i przez \val{ch17.waited} kroków nie
+robi nic, bo orbita jest poza zasięgiem. W kroku \val{ch17.catch} wchodzi w
+zasięg, dostaje pchnięcie i ląduje znacznie bliżej; każde następne pchnięcie
+jest dużo mniejsze od poprzedniego, a od kroku $200$ wydruk pokazuje dla $x$
+wciąż te same dziesięć cyfr.
+
+\plotfig{ch17-control}{Odwzorowanie logistyczne przy $r = \num{3.9}$,
+zostawione w spokoju na 100 kroków, a potem sterowane. Linia przerywana to
+punkt stały. Poniżej zmiana wprowadzana do $r$: zero, poza jednym małym
+spadkiem w chwili złapania.}{sterowanie włączone w trakcie przebiegu}
+
+Kuszącą alternatywą jest siła: kręcić pokrętłem, aż chaos ustanie.
+Rozdział~\ref{ch:logistic} pokazał, że punkt stały jest stabilny tylko
+wtedy, gdy $r$ jest mniejsze niż $3$. Ustaw $r = \num{2.9}$ i już tak zostaw:
+orbita rzeczywiście się ustali, w punkcie \val{ch17.brute.point}. To zmiana o
+\val{ch17.brute.pct} procent wartości $r$, wprowadzona na stałe, a nie daje
+ci nawet tego stanu, którego chciałeś: punkt stały spokojnego odwzorowania,
+$1 - 1/\num{2.9}$, leży gdzie indziej. Wartość \val{ch17.point} jest punktem
+stałym tylko przy $r = \num{3.9}$, gdzie jest niestabilna, więc żadne stałe
+ustawienie pokrętła nie da ci tego stanu. Sterownik utrzymuje go za drobne:
+wszystkie jego pchnięcia razem dają mniej niż jedną trzydziestą zmiany,
+jaką siła wprowadza w każdym pojedynczym kroku.
+
+Małe pchnięcia mają swoją cenę, a płaci się ją czasem. Sterownik może
+działać tylko wtedy, gdy orbita jest w zasięgu, a zasięg rośnie proporcjonalnie
+do największego pchnięcia, na jakie pozwalasz.
+
+\begin{think}
+Pozwalasz na pchnięcia dziesięć razy mniejsze: jedną dziesiątą procenta
+wartości $r$. Co się dzieje z czekaniem przed złapaniem?
+\end{think}
+\reveal{Staje się mniej więcej dziesięć razy dłuższe. Uśrednione po tysiącu
+punktów startowych czekanie trwa \val{ch17.wait.big} kroków przy
+pchnięciach do dziesięciu procent, \val{ch17.wait.mid} przy jednym procencie
+i \val{ch17.wait.small} przy jednej dziesiątej procenta.}
+
+\pyregion{code/ch17/waiting.py}{wait}{Ile czasu do pierwszego pchnięcia?}{lst:ch17-wait}
+
+\transcript{ch17-waiting}
+
+\noindent
+Zasięg maleje dziesięciokrotnie, więc orbita ma dziesięć razy węższy cel do
+trafienia i średnio potrzebuje dziesięć razy więcej czasu, żeby go znaleźć.
+Dla żadnego pojedynczego przebiegu nie da się z góry powiedzieć, jak długo
+potrwa czekanie \dash{} to pierwsza wizyta chaotycznej orbity \dash{} a
+najdłuższy z tysiąca przebiegów przy jednym procencie czekał
+\val{ch17.wait.longest} kroków. Średnia, tak jak statystyki z
+rozdziału~\ref{ch:lorenz}, jest stabilna.
+
+\begin{lab}{l17_01_controller}{Twój własny sterownik}
+Napisz \code{nudge} i \code{hold} dla odwzorowania logistycznego przy
+dowolnym $r$, przy którym punkt stały $1 - 1/r$ stał się niestabilny. W
+punkcie stałym nachylenie wynosi $r(1 - 2x)$, a dźwignia $x(1 - x)$. Testy
+łapią i trzymają orbitę przy $r = \num{3.9}$ i jeszcze raz przy
+$r = \num{3.7}$ oraz sprawdzają, że żadne pchnięcie nie jest większe, niż
+pozwoliłeś.
+\end{lab}
+
+\section{Dwa układy chaotyczne, które się zgadzają}
+\label{sec:ch17-sync}
+\index{synchronizacja!napęd i odpowiedź}\index{Pecora i Carroll}
+
+\noindent
+W rozdziale~\ref{ch:lorenz} trzy równania Lorenza uruchomiono dwa razy, ze
+startów różniących się o włos, i oba przebiegi rozeszły się na dobre. Dwa układy chaotyczne zostawione same sobie nigdy nie pozostają
+razem. W 1990 roku Louis Pecora i Thomas Carroll zapytali, co się dzieje,
+gdy jeden z nich nie jest zostawiony sam sobie. Zbuduj kopię układu Lorenza,
+która ma własne $y$ i $z$, podlegające tym samym regułom co w oryginale, ale
+nie ma własnego $x$: w każdej chwili dostaje zamiast niego $x$ oryginału.
+
+\mermaidfig{ch17-drive}{Napęd i odpowiedź. Oryginał działa swobodnie; jedna
+z jego trzech liczb trafia do kopii, która ma tylko dwie
+pozostałe.}{jeden sygnał, od oryginału do kopii}
+
+\begin{think}
+Niech $y$ i $z$ kopii startują od zera, w odległości \val{ch17.sync.start} od
+wartości oryginału. Oba układy są chaotyczne. Czy $y$ i $z$ kopii oddalą się
+od wartości oryginału, tak jak dwa przebiegi z rozdziału~\ref{ch:lorenz},
+czy się zbliżą?
+\end{think}
+\reveal{Zbliżą się, i to szybko. Odległość spada poniżej jednej milionowej w
+chwili \val{ch17.sync.tol}, a w chwili \val{ch17.sync.exact} obie liczby
+kopii są równe liczbom oryginału w każdej cyfrze, jaką przechowuje
+komputer.}
+
+\pyregion{code/ch17/sync.py}{field}{Oryginał i kopia, która dostaje jego x}{lst:ch17-field}
+
+\transcript{ch17-sync}
+
+\noindent
+Środkowa kolumna to kopia, która dostaje $x$. Ostatnia to druga kopia, z
+tego samego błędnego startu, zostawiona sama sobie. Jedyna różnica między
+nimi to ta jedna przekazywana liczba, i to ona robi całą różnicę: kopia
+zostawiona sama sobie nigdy nie zbliża się do oryginału bardziej niż na
+\val{ch17.free.min}, a odległość kopii napędzanej maleje mniej więcej
+\val{ch17.sync.factor} razy w każdej jednostce czasu. Gdy już zgodzą się co
+do ostatniej cyfry, tak zostaje, bo od tej chwili komputer wykonuje dwa razy
+te same rachunki.
+
+Dlaczego to działa? Kopia nie należy do pętli, która czyni oryginał
+chaotycznym. W układzie Lorenza $x$ napędza $y$ i $z$, a $y$ i $z$ napędzają
+z powrotem $x$, i mała różnica krąży po tej pętli i rośnie. Kopia tylko
+słucha. Gdy kopia dostaje to samo $x$, jej $y$ i $z$ zapominają, skąd wystartowały,
+tak jak dwa kubki herbaty w jednym pokoju zapominają o dzielącej je różnicy
+w rozdziale~\ref{ch:models}.
+
+\plotfig{ch17-sync}{Odległość każdej z kopii od oryginału w skali
+logarytmicznej. Kopia, która dostaje $x$, zgrywa się z oryginałem wzdłuż
+linii prostej, szybciej niż w gwarantowanym tempie; zostawiona sama sobie,
+pozostaje tak daleko, jak pozwala atraktor.}{kopia zgrywająca się z
+oryginałem}
+
+\begin{trapbox}
+\textbf{\enquote{Dwa układy chaotyczne nigdy nie mogą się zgadzać.}} Dwa
+układy chaotyczne zostawione same sobie nigdy nie pozostaną razem, bo każdy
+wzmacnia każdą różnicę, jaka jest między nimi. Sprzężone tak, że jeden
+słucha drugiego, mogą zgadzać się dokładnie, razem z całym swoim chaosem.
+Zwróć uwagę, czym ta zgodność nie jest: kopia zgadza się z oryginałem teraz,
+a nie z jego przyszłością. Synchronizacja to nie przewidywanie.
+\end{trapbox}
+
+\begin{rigourbox}
+Dlaczego to musi działać, cokolwiek robi $x$. Oznacz przez $e_y$ i $e_z$ to,
+jak daleko $y$ i $z$ kopii są od wartości oryginału. Odejmij reguły kopii od
+reguł oryginału i policz, jak szybko zmienia się $e_y^2 + e_z^2$: każdy
+wyraz zawierający $x$ się skraca, a to, co zostaje, $-2e_y^2 - 2\beta e_z^2$
+przy $\beta = 8/3$, nigdy nie jest dodatnie. Z tej jednej linijki wynika, że
+odległość maleje co najmniej $e$ razy, czyli mniej więcej \num{2.718} razy,
+w każdej jednostce czasu; zmierzony czynnik \val{ch17.sync.factor} jest
+lepszy od gwarancji. Rozumowanie tego rodzaju jest w podręczniku Strogatza
+\emph{Nonlinear Dynamics and Chaos}. Nie każdy wybór przekazywanej liczby
+działa, a artykuł Pecory i Carrolla podaje test, który to rozstrzyga.
+\end{rigourbox}
+
+\begin{lab}{l17_02_sync}{Ile czasu potrzebuje kopia?}
+Napisz \code{copy\_field}, pięć szybkości zmian oryginału i kopii;
+\code{error}, odległość między $y$ i $z$ kopii a wartościami oryginału; oraz
+\code{sync\_time}, która prowadzi pięć liczb razem krok po kroku i zwraca
+pierwszą chwilę,
+w której błąd spada poniżej zadanej tolerancji. Testy sprawdzają, że trzy
+kolejne rzędy wielkości zajmują nie więcej czasu, niż pozwala powyższa
+gwarancja.
+\end{lab}
+
+\section{Co już z tym zrobiono, a czego nie}
+\label{sec:ch17-world}
+\index{bezpieczna łączność}\index{sterowanie chaosem!w laboratorium}
+
+\noindent
+Wynik Pecory i Carrolla od razu podsunął pomysł na dochowanie tajemnicy.
+Dodaj słabą wiadomość do $x$ oryginału i wyślij sumę. Każdemu, kto
+podsłuchuje, wydaje się to szumem. Odbiornik zbudowany jako pasująca kopia
+zgrywa się z chaotyczną częścią sygnału, a odjęcie tego, co odtworzy,
+zostawia wiadomość. Wkrótce potem zbudowano układy elektroniczne, które to
+robią. Późniejsze prace pokazały, że wiele takich schematów może złamać
+podsłuchujący, który przeanalizuje sygnał, a chaos nie zastąpił zwykłego
+szyfrowania.
+
+\begin{worldbox}
+W ciągu kilku lat od 1990 roku metoda małych pchnięć utrzymała chaotyczne
+lasery i układy elektroniczne na orbitach, których same by nie utrzymały. W
+1992 roku Alan Garfinkel i współpracownicy zastosowali ją w doświadczeniu na
+wyizolowanej tkance serca królika, której skurcze stały się nieregularne
+pod wpływem leku: bodźce elektryczne, zgrane w czasie według tej samej
+logiki \enquote{czekaj, potem pchnij}, przywróciły regularny rytm. Misje
+kosmiczne korzystają z tej samej obosieczności wrażliwości. W pobliżu
+miejsc, gdzie przyciąganie Słońca, Ziemi i Księżyca prawie się równoważy,
+problem trzech ciał z rozdziału~\ref{ch:mechanics} jest chaotyczny, a małe
+odpalenie silników bardzo zmienia tor lotu. Sonda NASA ISEE-3 została w ten
+sposób wyprowadzona ze swojego stanowiska między Słońcem a Ziemią, dzięki
+serii bliskich przelotów obok Księżyca i przy niewielkim zużyciu paliwa, a w
+1985 roku przeleciała przez warkocz komety.
+\end{worldbox}
+
+\begin{warning}
+Zachowaj proporcje. Sterowanie chaosem wykazano w laboratorium wiele razy.
+Nie jest to rutynowe leczenie kliniczne ani standardowa technika
+przemysłowa; to, czy nieregularność samego serca w ogóle jest chaosem,
+rozdział~\ref{ch:life} nazywa sprawą sporną.
+\end{warning}
+
+\noindent
+Oto co ten rozdział dodaje do argumentu książki. Część~II zmierzyła
+wrażliwość jako ograniczenie: to przez nią horyzont prognozy jest krótki.
+Jest ona jednak także dźwignią. Spokojny układ ma jedno zachowanie, a jego
+zmiana wymaga siły. Układ chaotyczny jest pełen zachowań, których nie
+potrafi utrzymać, i każde z nich można wybrać i utrzymać za drobne, jeśli
+tylko zechcesz patrzeć i czekać. Chaos to nie tylko granica tego, co możesz
+wiedzieć. To zasób. Rozdział~\ref{ch:why} zbiera wszystko, co zmierzyła ta
+książka, w przewodnik po życiu z jednym i drugim.
+
+\begin{summarybox}
+\begin{itemize}
+\item Przy $r = \num{3.9}$ odwzorowanie logistyczne ma \textbf{punkt stały,
+  którego nie potrafi utrzymać}: jeden krok mnoży chybienie przez
+  nachylenie, \val{ch17.stretch}. Chaotyczna orbita wciąż przechodzi blisko
+  niego i blisko wielu \textbf{niestabilnych cykli}.
+\item \textbf{Sterownik} czeka na bliskie przejście, a potem zmienia
+  \textbf{parametr} $r$ o tyle, ile znosi nadchodzące chybienie: chybienie
+  razy nachylenie, podzielone przez \textbf{dźwignię}, ze zmienionym znakiem.
+  Przewiduje tylko o jeden krok naprzód, a na to chaos pozwala.
+\item Gdy orbita zostanie złapana, pchnięcia maleją prawie do zera. Siła,
+  czyli duża i trwała zmiana $r$, nie daje nawet tego samego stanu. Mniejsze
+  pchnięcia kosztują dłuższe \textbf{czekanie}, którego średnia jest stabilna.
+\item Kopia układu Lorenza, która dostaje $x$ oryginału, zgrywa się z nim:
+  to \textbf{synchronizacja}. Zostawiona sama sobie nigdy tego nie robi.
+  Zgodność to nie przewidywanie.
+\item Sterowanie chaosem i synchronizacja to \textbf{wyniki laboratoryjne}
+  \dash{} w laserach, układach elektronicznych i tkance serca \dash{} oraz
+  narzędzie sterowania lotem sond kosmicznych. Wrażliwość jest
+  \textbf{zasobem}, a nie tylko ograniczeniem.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Dla odwzorowania logistycznego przy $r = \num{3.5}$: jaki jest punkt
+  stały $1 - 1/r$, jakie jest w nim nachylenie $2 - r$ i czy orbita może w
+  nim pozostać?
+  \answerto{Mniej więcej \num{0.714}, z nachyleniem $-\num{1.5}$. Chybienie
+  mnoży się przez \num{1.5} i w każdym kroku zmienia stronę, więc orbita nie
+  może pozostać.}
+\item Przy $r = \num{3.9}$ orbita jest o \num{0.002} poniżej punktu
+  stałego. Gdzie umieści ją jeden krok bez sterowania i jaka zmiana $r$
+  znosi chybienie?
+  \answerto{Mniej więcej \num{0.0038} powyżej niego. Obniż $r$ mniej więcej
+  o $\num{0.0038} / \val{ch17.lever}$, czyli o \num{0.02}, na ten jeden
+  krok.}
+\item Dlaczego sterownik może kierować układem chaotycznym, skoro nikt nie
+  potrafi prognozować go daleko naprzód?
+  \answerto{Bo sterownik musi przewidzieć tylko jeden krok naprzód, a w
+  ciągu jednego kroku chybienie rośnie mniej więcej dwukrotnie, a nie
+  wykładniczo bez końca.}
+\item Zmniejszasz o połowę największe dozwolone pchnięcie. Co się dzieje z
+  zasięgiem sterownika i mniej więcej ze średnim czekaniem?
+  \answerto{Zasięg maleje o połowę, więc cel jest o połowę węższy, a średnie
+  czekanie mniej więcej się podwaja.}
+\item Dlaczego ustawienie na stałe $r = \num{2.9}$ nie daje ci stanu
+  \val{ch17.point}?
+  \answerto{Bo spokojne odwzorowanie ustala się w swoim własnym punkcie
+  stałym, $1 - 1/\num{2.9}$, mniej więcej \val{ch17.brute.point}. Wartość
+  \val{ch17.point} jest punktem stałym tylko przy $r = \num{3.9}$, gdzie jest
+  niestabilna.}
+\item W schemacie Pecory i Carrolla co przekazuje się od oryginału do kopii i
+  czy kopia przewiduje wtedy przyszłość oryginału?
+  \answerto{$x$ oryginału. Nie: kopia zgadza się z oryginałem w każdej
+  chwili, a to jest synchronizacja, nie przewidywanie.}
+\item Wymień dwa miejsca, w których wykazano sterowanie chaosem, i powiedz,
+  czym ono nie jest.
+  \answerto{Dowolne dwa spośród: lasery, układy elektroniczne i wyizolowana
+  tkanka serca w laboratorium. Nie jest to rutynowa technika kliniczna ani
+  przemysłowa.}
+\end{checkpoint}

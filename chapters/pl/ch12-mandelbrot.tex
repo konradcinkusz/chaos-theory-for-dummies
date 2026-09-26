@@ -1,0 +1,492 @@
+%% ch12 --- Iteracja na płaszczyźnie: Julia i Mandelbrot
+%%
+%% Napisany we wrześniu 2026. Liczby zespolone od zera (punkt płaszczyzny,
+%% którego długości się mnożą, a kąty dodają), reguła z -> z^2 + c i jej
+%% test ucieczki, zbiór Mandelbrota, zbiory Julii i puenta zamykająca
+%% część III: odwzorowanie logistyczne to ta sama reguła w przebraniu, więc
+%% oś rzeczywista zbioru Mandelbrota JEST kaskadą z rozdziału 8. Każda
+%% liczba, której czytelnik nie policzy w pamięci, pochodzi z
+%% code/measure/ch12.py, który importuje listingi z code/ch12/ oraz
+%% escape_time i r_to_c z chaoslab.
+%%
+%% Bliźniak: chapters/en/ch12-mandelbrot.tex. Podrozdział za podrozdziałem,
+%% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
+
+\chapter{Iteracja na płaszczyźnie: Julia i Mandelbrot}
+\label{ch:mandelbrot}
+\index{zbiór Mandelbrota}\index{liczby zespolone}
+
+\noindent
+Weź liczbę, podnieś ją do kwadratu i dodaj $1$. Zrób to samo z wynikiem, i
+jeszcze raz. Zaczynając od $0$, dostajesz $0$, $1$, $2$, $5$, $26$ i liczby
+znikają, pędząc do nieskończoności. Dodaj $-1$ zamiast $1$, a ten sam
+przepis daje $0$, $-1$, $0$, $-1$ bez końca. Oto więc pytanie z odpowiedzią
+tak albo nie dla każdej liczby $c$, którą możesz dodawać: \emph{czy
+przepis, zaczęty od $0$, ucieka?}
+
+Na osi liczbowej odpowiedź jest nudna: te $c$, które nie uciekają, tworzą
+jeden nieprzerwany odcinek, od $-2$ do $\tfrac14$. Ten rozdział zadaje to
+samo pytanie punktom płaskiej płaszczyzny, niczego poza tym nie zmieniając,
+a odpowiedzią jest najsłynniejszy obraz w matematyce. To także droga do
+chaosu z rozdziału~\ref{ch:bifurcations} oglądana z boku i ostatnia rzecz,
+którą część~III ma ci do pokazania o kształtach chaosu.
+
+\begin{outcomes}
+\outcome{dodawać i mnożyć dwa punkty płaszczyzny, ręcznie i za pomocą liczb
+  zespolonych Pythona}
+\outcome{stosować regułę $z \to z^{2} + c$ od punktu startowego i znajdować
+  krok, w którym orbita ucieka}
+\outcome{powiedzieć, co zbiór Julii, a co zbiór Mandelbrota ustala, a co
+  pozwala zmieniać}
+\outcome{przeliczać $r$ odwzorowania logistycznego na $c$ zbioru Mandelbrota
+  i z powrotem oraz odnaleźć kaskadę z rozdziału~\ref{ch:bifurcations} na
+  osi rzeczywistej}
+\outcome{odróżnić części zbioru Mandelbrota, w których orbita się ustala, od
+  tych, w których nigdy się nie ustala}
+\end{outcomes}
+
+\section{Liczby, które są punktami}
+\label{sec:ch12-plane}
+\index{liczby zespolone!mnożenie}
+
+\noindent
+Wszystkie liczby w tej książce żyły dotąd na prostej. Punkt płaskiej
+płaszczyzny potrzebuje dwóch liczb: jak daleko w poziomie i jak daleko w
+pionie. Punkt trzy w prawo i cztery w górę zapisz jako $3 + 4\iu$. Na razie
+$\iu$ to tylko etykieta znacząca \enquote{w górę}: liczba przy niej to część
+pionowa, a druga to część pozioma. Liczby zapisane w ten sposób nazywają się
+\emph{liczbami zespolonymi}; część pozioma nazywa się \emph{rzeczywistą}, a
+pionowa \emph{urojoną} \dash{} do końca tego podrozdziału będziesz mieć
+powody, żeby tym nazwom nie ufać.
+
+Dodawanie dwóch takich liczb to przesuwanie. Dodaj osobno części poziome i
+osobno pionowe, $(3 + 4\iu) + (1 + 2\iu) = 4 + 6\iu$, dokładnie tak, jak dwa
+ruchy na mapie składają się w jeden.
+
+Mnożenie wymaga reguły; oto ona w słowach. Każdy punkt ma \emph{długość},
+czyli odległość od $0$, i \emph{kąt}, czyli to, o ile jest obrócony
+przeciwnie do ruchu wskazówek zegara od dodatniej połowy osi poziomej. Dla
+$3 + 4\iu$ długość wynosi $5$, z twierdzenia Pitagorasa, a kąt to
+\val{ch12.angle} stopnia. Reguła: \textbf{żeby pomnożyć dwa punkty, pomnóż
+ich długości i dodaj ich kąty}. Mnożenie przez $2$, które ma długość $2$ i
+kąt $0$, podwaja odległość punktu od $0$ i nie zmienia jego kierunku.
+Mnożenie przez $\iu$, punkt o jeden krok w górę, zachowuje długość i obraca
+punkt o ćwierć obrotu przeciwnie do ruchu wskazówek zegara.
+
+\begin{think}
+Punkt $\iu$ ma długość $1$ i kąt $90$ stopni. Ile wynosi $\iu \times \iu$?
+\end{think}
+\reveal{$-1$. Długości mnożą się do $1 \times 1 = 1$, a kąty dodają do $180$
+stopni: pół obrotu od $1$ prowadzi do $-1$.}
+Szkoła uczy, że żadna liczba podniesiona do kwadratu nie daje wyniku
+ujemnego, i na prostej to prawda. Poza prostą już nie, i nie stało się nic
+tajemniczego: dwa ćwierćobroty dają pół obrotu. Mając $\iu \times \iu = -1$,
+możesz wymnażać nawiasy jak zawsze i na końcu uporządkować wynik:
+\[ (a + b\iu)(c + d\iu) = (ac - bd) + (ad + bc)\iu . \]
+Słowami: część pozioma iloczynu to iloczyn obu części poziomych minus
+iloczyn obu części pionowych; część pionowa to suma iloczynów części
+poziomej każdej liczby przez część pionową drugiej. Tej reguły używa
+komputer i zgadza się ona z regułą długości i kątów dla każdej pary
+punktów. Python ma ją wbudowaną: typ nazywa się \code{complex}, a $\iu$
+zapisuje się jako \code{1j}.
+
+\pyregion{code/ch12/complex_numbers.py}{times}{Reguła mnożenia, ręcznie}{lst:ch12-times}
+
+\pyregion{code/ch12/complex_numbers.py}{check}{Ręcznie, w Pythonie i przez długości i kąty}{lst:ch12-check}
+
+\transcript{ch12-complex}
+
+\noindent
+Podnieś $3 + 4\iu$ do kwadratu na oba sposoby. Algebra daje $9 - 16 = -7$ w
+poziomie i $12 + 12 = 24$ w pionie. Obrazek daje długość $5 \times 5 = 25$
+i kąt \val{ch12.angle.twice} stopnia, dwa razy \val{ch12.angle}, a punkt
+$-7 + 24\iu$ ma dokładnie tę długość i ten kąt. Dwa opisy, jedna
+odpowiedź.
+
+\begin{think}
+Liczby z $\iu$ nazywa się urojonymi. Czy cokolwiek na świecie naprawdę
+zachowuje się jak $\iu$?
+\end{think}
+\reveal{Tak: wszystko, co ma wielkość i kierunek i daje się obracać.
+Mnożenie przez $\iu$ to ćwierć obrotu, a obrót jest tak samo rzeczywisty
+jak wszystko, co da się zmierzyć.}
+
+\begin{trapbox}
+\textbf{\enquote{Liczby zespolone są urojone, więc nie opisują niczego
+rzeczywistego.}} Ta nazwa to historia, nie opis. Liczba zespolona to punkt
+płaszczyzny z regułą mnożenia, a ta reguła mówi, jak rozciągać i jak
+obracać. Wszystko, co się rozciąga i obraca \dash{} falę, obrót, prąd
+przemienny \dash{} opisują liczby zespolone, bo właśnie do tego służą, a nie
+dlatego, że ktoś udaje.
+\end{trapbox}
+
+\begin{worldbox}
+Elektrycy opisują napięcie przemienne jako punkt krążący po okręgu: jego
+długość to wielkość napięcia, a kąt mówi, w którym miejscu swojego cyklu
+napięcie jest. Obwód mnoży ten punkt przez stałą liczbę zespoloną, swoją
+\emph{impedancję}, która zmienia wielkość i przesuwa fazę \dash{} długości
+się mnożą, kąty dodają. Inżynierowie piszą $j$ zamiast $\iu$, bo litera $i$
+była już zajęta przez natężenie prądu, a Python idzie w ich ślady: dlatego
+pisze \code{1j}.
+\end{worldbox}
+
+\section{Kwadrat, dodawanie i pytanie o ucieczkę}
+\label{sec:ch12-escape}
+\index{czas ucieczki}
+
+\noindent
+Oto cała reguła tego rozdziału. Wybierz liczbę zespoloną $c$. Zacznij od
+$z = 0$ i rób kroki
+\[ z \to z^{2} + c , \]
+gdzie strzałka znaczy \emph{staje się}: podnieś punkt do kwadratu, a potem
+przesuń go o $c$. To iteracja z rozdziału~\ref{ch:iteration}, tylko z
+płaszczyzną zamiast prostej. Gdy $c$ leży na osi poziomej, to arytmetyka z
+początku rozdziału: ucieczka do nieskończoności dla $c = 1$, cykl długości
+dwa dla $c = -1$.
+
+\begin{think}
+Zacznij od $0$ z $c = -2$ i zapisz kilka pierwszych kroków. Czy orbita
+ucieka?
+\end{think}
+\reveal{Nie. Idzie $0$, $-2$, $2$, a potem $2 \times 2 - 2 = 2$ bez końca:
+stoi dokładnie na $2$ i nigdy nie oddala się bardziej.}
+
+\pyregion{code/ch12/orbits.py}{orbit}{Orbita 0 pod działaniem reguły}{lst:ch12-orbit}
+
+\transcript{ch12-orbits}
+
+\noindent
+Ostatni wiersz to płaszczyzna w działaniu. Dla $c = \iu$ orbita od razu
+opuszcza prostą, obiega małą pętlę, a potem przeskakuje między $-1 + \iu$ a
+$-\iu$ bez końca. Wiersz dla $\tfrac14$ pełznie w górę i nigdy nie
+przekracza $\tfrac12$.
+
+Nie da się patrzeć w nieskończoność, więc potrzebny jest test, który
+rozstrzyga sprawę w skończenie wielu krokach, i taki test istnieje:
+\textbf{gdy długość orbity przekroczy $2$, orbita już nie wraca}. Liczba
+kroków potrzebna do przekroczenia $2$ to \emph{czas ucieczki} punktu, a
+biblioteka książki liczy go w pięciu wierszach.
+
+\begin{rigourbox}
+Dlaczego $2$ wystarcza \dash{} słowami, a nie jako dowód. Jeśli $c$ jest
+dłuższe niż $2$, już pierwszy krok przekracza $2$, więc załóż, że nie jest,
+a $z$ jest dłuższe niż $2$. Podniesienie do kwadratu zamienia długość $z$ w
+jej kwadrat, a dodanie $c$ cofa punkt co najwyżej o długość $c$, która jest
+mniejsza od długości $z$. Nowa długość wynosi więc co najmniej starą
+długość razy (stara długość minus jeden), a to więcej niż stara długość:
+punkt się oddala, i to tym szybciej, im jest dalej. \enquote{Dodanie $c$
+cofa co najwyżej o jego długość} to nierówność trójkąta, udowadniana na
+każdym pierwszym kursie liczb zespolonych.
+\end{rigourbox}
+
+\pyregion{code/src/chaoslab/fractals.py}{escape}{Czas ucieczki, z biblioteki książki}{lst:ch12-escape}
+
+\noindent
+Test dodaje kwadraty obu części i porównuje sumę z $4$, co jest
+twierdzeniem Pitagorasa bez pierwiastka: długość przekracza $2$ dokładnie
+wtedy, gdy jej kwadrat przekracza $4$. Dla $c = 1$ odpowiedź to $3$, krok, w
+którym orbita dochodzi do $5$. Dla $c$, którego orbita nigdy nie ucieka,
+funkcja liczy aż do \code{limit} i zwraca tę wartość.
+
+\begin{think}
+$c = \tfrac14$ nigdy nie ucieka: to pełznący wiersz tabeli. Punkt
+$c = \num{0.26}$ leży o jedną setną dalej w prawo. Mniej więcej ile kroków
+potrzebuje jego orbita, żeby przekroczyć $2$: około $5$, około $30$ czy
+około $300$?
+\end{think}
+\reveal{Około $30$: przekracza $2$ w kroku \val{ch12.slow.260}. Pełznie w
+stronę $\tfrac12$ jak jego sąsiad, długo tam zwleka i dopiero potem się
+prześlizguje.}
+
+\pyregion{code/ch12/slow_escape.py}{slow}{Punkty blisko brzegu zwlekają}{lst:ch12-slow}
+
+\transcript{ch12-slow-escape}
+
+\noindent
+Trochę dalej orbita ucieka szybko: dla $c = \num{0.3}$ znika w kroku
+\val{ch12.slow.300}. Ale za każdym razem, gdy $c$ zbliża się do
+$\tfrac14$ dziesięć razy bardziej,
+orbita zwleka mniej więcej trzy razy dłużej: \val{ch12.slow.260},
+\val{ch12.slow.251}, \val{ch12.slow.2501} kroków. Nie ma więc liczby kroków,
+po której można mieć pewność: punkt, który nie uciekł po tysiącu kroków,
+może jeszcze uciec po dziesięciu tysiącach. Każdy dalszy obraz jest
+rysowany z limitem i blisko brzegu jest uczciwym przybliżeniem, a nie
+wyrokiem.
+
+\begin{lab}{l12_01_escape}{Czas ucieczki bez liczb zespolonych}
+Zapisz punkt jako parę zwykłych liczb i napisz jeden krok reguły za pomocą
+reguły mnożenia z podrozdziału~\ref{sec:ch12-plane}; potem czas ucieczki,
+korzystający z tego kroku; potem dwa pytania z odpowiedzią tak albo nie:
+czy dla tego $c$ orbita $0$ zostaje i czy dla ustalonego $c$ zostaje orbita
+tego punktu startowego? Test porównuje twoje czasy ucieczki z czasami z
+biblioteki w 480 punktach płaszczyzny.
+\end{lab}
+
+\section{Zbiór Mandelbrota}
+\label{sec:ch12-mset}
+\index{zbiór Mandelbrota!rysowanie}
+
+\noindent
+Teraz pokoloruj każde $c$ na płaszczyźnie: na ciemno, jeśli orbita $0$ nigdy
+nie ucieka, tym jaśniej, im szybciej ucieka. Ciemne punkty tworzą
+\emph{zbiór Mandelbrota}. Program poniżej rysuje go znakami, po jednym dla
+każdego $c$, i uznaje punkt za należący do zbioru, jeśli po
+\val{ch12.draw.limit} krokach wciąż jest w środku.
+
+\pyregion{code/ch12/ascii_mandelbrot.py}{draw}{Zbiór Mandelbrota narysowany znakami}{lst:ch12-draw}
+
+\noindent\begin{minipage}{\linewidth}
+\transcript{ch12-ascii}
+\end{minipage}
+
+\noindent
+Środkowy wiersz to oś pozioma: stoją w nim same \code{@} od $-2$ do
+$\tfrac14$, jak obiecywał początek rozdziału. Poza osią zbiór to ciało w
+kształcie serca z okrągłym bąblem po lewej, mniejszymi bąblami na obu i
+cienką igłą sięgającą do $-2$. Rysunek~\ref{fig:ch12-mandelbrot} pokazuje go
+porządnie, z dwoma powiększonymi kwadratami na brzegu.
+
+\plotfig{ch12-mandelbrot}{Zbiór Mandelbrota: czarny tam, gdzie orbita $0$
+nigdy nie ucieka, tym ciemniej niebieski, im dłużej punkt zwleka przed
+ucieczką. Kwadrat A leży na brzegu, tam gdzie serce styka się ze swoim
+największym bąblem, i jest pokazany w dwóch powiększeniach; kwadrat B leży
+na igle.}{zbiór Mandelbrota i trzy powiększenia}
+
+\noindent
+Pierre Fatou i Gaston Julia badali reguły takie jak ta w latach 1918--1920,
+piórem na papierze i zupełnie bez obrazków. Komputerowe obrazy Benoit
+Mandelbrota, opublikowane w 1980 roku, rozsławiły ten zbiór, a reguła,
+którą iterował w tamtej pracy, była samą regułą logistyczną, zapisaną
+liczbami zespolonymi \dash{} co wyjaśnia ostatni podrozdział tego
+rozdziału.
+
+\begin{think}
+Powiększ brzeg tysiąc razy, milion razy, a wciąż pojawiają się nowe
+szczegóły: spirale, włoski, maleńkie kopie. Gdzie przechowywane są
+wszystkie te szczegóły?
+\end{think}
+\reveal{Nigdzie. Każdy punkt jest liczony od nowa z reguły i testu
+ucieczki. Program, który narysował powyższe znaki, ma \val{ch12.draw.lines}
+wierszy.}
+
+\begin{trapbox}
+\textbf{\enquote{Nieskończenie wiele szczegółów to nieskończenie wiele
+informacji.}} Brzeg ma szczegóły w każdej skali, do której sięgniesz, i
+wszystkie wynikają z jednej linijki algebry i jednego pytania. Szczegóły są
+\emph{wytwarzane}, a nie przechowywane \dash{} to znowu lekcja z
+rozdziału~\ref{ch:logistic}, gdzie jedna linijka dawała każdy rodzaj
+zachowania. Żeby przekazać komuś cały zbiór dokładnie, wystarczy podać mu
+regułę i pytanie; krótki opis może mieć nieskończone konsekwencje.
+\end{trapbox}
+
+\noindent
+Niektóre proste fakty o zbiorze wciąż są nieznane, na przykład jego pole.
+Policz kwadraty siatki, których środek po 50 krokach wciąż należy do
+zbioru, a dostaniesz około \val{ch12.area.50}; po 200 krokach
+\val{ch12.area.200}; po 1000 \val{ch12.area.1000}. Wynik wciąż spada, w
+miarę jak przy brzegu wychodzą na jaw powolni uciekinierzy, i nikt nie zna
+wzoru na to, gdzie się zatrzyma. Sam brzeg jest tak pomięty, że jego wymiar
+w sensie z rozdziału~\ref{ch:fractals} wynosi $2$, najwięcej, ile może mieć
+jakikolwiek kształt narysowany na płaszczyźnie: udowodnił to Mitsuhiro
+Shishikura.
+
+\section{Zbiory Julii: ustal \texorpdfstring{$c$}{c}, zmieniaj start}
+\label{sec:ch12-julia}
+\index{zbiór Julii}
+
+\noindent
+Ta sama reguła odpowiada na drugie pytanie. Ustal $c$ i zmieniaj
+\emph{punkt startowy}: czy dla każdego punktu $z$ płaszczyzny orbita, która
+się w nim zaczyna, ucieka? Punkty startowe, które zostają, wypełniają
+\emph{zbiór Julii} dla tego $c$, nazwany na cześć Gastona Julii. (Ściśle
+biorąc, zbiorem Julii jest brzeg tego obszaru.)
+
+\mermaidfig{ch12-two-questions}{Jedna reguła, dwa pytania. Ustal $c$ i pytaj
+o każdy punkt startowy, a narysujesz zbiór Julii; zaczynaj od $0$ i pytaj o
+każde $c$, a narysujesz zbiór Mandelbrota.}{jedna reguła, dwa zbiory}
+
+\begin{think}
+Weź $c = 0$, więc reguła to tylko \enquote{podnieś punkt do kwadratu}. Które
+punkty startowe uciekają?
+\end{think}
+\reveal{Te, które leżą dalej niż $1$ od środka. Podnoszenie do kwadratu
+podnosi do kwadratu długość: długość większa od $1$ rośnie bez końca,
+mniejsza od $1$ maleje do $0$, a długość równa dokładnie $1$ zostaje równa
+$1$. Punkty startowe, które zostają, wypełniają koło o promieniu $1$, a jego
+brzegiem jest okrąg.}
+
+\noindent
+Zmień $c$, a okrąg się marszczy. Rysunek~\ref{fig:ch12-julia} pokazuje dwa
+przykłady. Dla $c = -1$ zbiór jest w jednym kawałku: to łańcuch ściśniętych
+ze sobą bąbli. Dla $c = \num{-0.8} + \num{0.2}\iu$ rozpadł się w pył:
+nieskończenie wiele drobinek, z których żadne dwie się nie łączą, jak zbiór
+Cantora z rozdziału~\ref{ch:fractals}.
+
+\plotfig{ch12-julia}{Dwa zbiory Julii, czarne tam, gdzie punkt startowy
+nigdy nie ucieka. Dla $c = -1$ zbiór jest jednym kawałkiem; dla
+$c = \num{-0.8} + \num{0.2}\iu$ zostaje tylko pył, zbyt drobny, by wyszedł
+czarny, widoczny dzięki ciemnym spiralom, na których punkty zwlekają
+najdłużej.}{zbiór Julii w jednym kawałku i w pyle}
+
+\noindent
+Co o tym decyduje? Orbita $0$, czyli pytanie Mandelbrota. Dla $c = -1$
+przeskakuje między $0$ a $-1$ i zostaje; dla $c = \num{-0.8} +
+\num{0.2}\iu$ przekracza $2$ w kroku \val{ch12.dust.escape}. Twierdzenie,
+którego nie dowodzimy tutaj, ale które jest w każdej książce o dynamice
+zespolonej, mówi, że to zawsze rozstrzyga sprawę: zbiór Julii jest w
+jednym kawałku dokładnie wtedy, gdy $c$ należy do zbioru Mandelbrota, a jest
+pyłem dokładnie wtedy, gdy nie należy. Zbiór Mandelbrota jest więc mapą
+wszystkich zbiorów Julii naraz, a każdy jego czarny punkt to zbiór Julii,
+który trzyma się w całości.
+
+\section{Odwzorowanie logistyczne w przebraniu}
+\label{sec:ch12-logistic}
+\index{odwzorowanie logistyczne!a zbiór Mandelbrota}
+
+\noindent
+Reguła tego rozdziału i odwzorowanie logistyczne z
+rozdziału~\ref{ch:logistic}, $x \to rx(1 - x)$, wyglądają inaczej, a są tą
+samą regułą. Przenumeruj prostą: mierz każde $x$ od $\tfrac12$ zamiast od
+$0$, odwróć je i rozciągnij $r$ razy, czyli dokonaj zamiany
+\[ z = r\left(\tfrac12 - x\right) . \]
+Wtedy $x(1 - x) = \tfrac14 - z^{2}/r^{2}$, a następne $z$, czyli
+$\tfrac{r}{2} - r^{2}x(1 - x)$, wychodzi równe $z^{2} + c$, gdzie
+\[ c = \frac{r}{2} - \frac{r^{2}}{4} . \]
+Słowami: weź połowę $r$ i odejmij ćwierć jego kwadratu. W tym przekładzie
+nic nie ginie. Każda orbita jednej reguły jest orbitą drugiej na
+przenumerowanej prostej, a $x = \tfrac12$ staje się $z = 0$: orbita $0$, o
+którą pyta zbiór Mandelbrota, to orbita logistyczna startująca z
+$\tfrac12$.
+
+\begin{think}
+Punkt stały z rozdziału~\ref{ch:logistic} traci stabilność przy $r = 3$ i
+władzę przejmuje cykl długości dwa. Jakie to $c$?
+\end{think}
+\reveal{$c = \tfrac32 - \tfrac94 = \num{-0.75}$: dokładnie tam, gdzie serce
+styka się z okrągłym bąblem po swojej lewej.}
+Serce to więc punkt stały, a ten bąbel to cykl długości dwa. Gdy $r$ biegnie
+od $1$ do $3$, $c$ biegnie od $\tfrac14$ w dół do $\num{-0.75}$ wzdłuż
+odcinka prostej należącego do serca. Listing uruchamia obie reguły obok
+siebie dla wartości $r$ z rozdziału~\ref{ch:logistic}, od punktów
+startowych, które zamiana ze sobą łączy, i podaje długość cyklu, w który
+każda z nich się układa.
+
+\pyregion{code/ch12/same_rule.py}{same}{Ta sama reguła, uruchomiona dwa razy}{lst:ch12-same}
+
+\transcript{ch12-same-rule}
+
+\noindent
+Cykle zgadzają się przy każdym $r$ \dash{} jeden, dwa, cztery, osiem, trzy
+i żaden przy $\num{3.9}$ \dash{} a to jest diagram bifurkacyjny z
+rozdziału~\ref{ch:bifurcations}, zapisany wzdłuż osi rzeczywistej.
+Rysunek~\ref{fig:ch12-real-axis} stawia jeden obraz nad drugim.
+
+\plotfig{ch12-real-axis}{U góry zbiór Mandelbrota wzdłuż osi rzeczywistej;
+na dole diagram bifurkacyjny z rozdziału~\ref{ch:bifurcations}, w którym
+każde $r$ narysowano w miejscu jego $c$. Każde rozszczepienie cyklu zachodzi
+tam, gdzie jeden bąbel styka się z następnym. Linie przerywane oznaczają
+$r = 3$, $r = 1 + \sqrt{6}$, punkt Feigenbauma i okno okresu
+trzy.}{oś rzeczywista nad diagramem bifurkacyjnym}
+
+\noindent
+Drugie rozszczepienie, przy $r = 1 + \sqrt{6}$, przelicza się na
+$c = \val{ch12.c.two}$, gdzie pierwszy bąbel styka się z następnym. Każdy
+bąbel ma też środek, takie $c$, przy którym orbita $0$ wraca dokładnie do
+$0$: $-1$, potem \val{ch12.centre.4}, potem \val{ch12.centre.8} i tak dalej.
+Przeliczone na $r$ dają \val{ch12.rc.2}, \val{ch12.rc.4} i \val{ch12.rc.8}:
+wartości, przy których cykle z rozdziału~\ref{ch:bifurcations} przechodzą
+przez $\tfrac12$, czyli jego parametry superstabilne. Odstępy między
+środkami maleją o czynnik, który ustala się na \val{ch12.feig.ratio}
+\dash{} to znowu liczba Feigenbauma \dash{} a bąble gromadzą się przy
+$c = \val{ch12.feig.c}$, czyli $r = \val{ch12.feig.r}$: w punkcie
+Feigenbauma. Dalej leży igła. Jest tam nawet okno okresu trzy. Otwiera się
+przy $c = \val{ch12.c.window}$, a kwadrat B na
+rysunku~\ref{fig:ch12-mandelbrot} pokazuje, co siedzi na igle w tym
+miejscu: maleńką kopię całego zbioru.
+
+\begin{think}
+Orbity z rozdziału~\ref{ch:logistic}, które nigdy się nie ustalają, żyją
+przy $r = \num{3.9}$. Tabela powyżej ją przelicza. Czy odpowiadające jej
+$c$ leży w sercu, w bąblu, czy na igle?
+\end{think}
+\reveal{Na igle: $c$ wynosi około $\num{-1.85}$, na lewo od punktu
+Feigenbauma, za ostatnim z bąbli, które się tam gromadzą.}
+
+\begin{trapbox}
+\textbf{\enquote{Zbiór Mandelbrota to obraz chaosu.}} Większość tego, co
+czarne, to porządek. W sercu orbita $0$ ustala się w jednym punkcie, w dużym
+bąblu w cyklu długości dwa, a w każdym bąblu w cyklu, którego długość ten
+bąbel wyznacza. Nieustalające się orbity z rozdziału~\ref{ch:logistic} leżą
+na cienkim brzegu, a na osi rzeczywistej oznacza to igłę, między jej
+oknami. Słynny obraz jest głównie mapą porządku, a chaos żyje wzdłuż jego
+granicy.
+\end{trapbox}
+
+\begin{lab}{l12_02_convert}{Od $r$ do $c$ i z powrotem}
+Napisz przeliczenie w obie strony, $r$ na $c$ i $c$ z powrotem na $r$, oraz
+samą zamianę $z = r(\tfrac12 - x)$. Test uruchamia obok siebie
+odwzorowanie logistyczne i $z \to z^{2} + c$ i sprawdza, czy twoja zamiana
+utrzymuje je w zgodzie. Potem przenieś na drugą stronę wartości $r$
+podwojenia okresu z pliku startowego i zobacz, gdzie na osi rzeczywistej
+wylądują.
+\end{lab}
+
+\noindent
+Na tym kończy się część~III: chaos ma kształt, a jej ostatni obraz zawiera
+w sobie cały rozdział~\ref{ch:bifurcations}. Część~IV wynosi te idee w świat
+wahadeł, planet, pogody i żywych istot.
+
+\begin{summarybox}
+\begin{itemize}
+\item \textbf{Liczba zespolona} to punkt płaszczyzny, zapisywany jako $a +
+  b\iu$. Dodawanie to przesuwanie; mnożenie mnoży \textbf{długości} i dodaje
+  \textbf{kąty}, co daje to samo, co wymnożenie nawiasów z
+  $\iu \times \iu = -1$.
+\item Reguła $z \to z^{2} + c$, zaczęta od $0$, albo zostaje, albo ucieka, a
+  gdy długość przekroczy $2$, ucieczka jest ostateczna. \textbf{Czas
+  ucieczki} liczy kroki; blisko brzegu rośnie bez ograniczeń.
+\item \textbf{Zbiór Mandelbrota} to wszystkie $c$, dla których orbita $0$
+  nigdy nie ucieka: serce, bąble, igła do $-2$ i brzeg ze szczegółami w
+  każdej skali, wytworzonymi przez regułę. Jego pole nie jest dokładnie
+  znane.
+\item \textbf{Zbiór Julii} ustala $c$ i pyta o każdy punkt startowy. Jest w
+  jednym kawałku, gdy $c$ należy do zbioru Mandelbrota, a pyłem, gdy nie
+  należy.
+\item Zamiana $z = r(\tfrac12 - x)$ zmienia \textbf{odwzorowanie
+  logistyczne} w $z \to z^{2} + c$ z $c = \tfrac{r}{2} - \tfrac{r^{2}}{4}$,
+  więc oś rzeczywista zbioru to diagram bifurkacyjny: bąble to cykle,
+  gromadzą się w punkcie Feigenbauma, a chaos żyje na igle.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Oblicz $(2 + 3\iu) + (1 - \iu)$ oraz $(1 + \iu)(1 - \iu)$.
+  \answerto{$3 + 2\iu$ oraz $2$: wymnożenie daje
+  $1 - \iu + \iu - \iu \times \iu = 1 + 1$.}
+\item Znajdź $(1 + \iu)^{2}$ za pomocą długości i kątów, a potem sprawdź
+  wynik, wymnażając nawiasy.
+  \answerto{$1 + \iu$ ma kąt $45$ stopni, więc jego kwadrat ma kąt $90$ i
+  długość $2$ (kwadrat długości $1 + \iu$): to $2\iu$. Po wymnożeniu
+  $1 + 2\iu + \iu \times \iu = 2\iu$.}
+\item Zacznij od $0$ z $c = 2$. W którym kroku orbita przekracza $2$?
+  \answerto{W kroku $2$: orbita to $0$, $2$, $6$, a $2$ nie jest większe od
+  $2$, natomiast $6$ jest.}
+\item Czy $c = \num{-1.5}$ należy do zbioru Mandelbrota?
+  \answerto{Tak. Należy do niego każde rzeczywiste $c$ od $-2$ do
+  $\tfrac14$; orbita $0$ pozostaje między $-2$ a $2$.}
+\item Czy dla $c = 0$ punkt startowy $\num{0.6} + \num{0.9}\iu$ ucieka?
+  \answerto{Tak. Jego długość to pierwiastek z $\num{0.36} + \num{0.81}$,
+  trochę więcej niż $1$, a podnoszenie do kwadratu stale powiększa długość
+  większą od $1$.}
+\item Przelicz $r = \num{3.2}$ na $c$. Czy wypada w sercu, czy w dużym
+  bąblu, i czy zgadza się to z rozdziałem~\ref{ch:logistic}?
+  \answerto{$c = \num{1.6} - \num{2.56} = \num{-0.96}$, wewnątrz dużego
+  bąbla, który rozciąga się od $\num{-0.75}$ do $\num{-1.25}$: cykl długości
+  dwa, tak jak w rozdziale~\ref{ch:logistic} przy tym $r$.}
+\item Dlaczego zbiór Mandelbrota nie jest obrazem chaosu?
+  \answerto{Jego serce i bąble to wartości $c$, przy których orbita $0$
+  układa się w cykl. Wartości chaotyczne leżą na cienkim brzegu, który na
+  osi rzeczywistej jest igłą między jej oknami.}
+\end{checkpoint}

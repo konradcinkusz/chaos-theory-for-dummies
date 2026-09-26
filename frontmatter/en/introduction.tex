@@ -1,0 +1,133 @@
+%% introduction --- the book's argument in one sitting: why chaos is worth
+%% learning, what it is, and what the five parts do about it.
+%%
+%% Twin: frontmatter/pl/introduction.tex.
+
+\chapter*{\lblIntroduction}
+\phantomsection
+\addcontentsline{toc}{chapter}{\lblIntroduction}
+\markboth{\lblIntroduction}{\lblIntroduction}
+
+\noindent
+The total eclipse of the Sun that crossed Spain on 12 August 2026 was in the
+astronomers' tables long before anybody who watched it was born. Its path,
+its date and the minute it began had been worked out from the motions of the
+Earth and the Moon, and the tables of eclipses run on, calculated the same
+way, for thousands of years to come.
+
+Nobody could have told the people waiting under that path, a month
+earlier, whether their sky would be clear enough to see it.
+
+Both forecasts are made by the same kind of mathematics. In each case a
+computer takes the state of a piece of the world now, applies rules about
+how it changes, and steps forward in time. The rules for the air are no
+secret: they are the same laws of motion and heat that describe the Moon.
+And yet one forecast is good for millennia and the other for about a week.
+The difference is not that meteorologists are less careful than
+astronomers, and it is not that the air is too complicated to write down.
+The difference has a name, a measurement and a precise mathematical
+description. It is called chaos, and this book is about it.
+
+\section*{What chaos is}
+
+In everyday speech chaos means a mess. In mathematics it means something
+much more interesting, and almost the opposite: a system that follows an
+exact rule, with no chance involved anywhere, and still behaves in a way
+that cannot be predicted far ahead. Three things have to be true together:
+
+\begin{itemize}[leftmargin=1.4em, itemsep=2pt]
+  \item \textbf{the rule is exact} \dash{} the same starting state always
+        leads to the same future, with nothing random added;
+  \item \textbf{small differences grow} \dash{} two starting states that
+        differ by less than anything you could measure end up, after a
+        while, completely different;
+  \item \textbf{it stays in bounds} \dash{} the motion does not fly off to
+        infinity, so the growing differences keep being folded back into
+        the same region and never settle down.
+\end{itemize}
+
+Each of those is simple. What surprised the scientists who found them
+together is how common the combination is. It needs no complicated rule:
+the first chaotic system in this book is one line of school algebra, and it
+fits on a pocket calculator. It needs no randomness, no crowd and no
+mystery. It turns up in dripping taps, swinging pendulums, animal
+populations, heart rhythms, the orbits of planets and, most famously, the
+weather.
+
+\section*{Why it is worth your time}
+
+You might reasonably ask why anyone who is not a scientist should learn
+this. Here are the reasons that persuaded me.
+
+\emph{You live on forecasts.} Weather apps, pension projections, epidemic
+curves, economic outlooks, traffic estimates and the confident answers of
+computer programs are all predictions made by models. Chaos theory tells you
+which of them can in principle be trusted far ahead, which only for a short
+time, and what the honest form of a forecast looks like in each case.
+
+\emph{It measures the limit, and the limit is strange.} In a chaotic
+system an error in the starting state grows by roughly the same factor every
+step. That means improving your measurements a thousandfold does not buy you
+a thousand times more forecast; it buys you a fixed extra stretch of time,
+and then the fog closes in exactly as before. Once you have seen this worked
+out with numbers \dash{} and you will, in Part~II \dash{} you will never
+again hear \enquote{we just need better data} in quite the same way.
+
+\emph{It explains why good forecasts come with odds.} If the far future
+cannot be computed as a single answer, what can be computed is a spread of
+answers and how likely each is. A \enquote{70 per cent chance of rain} is not
+a forecaster hedging. It is the correct answer to a question chaos has made
+impossible to answer with a yes or no.
+
+\emph{It separates things people usually lump together.} \enquote{We cannot
+predict it} can mean that nobody knows the rules, that the rules involve
+chance, or that the rules are known exactly and the future is still out of
+reach. These are different situations that call for different responses,
+and chaos is the third one.
+
+\emph{It is beautiful, and it is universal.} The shapes chaos draws are
+fractals, structures with detail at every magnification, and some of its
+numbers turn out to be the same in systems that have nothing in common. A
+fluid, an electronic circuit and a line of algebra can share a constant that
+nobody put there.
+
+\emph{And it is useful.} The same sensitivity that makes chaos
+unpredictable makes it steerable with very small nudges, and chaotic
+systems can be made to keep in step with each other. Part~V shows both.
+
+\section*{What this book is, and is not}
+
+It is not a textbook, and it will not make you a mathematician. It is also
+not a book of pictures with the mathematics taken out. Every idea in it is
+the real idea, developed from arithmetic upwards, and every claim a computer
+can check has been checked by one; the programs are printed in the book and
+you can run them yourself. Where the book states something it does not
+prove, it says so and says where the proof is.
+
+It starts from nothing. Part~I (Chapters~\ref{ch:models}
+to~\ref{ch:motion}) shows how mathematics describes the world at all: what a
+model is, how a rule is stepped forward in time, why feedback stops things
+growing for ever, and how motion is described. Part~II
+(Chapters~\ref{ch:logistic} to~\ref{ch:bifurcations}) finds chaos in a single
+line of algebra, measures how fast small errors grow, turns that into a
+single number and a forecasting horizon, and follows the road from order to
+chaos. Part~III (Chapters~\ref{ch:lorenz} to~\ref{ch:mandelbrot}) looks at the
+shapes chaos makes: the Lorenz attractor, strange attractors, fractals and the
+Mandelbrot set. Part~IV (Chapters~\ref{ch:mechanics} to~\ref{ch:computers})
+takes it into the world: pendulums and planets, the weather forecast, living
+systems and markets, and the computer itself. Part~V
+(Chapters~\ref{ch:taming} and~\ref{ch:why}) shows how chaos can be controlled,
+and ends with a field guide to judging any prediction you are given.
+
+\section*{The question}
+
+In 1814 the mathematician Pierre-Simon Laplace imagined an intelligence that
+knew every force in nature and the exact state of everything at one instant.
+For such an intelligence, he wrote, nothing would be uncertain: the future
+would be as plain as the past. It is the most confident sentence ever
+written about prediction, and for a century it looked like the natural
+conclusion of physics.
+
+This book asks whether he was right, and answers with numbers you can
+compute yourself. Chapter~\ref{ch:models} begins with a stone and a cup of
+tea.

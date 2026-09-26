@@ -1,0 +1,5 @@
+c = 0.3     passes 2 at step 12
+c = 0.26    passes 2 at step 30
+c = 0.251   passes 2 at step 97
+c = 0.2501  passes 2 at step 312
+c = 0.25    still inside after 10000 steps

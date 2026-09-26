@@ -1,0 +1,113 @@
+%% how-to-use --- how the book is meant to be read, and what its boxes mean.
+%%
+%% Twin: frontmatter/pl/how-to-use.tex. parity.py compares them token by
+%% token, like every chapter.
+
+\chapter*{\lblHowToUse}
+\phantomsection
+\addcontentsline{toc}{chapter}{\lblHowToUse}
+\markboth{\lblHowToUse}{\lblHowToUse}
+
+\noindent
+This book assumes you can add, multiply, work out a percentage and read a
+graph. It does not assume you remember any algebra, and it never uses a
+symbol it has not introduced first. Every formula is said in words as well,
+and where a formula would only get in the way, it is left out. If you
+stopped doing mathematics at school and have always wanted to know what
+people mean when they say \enquote{chaos}, you are the reader it was written
+for.
+
+What it does ask of you is to take part. The book is built as a sequence of
+small steps, and at the end of many of them you are asked a question.
+
+\section*{The loop}
+
+Every chapter is read the same way:
+
+\begin{enumerate}[leftmargin=1.6em, itemsep=3pt]
+  \item \textbf{Read a short stretch.} Each section is a few paragraphs.
+  \item \textbf{Stop and think.} A violet box asks you a question. Answer it
+        \dash{} on paper, aloud, or as a guess \dash{} before you read on.
+        The answer is directly underneath, so cover it with your hand.
+  \item \textbf{Run the code}, if you have a computer beside you. Every
+        listing is a small file, and running it takes a single command.
+  \item \textbf{Do the lab}, if you want to make the idea your own: a lab is
+        a half-written program and a test that tells you when it works.
+  \item \textbf{Take the checkpoint} at the end of the chapter, and check
+        your answers in Appendix~\ref{app:answers}.
+\end{enumerate}
+
+\section*{Why the book keeps asking you questions}
+
+Being asked a question before you are told the answer is uncomfortable.
+It is meant to be. An answer you have reached for, even a wrong one, stays
+with you far longer than one you have only read, and a wrong guess that is
+then corrected is the fastest way to find out which of your intuitions are
+going to mislead you. This subject is full of those. Most people's first
+guess about how fast a small error grows, or about what a simple rule can do,
+is wrong, and the book is arranged so that you make that guess before you are
+shown why.
+
+So when a box asks you to answer before you read on, please do. Nobody is
+marking it.
+
+\section*{The laboratory}
+
+Everything in the book that a computer can check has been checked by one,
+and you can check it again. The programs are in the book's repository, under
+\texttt{code/}. They are written in Python and need one tool, \pkg{uv},
+which installs the right version of Python and every library by itself.
+Once you have it, from the repository's \texttt{code/} directory:
+
+\begin{shellcmd}
+uv sync
+uv run python ch01/falling_stone.py
+uv run pytest -k l01_01
+\end{shellcmd}
+
+The first line sets up the laboratory, once. The second runs a listing from
+Chapter~\ref{ch:models}. The third runs the test of that chapter's first
+lab. You do not need to know Python to begin: the first chapters explain
+every line they print, and the programs stay short throughout.
+
+\section*{The boxes}
+
+Besides the questions, the text is broken up by boxes, each with one job:
+
+\begin{description}[leftmargin=1.2em, itemsep=2pt]
+  \item[\lblTrap.] A mistake almost everybody makes, set out after you have
+    had the chance to make it yourself.
+  \item[\lblWorld.] A real place the idea turns up: a field, a device, a
+    practice.
+  \item[\lblRigour.] What the book states without proving it, and where the
+    proof lives.
+  \item[\lblNote, \lblWarning.] An aside, and a caution.
+  \item[\lblProject.] A piece of the book's own small library of chaos, which
+    the listings share.
+  \item[\lblLab.] Something to do at the keyboard, with a test that tells
+    you when you have done it.
+\end{description}
+
+\section*{Numbers you can trust}
+
+Any number in this book that you could not work out in your head was
+produced by a program, and the book prints the program's output rather than
+a number somebody typed. The build checks every one of them again on every
+change. That matters more than usual here, for a reason the book spends a
+chapter on: in a chaotic system a computation can go wrong in the last digit
+and be completely wrong a few dozen steps later. Chapter~\ref{ch:computers}
+explains how the book protects itself against that, and why some of its
+numbers are deliberately rounded.
+
+\section*{Reading without a computer}
+
+You can. Every listing's output is printed beside it, every figure is on the
+page, and the questions work on paper. The labs are the only part you will
+miss, and they are there for readers who want to go further, not to gate
+the argument.
+
+\section*{Two languages, one book}
+
+The book is published in English and in Polish from one source. The two
+editions contain the same chapters, sections, figures, numbers and questions
+in the same order, and the build compares them to make sure they do.

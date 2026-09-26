@@ -1,0 +1,460 @@
+%% ch10 --- Stretch and fold: strange attractors
+%%
+%% Written September 2026. Every number the reader cannot do in their head
+%% comes from code/measure/ch10.py, which imports the SAME rules the listings
+%% print (code/ch10/). The tent map and Henon's map use only +, - and *, so
+%% every trajectory behind a number on this page is bit-for-bit the same on
+%% every machine; the one logarithm in a loop (the Lyapunov exponent) is only
+%% summed and is printed to two decimals.
+%%
+%% WHAT THIS CHAPTER MAY NOT SAY. It shows that the Henon attractor has zero
+%% area and layers within layers, and says only that its dimension lies
+%% between one and two: MEASURING that dimension (box counting) is Chapter
+%% 11's payoff. It uses the Lyapunov exponent as Chapter 7 defines it and the
+%% attractor idea Chapters 4 and 9 plant; it does not re-derive the horizon
+%% formula (Chapter 7) or the statistics of an attractor (Chapter 9). The
+%% floating-point collapse of the tent map after about fifty kneads is
+%% Chapter 16's, which is why no run here is longer than fourteen kneads.
+%%
+%% Twin: chapters/pl/ch10-strange-attractors.tex. Section for section, macro
+%% for macro, number for number; tools/parity.py compares them.
+
+\chapter{Stretch and fold: strange attractors}
+\label{ch:strange}
+\index{strange attractor}\index{stretch and fold}
+
+\noindent
+In Chapter~\ref{ch:lorenz} two runs of Lorenz's equations that began a hair
+apart drifted until they had nothing to do with each other, and yet neither
+ever left the butterfly-shaped region it started in. Put those two facts side
+by side and they look impossible. If nearby states are pushed apart at every
+step, why do they not end up at opposite ends of the universe? And if
+everything stays inside a small region, where does all that separation go?
+
+The answer is something every baker does with their hands. This chapter
+shows it on a strip of dough, then on a two-line rule the astronomer Michel
+Hénon wrote down in 1976, and then follows it to a shape with no area, no end
+to its length, and layers inside its layers however closely you look.
+
+\begin{outcomes}
+\outcome{explain how motion can stay inside a region for ever and still be
+  sensitive to its start, using the words stretch and fold}
+\outcome{iterate the tent map and Hénon's map in Python and read what they
+  print}
+\outcome{work out how much one step of Hénon's map multiplies an area, and
+  check it by measuring}
+\outcome{say what an attractor, its basin and a strange attractor are}
+\outcome{describe what zooming in shows on a strange attractor, and how that
+  differs from zooming in on a smooth curve}
+\outcome{describe how a Poincaré section turns a flow into a map}
+\end{outcomes}
+
+\section{Stretch, then fold}
+\label{sec:ch10-knead}
+\index{kneading}\index{tent map}
+
+\noindent
+Put a lump of dough on a board and press two raisins into it side by side.
+Now knead: roll the dough out to twice its length, then fold the far half
+back on top of the near half. Do it again, and again. After a minute the
+raisins are nowhere near each other, and neither has left the board.
+
+A knead is two moves, and they are the whole of this chapter. The
+\emph{stretch} pulls every pair of neighbours further apart. The \emph{fold}
+puts the stretched dough back into the space it came from. Stretching alone
+would carry the raisins off the board; folding alone would do nothing to
+them. Together they do what neither can.
+
+To turn that into arithmetic, flatten the dough into a strip running from
+$0$ to $1$ and let $x$ be a raisin's position along it. Stretching sends $x$
+to $2x$. Anything now past $1$ is folded back, so a point that stuck out to
+$2x$ lands at $2 - 2x$, as far short of the end as it had gone past it:
+\[ x_{n+1} = 2x_n \ \text{if } 2x_n \le 1, \qquad
+   x_{n+1} = 2 - 2x_n \ \text{otherwise}, \]
+where $x_n$ is the raisin's position after $n$ kneads. Its graph climbs in a
+straight line from $0$ to $1$ and comes straight back down, like a tent seen
+from the side, so it is called the \emph{tent map}.
+
+\begin{think}
+Two raisins start at $\num{0.2345}$ and $\num{0.2355}$, a thousandth of the
+strip apart. While both stay on the same side of the fold, every knead
+doubles the gap between them. If it went on doubling, after how many kneads
+would the gap be longer than the whole strip? What must happen instead?
+\end{think}
+\reveal{After ten: $\num{0.001} \times 2^{10} = \num{1.024}$, longer than the
+strip. It cannot happen: two raisins on a strip of length one are never more
+than one apart, so before then the fold must catch one raisin and not the
+other.}
+
+\pyregion{code/ch10/kneading.py}{knead}{Kneading a strip of dough: stretch, then fold}{lst:ch10-knead}
+
+\needspace{13\baselineskip}
+\transcript{ch10-kneading}
+
+\noindent
+The gap doubles nine times in a row, to \num{0.512}. At the tenth knead one
+raisin is folded and the other is not, and the gap is \val{ch10.knead.ten}.
+One knead later they are only \val{ch10.knead.eleven} apart, by chance:
+scattered raisins can be any distance apart, and from now on knowing where
+one is tells you nothing about the other. Every knead multiplies every short gap by
+exactly $2$, so this rule's Lyapunov exponent, in the sense of
+Chapter~\ref{ch:lyapunov}, is $\ln 2 \approx \val{ch10.knead.lambda}$ per
+knead.
+
+\begin{trapbox}
+\textbf{\enquote{If a system can never leave a small region, it cannot be very
+sensitive to its start.}} The region limits how \emph{big} an error can get,
+not how fast it grows. A tiny error doubles and doubles until it is as large
+as the region, and from then on the two runs are as unrelated as two raisins
+dropped on the board at random. Staying in the bowl and being predictable are
+different promises, and the fold is what lets a system keep the first
+without the second.
+\end{trapbox}
+
+\begin{lab}{l10_01_knead}{A strip of dough}
+Write \code{knead}, one stretch and one fold. Then write
+\code{kneads\_until\_apart}, which counts the kneads before two raisins that
+start a small gap apart are more than a tolerance apart. For raisins a
+thousandth apart and a tolerance of \num{0.1} the answer is seven. Start them
+ten times closer and see how few extra kneads that buys.
+\end{lab}
+
+\section{Hénon's two-line map}
+\label{sec:ch10-henon}
+\index{Henon map@Hénon map}\index{Henon, Michel@Hénon, Michel}
+
+\noindent
+The strip is one number. The Lorenz system of Chapter~\ref{ch:lorenz} has
+three, and it stretches and folds as a trajectory swings round a lobe, is
+pulled away from its neighbours and is thrown back into the middle. In 1976
+Michel Hénon, an astronomer at the observatory in Nice, published a rule,
+about as simple as a rule can be, that does the same thing to a plane
+\dash{} so simple that a computer can run it for millions of steps. It takes
+a point $(x, y)$, a state of two numbers, to a new point:
+\[ x_{n+1} = 1 - a\,x_n^{2} + y_n, \qquad y_{n+1} = b\,x_n, \]
+with $a = \val{ch10.a}$ and $b = \val{ch10.b}$. In words: the new $x$ is one,
+minus $a$ times the square of the old $x$, plus the old $y$; the new $y$ is
+the old $x$ shrunk to three tenths of its size.
+
+Hénon built it from three moves. A \emph{bend} moves every point up or down
+by $1 - a x^{2}$, a hump that sends $x$ and $-x$ to the same height, so a
+straight line across the plane is creased into an arch: that is the fold. A
+\emph{squeeze} presses the plane sideways to three tenths of its width. A
+\emph{swap} exchanges the two numbers, so the next bend works across the
+last one.
+
+\begin{think}
+Start at the origin, $(0, 0)$. Where is the point after one step of Hénon's
+map, and after two?
+\end{think}
+\reveal{After one step, $(1, 0)$. After two, $x = 1 - \num{1.4} \times 1 +
+0 = -\num{0.4}$ and $y = \num{0.3} \times 1$, so the point is
+$(-\num{0.4}, \num{0.3})$.}
+
+\pyregion{code/ch10/henon.py}{rule}{Hénon's map: two numbers, one line of arithmetic each}{lst:ch10-henon}
+
+\needspace{9\baselineskip}
+\transcript{ch10-henon}
+
+\noindent
+The listing carries on where your hand stopped. The point jumps about without
+settling, repeating or running away: however long you let it go, $x$ stays
+between \val{ch10.attractor.left} and \val{ch10.attractor.right}.
+
+\section{One shape for every start}
+\label{sec:ch10-cloud}
+\index{attractor}\index{basin of attraction}
+
+\noindent
+One start is one story. Take many: a grid of forty by forty,
+\val{ch10.cloud.n} starting points spread evenly over the square in which
+both $x$ and $y$ run from $-\num{0.5}$ to $\num{0.5}$.
+
+\begin{think}
+Run every one of these points through Hénon's map for thirty steps. Where do
+you expect the cloud to be: still spread over its square, all gathered at a
+single point, or somewhere else?
+\end{think}
+\reveal{Somewhere else. A few points leave for good, and all the rest lie on
+one thin, bent set \dash{} the set a single start draws if you run it long
+enough. They do not gather at a point, because the stretching keeps them
+apart along that set.}
+
+\pyregion{code/ch10/cloud.py}{cloud}{A cloud of starts, and whether each lands on the attractor}{lst:ch10-cloud}
+
+\needspace{8\baselineskip}
+\transcript{ch10-cloud}
+
+\noindent
+To decide whether a point is on that set, the program first runs one start
+for \val{ch10.cloud.reference} steps and marks every little square of side
+\val{ch10.cloud.cell} that it visits. At the start only \val{ch10.cloud.zero}
+of the \val{ch10.cloud.n} points sit in a marked square. From step
+\val{ch10.cloud.settled} on, all \val{ch10.cloud.kept} that remain do, and
+\val{ch10.cloud.left} have left for good, running off past ten and on
+towards infinity.
+
+That is what the word \emph{attractor} means: a set of states that the
+motion settles onto and never leaves, and that pulls in the states around it.
+The resting point of Chapter~\ref{ch:motion}'s damped pendulum is the
+simplest attractor; the butterfly of Chapter~\ref{ch:lorenz} is another.
+Every start that ends up on an attractor belongs to its \emph{basin}, as
+every raindrop that reaches a lake fell in the lake's basin. Hénon's attractor has a basin with an edge, and starts outside
+it run off to infinity.
+
+\plotfig{ch10-attractor}{Hénon's attractor (blue) on its basin. Every start
+in the white region ends up on the attractor; every start in the grey region
+leaves for good. The top edge of the listing's square reaches into the grey,
+and that is where the starts that left began.}{the attractor and its basin}
+
+\section{Squeezed, not stopped}
+\label{sec:ch10-area}
+\index{area}\index{determinant}\index{dissipation}
+
+\noindent
+The cloud began as a square with an area and ended on a set as thin as a
+line. Hénon's rule says exactly how fast the area goes. Take a tiny square of
+side $h$ with a corner at $(x, y)$. One step moves its two sides, the arrows
+$(h, 0)$ and $(0, h)$, to two new arrows. Nudging $x$ by $h$ changes the new
+$x$ by about $-2ax\,h$, because $(x + h)^{2} = x^{2} + 2xh + h^{2}$ and
+$h^{2}$ is tiny next to $h$, and it changes the new $y$ by $bh$. Nudging $y$
+by $h$ changes the new $x$ by $h$ and the new $y$ not at all. So the square
+becomes a slanted parallelogram with sides
+\[ (p, q) = (-2ax\,h,\ b\,h), \qquad (r, s) = (h,\ 0). \]
+The area of a parallelogram with sides $(p, q)$ and $(r, s)$ is the size of
+$ps - qr$, a number called the \emph{determinant}; for a rectangle with sides
+$(2, 0)$ and $(0, 3)$ it gives $2 \times 3 - 0 \times 0 = 6$. Here it is
+$(-2ax\,h) \times 0 - (b\,h) \times h = -b\,h^{2}$, so the area $h^{2}$
+becomes $b\,h^{2}$. Every step multiplies every area by $b = \val{ch10.b}$,
+wherever the square was: the position $x$, which decides how much the square
+is stretched, is multiplied by zero and drops out.
+
+\begin{think}
+A patch of starting points has an area of $1$. What is its area after ten
+steps? Does that mean its points slow down and come to rest, as the damped
+pendulum of Chapter~\ref{ch:motion} did?
+\end{think}
+\reveal{About \val{ch10.area.ten}, which is $\num{0.3}^{10}$: six millionths
+of what it was. And no, the points do not slow down at all. The area is
+squeezed out of the patch; the motion is not.}
+
+\begin{trapbox}
+\textbf{\enquote{If the area keeps shrinking, the motion must be dying out.}}
+A damped pendulum loses area because everything is pulled towards one resting
+point. Hénon's map squeezes hard in one direction while it stretches in
+another, so a patch becomes a longer, thinner ribbon whose points go on moving
+for ever. Shrinking area says that the motion ends up on something thin, not
+that it stops.
+\end{trapbox}
+
+\noindent
+Now measure it. A square a tenth on a side becomes sixteen thousand points
+round its edge; the map moves each one, and the surveyor's shoelace formula
+measures the area inside the new outline.
+
+\pyregion{code/ch10/area.py}{area}{Measuring what the map does to an area}{lst:ch10-area}
+
+\needspace{7\baselineskip}
+\transcript{ch10-area}
+
+\noindent
+The area falls by the factor the determinant promised, to five decimals,
+down to \val{ch10.area.six} of the start after six steps. The outline does
+the opposite: after first getting shorter, as the squeeze flattens the square,
+it keeps growing, and after six steps it is \val{ch10.outline.six} times as
+long, wrapped round less than a thousandth of the area.
+
+\plotfig{ch10-square-folds}{A square of starting points, coloured by where
+along $x$ each point began, after up to five steps. One step bends it into a
+crescent, the next stretches it into a thin strip, and by the third the strip
+is folded back on itself and its colours lie in layers.}{a square stretched
+and folded}
+
+\noindent
+How hard is the stretching? Carry a tiny arrow along one long run, moving it
+at each step as the sides of the square were moved. Measure how much longer
+it got, add the logarithm of that to a running total, and shrink it back to
+length one. The average of the logarithms is the Lyapunov exponent of
+Chapter~\ref{ch:lyapunov}, now for a map of the plane.
+
+\pyregion{code/ch10/stretch.py}{arrow}{The average stretch of a tiny arrow}{lst:ch10-arrow}
+
+\needspace{11\baselineskip}
+\transcript{ch10-stretch}
+
+\noindent
+The first lines come from the other half of the file: two starts $10^{-10}$
+apart, which Python writes as \code{1.0e-10}. Their gap grows until by step
+$70$ it is about $2$, and after that it never exceeds \val{ch10.gap.widest},
+roughly the width of the attractor. Bounded, and sensitive, like the dough.
+The exponent is \val{ch10.lambda} per step: along the attractor a tiny arrow
+grows on average by a factor of \val{ch10.stretch} a step, while across it the
+map squeezes by \val{ch10.squeeze}. Multiply the two and you get back about
+\val{ch10.b}, the area factor. Stretch one way, squeeze the other, fold to
+fit: that is the whole recipe.
+
+\needspace{10\baselineskip}
+\begin{lab}{l10_02_henon}{One step, and its area}
+Write \code{step}, one step of Hénon's map, and \code{area\_factor}, which
+moves three corners of a tiny square one step, reads off the two new sides as
+arrows $(p, q)$ and $(r, s)$, and returns the size of $ps - qr$ divided by the
+old area. Check that it gives \num{0.3} wherever you put the square, and that
+changing $b$ changes it while changing $a$ does not.
+\end{lab}
+
+\section{Layers within layers}
+\label{sec:ch10-zoom}
+\index{strange attractor!layers}\index{fractal}
+
+\noindent
+Drawn at the size of a page, Hénon's attractor looks like a few curved lines.
+Look closer.
+
+\begin{think}
+Draw any smooth curve with a pen and zoom in on a small piece of it, again
+and again. What does the piece look like in the end? Now guess what you will
+see if you zoom in on one of the attractor's lines.
+\end{think}
+\reveal{A smooth curve looks more and more like a straight line. The
+attractor's line does not: under the magnifier it splits into several
+parallel lines, and each of those, magnified again, splits again.}
+
+\plotfig{ch10-zooms}{Zooming into Hénon's attractor. Each red box is shown
+enlarged in the next panel. What looked like one line is a bundle of lines,
+and each line of the bundle is itself a bundle.}{the attractor, zoomed twice}
+
+\noindent
+The layers come straight from the recipe. Every step stretches the set,
+folds it over and squeezes it to fit, so each fold lays a thinner copy of
+everything beside what was there, and the copy carries its own layers inside
+it. Two consequences sound absurd until you have watched them happen.
+The attractor has no area, since every area is multiplied by \val{ch10.b} at
+every step, for ever. And its length has no end, since it is traced by a curve
+stretched by about \val{ch10.stretch} at every step, for ever.
+
+\begin{trapbox}
+\textbf{\enquote{Zoom in far enough on any curve and it turns into a straight
+line.}} That is true of the smooth curves you draw with a pen and of the
+graphs of the formulas you met at school. It is not true here. However far you
+zoom into Hénon's attractor, each line splits into a bundle: the structure has
+no smallest scale.
+\end{trapbox}
+
+\noindent
+An attractor with this layered structure, on which the motion is chaotic, is
+called a \emph{strange attractor}, a name given by David Ruelle and Floris
+Takens in 1971. Lorenz's butterfly is one, and so is Hénon's. Such a set is
+more than a line, which would have a finite length, and less than an area,
+since it has none: its dimension lies between one and two, and
+Chapter~\ref{ch:fractals} measures where.
+
+\begin{worldbox}
+Chemical engineers mix thick fluids \dash{} resins, sealants, food pastes
+\dash{} with a \emph{static mixer}, a pipe fitted with a row of short twisted
+blades and no moving parts. Each blade splits the stream in two, turns the
+halves and stacks them: a stretch and a fold, done by the shape of the pipe.
+Every blade doubles the number of layers, so twenty blades make roughly a
+million, because ten doublings make about a thousand.
+\end{worldbox}
+
+\begin{rigourbox}
+Stephen Smale turned the baker's knead into mathematics about a decade
+before Hénon's map. His
+\emph{horseshoe} stretches a square into a long strip, bends it into a
+horseshoe and lays it back across the square. The points that stay in the
+square for ever form a set with gaps inside gaps, and on it Smale proved that
+the motion is as unpredictable as a sequence of coin tosses. What this chapter
+shows about Hénon's map at $a = \val{ch10.a}$ and $b = \val{ch10.b}$ is
+measured, not proved: nobody has proved that the set the computer draws is not,
+say, an extremely long cycle. Michael Benedicks and Lennart Carleson proved in
+1991 that maps of Hénon's form do have strange attractors for many other
+choices of the two numbers.
+\end{rigourbox}
+
+\section{Cutting a flow into a map}
+\label{sec:ch10-section}
+\index{Poincare section@Poincaré section}
+
+\noindent
+Why should a rule with two numbers tell you anything about the Lorenz system,
+a flow with three? Picture the butterfly with a pane of glass pushed through
+one of its wings. The trajectory pierces the pane again and again, leaving a
+dot each time. Forget the path between the crossings and keep only the dots.
+Given one dot, the flow decides where the next will be, so the dots obey a
+rule of their own: a map from the pane to itself, with two numbers for a
+state. This is a \emph{Poincaré section}, after Henri Poincaré, who used it in
+his work on the three bodies of Chapter~\ref{ch:mechanics}.
+
+\mermaidfig{ch10-section}{A Poincaré section. The flow's path crosses a pane
+again and again; the rule that takes one crossing to the next is a map of
+the pane.}{flow, section, map}
+
+\noindent
+Hénon's map is not the Lorenz flow's own section, but it was built to behave
+like one: between two crossings a flow like Lorenz's stretches a patch of the
+pane, squeezes it and folds it, which is what the bend, the squeeze and the
+swap do.
+
+\begin{think}
+Chapter~\ref{ch:motion} said that a smooth flow needs at least three numbers
+in its state to be chaotic. Hénon's map is chaotic with two, and the logistic
+map of Chapter~\ref{ch:logistic} with one. Is that a contradiction?
+\end{think}
+\reveal{No. That rule is about flows, whose paths move continuously and in a
+plane can never cross one another. A map jumps from one state to the next, so
+nothing stops it folding. Cutting a three-number flow with a pane leaves a
+two-number map, and the chaos survives the cut.}
+
+\begin{summarybox}
+\begin{itemize}
+\item Chaos in a bounded system is two moves repeated: a \textbf{stretch},
+  which pulls neighbours apart, and a \textbf{fold}, which puts everything back.
+  The \textbf{tent map} kneads a strip and doubles every small gap.
+\item \textbf{Hénon's map}, $x_{n+1} = 1 - a x_n^{2} + y_n$ and
+  $y_{n+1} = b x_n$, bends, squeezes and swaps a plane.
+\item A cloud of starts ends up on one set, the \textbf{attractor}; the starts
+  that end there form its \textbf{basin}.
+\item Every step multiplies every area by $b$, the \textbf{determinant} of the
+  step, yet the motion never stops: the map \textbf{squeezes} one way while it
+  \textbf{stretches} the other.
+\item Zoomed in, each line of the attractor splits into a bundle, again and
+  again. An attractor like that, with chaotic motion on it, is a
+  \textbf{strange attractor}: no area, no end to its length.
+\item A \textbf{Poincaré section} turns a flow into a map, which is why a
+  two-number map can be chaotic although a two-number flow cannot.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item A raisin sits at $\num{0.3}$ on the strip. Where is it after one knead,
+  and after two?
+  \answerto{At \num{0.6}, then at \num{0.8}: doubling \num{0.6} gives
+  \num{1.2}, past the end, so it folds back to $2 - \num{1.2} = \num{0.8}$.}
+\item Two raisins start \num{0.01} apart and stay on the same side of the fold.
+  How far apart are they after three kneads, and why can the doubling not go
+  on for ever?
+  \answerto{\num{0.08}. The strip is only one long, so sooner or later the
+  fold catches one raisin and not the other.}
+\item Take one step of Hénon's map from the point $(\num{0.5}, 0)$.
+  \answerto{$1 - \num{1.4} \times \num{0.25} + 0 = \num{0.65}$ and
+  $\num{0.3} \times \num{0.5} = \num{0.15}$: the point $(\num{0.65},
+  \num{0.15})$.}
+\item A patch of starting points has an area of $2$. What is its area after
+  three steps of Hénon's map, and have its points stopped moving?
+  \answerto{$2 \times \num{0.027} = \num{0.054}$. No: the patch is squeezed one
+  way and stretched another, and its points keep moving.}
+\item What is the difference between an attractor and its basin?
+  \answerto{The attractor is the set the motion settles onto and never leaves;
+  its basin is every start that ends up on it.}
+\item What do you see when you zoom in on a smooth curve, and when you zoom in
+  on Hénon's attractor?
+  \answerto{A smooth curve looks more and more like a straight line. Each line
+  of the attractor splits into a bundle of lines, again and again.}
+\item What is a Poincaré section, and why does it let a map with a two-number
+  state be chaotic?
+  \answerto{It keeps only the points where a flow's path crosses a surface;
+  the rule from one crossing to the next is a map. The three-number rule is
+  about flows, and a map jumps, so it can fold.}
+\end{checkpoint}

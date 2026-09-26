@@ -1,0 +1,512 @@
+%% ch16 --- Chaos wewnątrz komputera
+%%
+%% Napisany we wrześniu 2026. Każdy obraz chaosu w tej książce narysowała
+%% maszyna, która zaokrągla w każdym kroku; ten rozdział pyta, co to robi, i
+%% to mierzy. Liczby zmiennoprzecinkowe od zera; odwzorowanie podwajające
+%% ginące w komputerze; jedna reguła zapisana na dwa sposoby, rozchodząca się
+%% w ciągu mniej więcej pięćdziesięciu kroków, wobec prawdy liczonej ze stu
+%% cyframi; dlaczego arytmetyka dokładna i rozszerzona nie ratuje długiego
+%% chaotycznego przebiegu; ratunek, który działa (cieniowanie, sformułowane w
+%% ramce i pokazane przez znalezienie cienia i przez zgodne statystyki);
+%% wreszcie skończone maszyny, pętle i generatory liczb losowych. Każda
+%% liczba pochodzi z code/measure/ch16.py, który importuje te same funkcje,
+%% które drukują listingi.
+%%
+%% Bliźniak: chapters/en/ch16-computers.tex. Podrozdział za podrozdziałem,
+%% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
+
+\chapter{Chaos wewnątrz komputera}
+\label{ch:computers}
+\index{liczby zmiennoprzecinkowe}\index{zaokrąglanie}
+
+\noindent
+Każdy obraz chaosu w tej książce narysował komputer i tak samo policzył
+każdą liczbę. Oto niewygodny fakt o maszynie, która je narysowała. Nie umie
+zapamiętać liczby $\num{0.1}$. Zapamiętuje liczbę bardzo do niej zbliżoną, a
+za każdym razem, gdy dodaje albo mnoży dwie liczby, zaokrągla wynik do
+takiej, którą umie zapamiętać.
+
+Przez kilka rozdziałów uczyłeś się, że chaos zamienia najmniejszy błąd w
+duży. Skoro więc komputer robi drobny błąd w każdym kroku, jak którykolwiek
+z tych obrazów może być poprawny? Ten rozdział mierzy odpowiedź, a jest ona
+lepsza, niż mógłbyś się obawiać, i gorsza, niż mógłbyś mieć nadzieję.
+
+\begin{outcomes}
+\outcome{powiedzieć, co zapamiętuje komputer, gdy wpisujesz liczbę, i
+  dlaczego $\num{0.1} + \num{0.2}$ nie daje $\num{0.3}$}
+\outcome{przewidzieć krok, w którym odwzorowanie podwajające ginie w
+  komputerze}
+\outcome{oszacować, przez ile kroków chaotyczne obliczenie pozostaje
+  poprawne, na podstawie liczby cyfr dwójkowych, które zachowuje}
+\outcome{powiedzieć, którym wynikom chaotycznej symulacji możesz ufać, i
+  dlaczego}
+\outcome{opisać generator liczb losowych jako regułę deterministyczną i
+  powiedzieć, dlaczego musi się powtarzać}
+\end{outcomes}
+
+\section{Co zapamiętuje komputer}
+\label{sec:ch16-keeps}
+\index{system dwójkowy}\index{podwójna precyzja}
+
+\noindent
+Zapisz jedną trzecią jako ułamek dziesiętny, a nigdy nie skończysz:
+$\num{0.333}\ldots$, trójki ciągną się bez końca. Zapis dziesiętny oddaje
+dokładnie tylko te ułamki, których mianownik składa się z dwójek i piątek,
+czynników dziesiątki. Komputer liczy zamiast tego dwójkami. W \emph{systemie
+dwójkowym} miejsca po przecinku są warte połowę, ćwierć, jedną ósmą i tak
+dalej, więc $\tfrac{3}{4}$ zapisuje się jako $\num{0.11}$: połowa plus ćwierć.
+
+\begin{think}
+Które z tych liczb system dwójkowy zapisze dokładnie, stałą liczbą miejsc:
+$\tfrac{1}{2}$, $\tfrac{3}{8}$, $\tfrac{1}{10}$?
+\end{think}
+\reveal{$\tfrac{1}{2}$ i $\tfrac{3}{8}$, ale nie $\tfrac{1}{10}$. System
+dwójkowy zapisuje dokładnie ułamki, których mianownik jest potęgą dwójki, a
+dziesięć ma czynnik pięć.}
+Dwójkowo jedna dziesiąta to $\num{0.000110011}\ldots$, a blok $0011$
+powtarza się bez końca, więc komputer musi ją gdzieś uciąć. Python, jak
+prawie każdy program, którego używasz, przechowuje liczbę jako
+\emph{double}, liczbę podwójnej precyzji: \val{ch16.bits.double} cyfry
+dwójkowe znaczące, czyli około \val{ch16.decimal.double} dziesiętnych,
+plus potęgę dwójki, która mówi, gdzie stoi przecinek. Dla jednej dziesiątej
+zapamiętuje najbliższą liczbę podwójnej precyzji, za dużą o mniej więcej
+\val{ch16.tenth.err}. Każda suma i każdy iloczyn są potem także
+\emph{zaokrąglane}: dokładny wynik zastępuje najbliższa liczba podwójnej
+precyzji.
+
+\begin{think}
+Zarówno $\num{0.1}$, jak i $\num{0.2}$ są zapamiętane odrobinę błędnie, a ich
+suma jest jeszcze raz zaokrąglana. Czy komputer zgodzi się, że
+$\num{0.1} + \num{0.2}$ to $\num{0.3}$?
+\end{think}
+\reveal{Nie. Suma drukuje się jako liczba o włos większa od $\num{0.3}$, a
+porównanie odpowiada \code{False}.}
+
+\pyregion{code/ch16/floats.py}{store}{Co zapamiętuje komputer i co z tym robi}{lst:ch16-floats}
+
+\transcript{ch16-floats}
+
+\noindent
+Trzeci wiersz to dokładna wartość zapamiętana dla $\num{0.1}$; czwarty
+zapisuje ją jako ułamek, którego mianownik to $2^{\val{ch16.tenth.power}}$.
+Każda liczba podwójnej precyzji to liczba całkowita podzielona przez potęgę
+dwójki. Szósty wiersz dodaje trzy liczby w dwóch kolejnościach i dostaje dwa
+wyniki: gdy każdy krok zaokrągla, grupowanie, o którym szkoła mówiła, że nie
+ma znaczenia, ma znaczenie. Ostatni pokazuje, że brakuje miejsca: powyżej
+$2^{53}$ liczba podwójnej precyzji nie mieści już każdej liczby całkowitej.
+
+\begin{note}
+Te reguły zaokrąglania ustalono w 1985 roku w standardzie IEEE~754, którego
+przestrzega prawie każdy komputer. Wymaga on, by $+$, $-$, $\times$, $\div$ i
+pierwiastek kwadratowy dawały dokładny wynik zaokrąglony do najbliższej
+liczby podwójnej precyzji. Dlatego twój komputer powinien się zgadzać z każdą
+liczbą wydrukowaną w tej książce: jej własne pomiary używają tylko tych
+działań.
+\end{note}
+
+\section{Odwzorowanie, którego komputer nie umie policzyć}
+\label{sec:ch16-doubling}
+\index{odwzorowanie podwajające}
+
+\noindent
+Najprostsza chaotyczna reguła, jaka istnieje, mieści się w jednym wierszu:
+podwój liczbę, a jeśli wynik wynosi $1$ albo więcej, odejmij $1$.
+Symbolicznie $x \to 2x \bmod 1$, czyli \enquote{$2x$ bez części całkowitej}.
+To \emph{odwzorowanie podwajające} w każdym kroku podwaja odstęp między
+dowolnymi dwoma bliskimi punktami startowymi. W systemie dwójkowym widać, jak
+działa: podwojenie przesuwa każdą cyfrę o jedno miejsce w lewo, a odjęcie
+$1$ wyrzuca cyfrę, która przeszła przez przecinek, więc $\num{0.1011}$ staje
+się $\num{0.011}$, potem $\num{0.11}$, potem $\num{0.1}$. Odwzorowanie
+odczytuje swój start po jednej cyfrze dwójkowej naraz.
+
+\begin{think}
+Policz odwzorowanie podwajające ręcznie od $\tfrac{1}{10}$, na ułamkach,
+przez pięć kroków. Co jego orbita robi potem na zawsze?
+\end{think}
+\reveal{$\tfrac{1}{5}$, $\tfrac{2}{5}$, $\tfrac{4}{5}$, $\tfrac{3}{5}$,
+$\tfrac{1}{5}$: krąży po tych samych czterech wartościach bez końca i nigdy
+nie dochodzi do $0$.}
+Tymczasem komputerowe $\num{0.1}$ to liczba całkowita podzielona przez
+$2^{\val{ch16.tenth.power}}$: ma ostatnią cyfrę dwójkową, a każdy krok
+wypycha jedną cyfrę za przecinek.
+
+\begin{think}
+Jaka będzie komputerowa orbita $\num{0.1}$ po sześćdziesięciu krokach?
+\end{think}
+\reveal{Dokładnie $0$. Gdy ostatnia cyfra dwójkowa odejdzie, w kroku
+\val{ch16.collapse.tenth}, nic nie zostaje, a $0$ podwojone to $0$ na
+zawsze.}
+
+\pyregion{code/ch16/doubling.py}{race}{Odwzorowanie podwajające od jednej dziesiątej: w komputerze i na dokładnych ułamkach}{lst:ch16-doubling}
+
+\transcript{ch16-doubling}
+
+\noindent
+Przez czterdzieści kroków obie orbity zgadzają się do sześciu miejsc po
+przecinku; potem komputer odpływa i ginie. Obliczona orbita może się mylić
+w całym swoim charakterze: pętla zamieniła się w upadek do zera.
+
+Najdziwniejsze jest to, że arytmetyka komputera nie popełniła żadnego błędu.
+Podwojenie liczby podwójnej precyzji i odjęcie $1$ nigdy nie wymagają
+zaokrąglenia, a skrypt pomiarowy rozdziału sprawdza krok po kroku, że orbita
+komputera jest dokładnie prawdziwą orbitą liczby, którą zapamiętał. Błędny
+jest start. Liczba, którą da się zapamiętać, ma skończenie wiele cyfr
+dwójkowych, więc każdy taki start zostaje pochłonięty przez $0$, a prawie
+każdy prawdziwy start ma nieskończenie wiele cyfr i nie zostaje pochłonięty
+nigdy. Z każdego
+z \val{ch16.collapse.starts} startów $\tfrac{1}{997}$, $\tfrac{2}{997}$ i tak
+dalej orbita komputera zginęła po liczbie kroków od \val{ch16.collapse.min}
+do \val{ch16.collapse.max}, najczęściej po \val{ch16.collapse.mode}.
+
+\plotfig{ch16-collapse}{Odwzorowanie podwajające od jednej dziesiątej.
+Prawda (puste kółka) krąży w pętli bez końca; komputer (kropki) zgadza się z
+nią przez mniej więcej czterdzieści kroków, odpływa, a w kroku
+\val{ch16.collapse.tenth} spada do $0$ na dobre.}{odwzorowanie podwajające
+ginące w komputerze}
+
+\begin{lab}{l16_01_collapse}{Kiedy ginie odwzorowanie podwajające?}
+Napisz odwzorowanie podwajające, funkcję, która liczy kroki, aż orbita
+będzie dokładnie $0$, i funkcję, która przewiduje tę liczbę bez uruchamiania
+czegokolwiek, na podstawie \code{x.as\_integer\_ratio()}, które podaje
+zapamiętaną liczbę jako liczbę całkowitą przez potęgę dwójki. Test
+sprawdza, że obie zawsze się zgadzają.
+\end{lab}
+
+\section{Jedna reguła, dwa programy}
+\label{sec:ch16-formulas}
+\index{odwzorowanie logistyczne!w komputerze}\index{powtarzalność}
+
+\noindent
+Odwzorowanie podwajające nigdy nie zaokrągla. Odwzorowanie logistyczne z
+rozdziału~\ref{ch:logistic} jest bardziej typowe: zaokrągla prawie każdy
+krok. Oto ono przy $r = 4$, zapisane na dwa sposoby.
+
+\pyregion{code/ch16/two_formulas.py}{rules}{Odwzorowanie logistyczne przy r = 4 zapisane na dwa sposoby}{lst:ch16-rules}
+
+\noindent
+Wymnóż nawias w pierwszym, a dostaniesz drugie:
+$4x(1 - x) = 4x - 4x^{2}$. Na papierze to jedna reguła.
+
+\begin{think}
+Uruchom oba od $\num{0.1}$ na tym samym komputerze i pozwól im działać przez
+siedemdziesiąt kroków. Czy oba programy wydrukują te same liczby?
+\end{think}
+\reveal{Nie. Różnią się na ostatniej cyfrze dwójkowej od kroku
+\val{ch16.formulas.first}, a w kroku \val{ch16.formulas.apart} dzieli je już
+więcej niż $\num{0.1}$.}
+Pierwszy wzór zaokrągla $1 - x$, a potem iloczyn; drugi zaokrągla $4x^{2}$,
+a potem różnicę. Każdy błąd to mniej więcej jedna część na $10^{16}$, a
+odwzorowanie podwaja go w każdym kroku. Prawa kolumna poniżej to prawda:
+orbita dokładnie jednej dziesiątej, liczona ze stu cyframi znaczącymi.
+
+\transcript{ch16-two-formulas}
+
+\noindent
+Który wzór ma rację? Oba, przez czterdzieści kroków. W kroku
+\val{ch16.wrong.a} pierwszy odszedł od prawdy, a w kroku \val{ch16.wrong.b}
+także drugi. Żaden wzór nie jest błędny; każdy jest poprawny przez mniej
+więcej pięćdziesiąt kroków, a potem podąża już za inną orbitą.
+
+\begin{trapbox}
+\textbf{\enquote{Program deterministyczny zawsze daje ten sam wynik.}}
+Uruchom ten sam program na tej samej maszynie, a da, co do ostatniej cyfry.
+Ale zmień komputer, kompilator, bibliotekę matematyczną albo kolejność
+dodawania długiej sumy, a zmienisz to, które zaokrąglenia zachodzą \dash{}
+dokładnie tak jak dwa wzory powyżej. Kompilatory mogą dla szybkości
+przestawiać działania albo łączyć mnożenie i dodawanie w jeden krok z jednym
+zaokrągleniem. W większości programów różnica zostaje na ostatniej cyfrze. W
+chaotycznym dociera do pierwszej.
+\end{trapbox}
+
+\noindent
+Pięćdziesiąt to nie przypadek i da się je przewidzieć.
+
+\begin{think}
+Przy $r = 4$ błąd mniej więcej podwaja się w każdym kroku, co zmierzył
+rozdział~\ref{ch:butterfly}. Błąd zaokrąglenia liczby podwójnej precyzji to
+około $10^{-16}$, a dziesięć podwojeń mnoży błąd mniej więcej przez tysiąc.
+Po mniej więcej ilu krokach błąd $10^{-16}$ urośnie do $\num{0.1}$?
+\end{think}
+\reveal{Po około pięćdziesięciu. Od $10^{-16}$ do $10^{-1}$ to piętnaście
+czynników dziesięć, a każde trzy czynniki dziesięć to mniej więcej dziesięć
+podwojeń. Horyzont z rozdziału~\ref{ch:lyapunov}, z błędem zaokrąglenia
+jako błędem startu, daje \val{ch16.predict.double}.}
+Jednym zdaniem: przy $r = 4$ odwzorowanie zużywa jedną cyfrę dwójkową
+dokładności na krok, więc \val{ch16.bits.double} cyfry liczby podwójnej
+precyzji starczają na mniej więcej pięćdziesiąt kroków. \emph{Pojedyncza
+precyzja}, której używają karty graficzne i wiele programów uczenia
+maszynowego, bo zajmuje połowę pamięci, zachowuje \val{ch16.bits.single} cyfry
+dwójkowe, czyli około \val{ch16.decimal.single} dziesiętnych; ta sama arytmetyka przewiduje \val{ch16.predict.single} kroków, a
+wytrzymuje ona \val{ch16.wrong.single}.
+
+\plotfig{ch16-parting}{Odległość od prawdziwej orbity jednej dziesiątej, w
+skali logarytmicznej, dla odwzorowania logistycznego przy $r = 4$. Błąd
+każdego przebiegu podwaja się co krok, wzdłuż kropkowanej linii, aż wypełni
+cały przedział: po mniej więcej dwudziestu krokach w pojedynczej precyzji,
+pięćdziesięciu w podwójnej.}{dwie precyzje, które się rozchodzą}
+
+\begin{lab}{l16_02_single}{Pojedyncza przeciw podwójnej}
+Zaokrąglij liczbę do pojedynczej precyzji, pakując ją do czterech bajtów i
+odczytując z powrotem (plik startowy pokazuje, jak). Napisz odwzorowanie
+logistyczne przy $r = 4$ z każdym działaniem zaokrąglanym w ten sposób,
+uruchom je obok wersji podwójnej precyzji i znajdź pierwszy krok, w którym
+różnią się o więcej niż $\num{0.1}$.
+\end{lab}
+
+\begin{worldbox}
+Uczenie maszynowe spotyka to codziennie. Sieć neuronową trenuje się,
+dodając miliony małych liczb na karcie graficznej, której równoległe wątki
+mogą za każdym razem kończyć w innej kolejności, więc suma zaokrągla się
+inaczej przy każdym przebiegu. Dwa przebiegi tego samego programu z tym samym
+ziarnem losowym mogą dać sieci, których wagi różnią się wszędzie \dash{} i
+które zwykle wypadają w testach mniej więcej tak samo. Dokumentacja
+PyTorcha, szeroko używanej biblioteki, mówi wprost, że w pełni powtarzalne
+wyniki nie są gwarantowane między platformami i wersjami, i oferuje
+przełącznik wymuszający stałą kolejność działań, kosztem szybkości.
+\end{worldbox}
+
+\section{Dlaczego więcej cyfr cię nie uratuje}
+\label{sec:ch16-exact}
+\index{arytmetyka dokładna}
+
+\noindent
+Oczywiste lekarstwo to przestać zaokrąglać. Moduł \pkg{fractions} Pythona
+przechowuje każdą liczbę jako dokładny ułamek. Jedna dziesiąta zostaje
+jedną dziesiątą, a $4x(1 - x)$ daje z niej $\tfrac{9}{25}$, potem
+$\tfrac{576}{625}$, bez żadnego błędu.
+
+\begin{think}
+Od $\tfrac{9}{25}$ do $\tfrac{576}{625}$ mianownik zmienił się z $25$ na
+$625 = 25 \times 25$. Jeśli jest podnoszony do kwadratu w każdym kroku, co
+dzieje się z liczbą jego cyfr?
+\end{think}
+\reveal{W każdym kroku mniej więcej się podwaja: podniesienie liczby do
+kwadratu mniej więcej podwaja liczbę jej cyfr.}
+
+\pyregion{code/ch16/more_digits.py}{exact}{Dokładne ułamki: mianownik podnoszony do kwadratu w każdym kroku}{lst:ch16-exact}
+
+\transcript{ch16-more-digits}
+
+\noindent
+Po dziesięciu krokach mianownik ma \val{ch16.exact.ten} cyfr. Po
+pięćdziesięciu miałby ich około \val{ch16.exact.fifty}, a samo jego
+zapisanie zajęłoby jakieś \val{ch16.exact.fifty.tb} terabajtów. Arytmetyka
+dokładna liczy każdy krok bez błędu i nie może skończyć. Ostatnie cztery
+wiersze próbują lekarstwa praktycznego: trzymać stałą, ale większą liczbę
+cyfr, modułem \pkg{decimal} Pythona, i porównać z przebiegiem liczonym z
+tysiącem cyfr. Szesnaście cyfr wystarcza na \val{ch16.right.sixteen} kroki,
+jak w liczbie podwójnej precyzji; dwa razy więcej cyfr wystarcza na dwa razy
+dłużej. Każda cyfra dziesiętna kupuje mniej więcej \val{ch16.right.per.digit}
+kroku, bo jest warta mniej więcej \val{ch16.right.per.digit} cyfry dwójkowej.
+
+\begin{trapbox}
+\textbf{\enquote{Więcej miejsc po przecinku czyni symulację dokładną.}}
+Czyni ją poprawną dłużej, o stałą liczbę kroków na cyfrę, nigdy na zawsze.
+Żeby śledzić chaotyczną orbitę przez tysiąc kroków, trzeba nieść około
+trzystu cyfr dziesiętnych i znać start równie dokładnie, czego nie da żaden
+pomiar. To okrutna arytmetyka z rozdziału~\ref{ch:lyapunov} od strony
+komputera: precyzja kupuje horyzont dłuższy o stałą, a nie proporcjonalnie.
+\end{trapbox}
+
+\section{Zła droga, dobry obraz}
+\label{sec:ch16-shadow}
+\index{cieniowanie}
+
+\noindent
+Każde długie chaotyczne obliczenie w tej książce podążało więc za złą
+orbitą. Czy narysowało zły obraz? Sposób, by się przekonać, opiera się na
+jednej obserwacji.
+
+\begin{think}
+Odwzorowanie logistyczne uruchomione do przodu podwaja mały błąd w każdym
+kroku, przeciętnie. Co robi z małym błędem uruchomienie go wstecz, od każdej
+wartości do poprzedniej?
+\end{think}
+\reveal{Przeciętnie go połowi. Co krok do przodu rozciąga, to krok wstecz
+ściska.}
+Zacznij więc od końca obliczonej orbity i idź wstecz. Do każdej wartości
+prowadzą w jednym kroku dwie liczby, jedna poniżej $\tfrac{1}{2}$ i jedna
+powyżej; bierz tę po tej samej stronie co wartość obliczona. Marsz wstecz
+zmniejsza błędy, więc trzyma się blisko obliczonej orbity aż do startu, a to,
+co znajduje, liczone z czterystoma cyframi, jest prawdziwą orbitą reguły.
+
+\pyregion{code/ch16/shadow.py}{back}{Marsz wstecz w poszukiwaniu prawdziwej orbity, za którą podąża obliczona}{lst:ch16-back}
+
+\transcript{ch16-shadow}
+
+\noindent
+Obliczona orbita $\num{0.1}$ odeszła od prawdy po \val{ch16.wrong.a}
+krokach. Ale start różniący się od jednej dziesiątej o mniej więcej
+\val{ch16.shadow.start} ma dokładną orbitę, która trzyma się w odległości
+\val{ch16.shadow.gap} od każdej z \val{ch16.shadow.steps} obliczonych
+wartości. Komputer nie podążał za orbitą, o którą go poproszono. Podążał,
+wiernie, za orbitą startu tak bliskiego, że żaden pomiar nie odróżniłby ich
+od siebie. Ta prawdziwa orbita to jego \emph{cień}.
+
+\begin{rigourbox}
+\emph{Lemat o cieniowaniu} (nazywany też lematem o śledzeniu), udowodniony
+przez Dmitrija Anosowa i Rufusa Bowena, dotyczy układów, które w każdym punkcie rozciągają w niektórych
+kierunkach i ściskają w innych, w tempie, które nigdy nie słabnie (układów
+\emph{jednostajnie hiperbolicznych}, takich jak odwzorowanie podwajające).
+Mówi, że jakkolwiek blisko chcesz, by obliczona orbita miała swój cień,
+wystarczająco mały błąd na krok to gwarantuje, na zawsze. Odwzorowanie
+logistyczne przy $r = 4$ nie całkiem jest takie: w pobliżu $x = \tfrac{1}{2}$
+jego krzywa jest płaska i tam marsz wstecz rozciąga. Dla niego cieniowanie
+potwierdzono starannymi obliczeniami na długich, ale skończonych odcinkach,
+zwłaszcza Hammel, Yorke i Grebogi w 1987 roku. Ta książka nie dowodzi ani
+jednego, ani drugiego; dowody są w podręcznikach układów dynamicznych dla
+zaawansowanych.
+\end{rigourbox}
+
+\noindent
+Teraz zapłata. Cień jest prawdziwą orbitą, więc spędza czas tak, jak
+prawdziwe orbity. Mierzą to ostatnie dwa wiersze wydruku: przez milion
+kroków pierwszy wzór spędza ułamek \val{ch16.stats.a} czasu poniżej
+$\num{0.1}$, drugi \val{ch16.stats.b}, a dokładna odpowiedź, ze wzoru,
+którego ta książka nie wyprowadza, to \val{ch16.stats.exact}. Dwa programy, których drogi rozeszły
+się po pięćdziesięciu krokach, zgadzają się co do tego, gdzie orbita
+mieszka. Dlatego ułamkom czasu na skrzydłach z rozdziału~\ref{ch:lorenz} i
+statystykom klimatu z rozdziału~\ref{ch:weather} można ufać, choć żadnej
+pojedynczej obliczonej drodze nie można.
+
+\plotfig{ch16-statistics}{Z lewej: gdzie dwa przebiegi podwójnej precyzji
+po milion kroków spędzają czas, wobec dokładnej odpowiedzi. Z prawej: udział
+kroków poniżej \num{0.1} w miarę wydłużania przebiegów. Przebiegi podwójnej
+precyzji ustalają się na wartości dokładnej; przebieg pojedynczej precyzji,
+uwięziony w pętli, na błędnej.}{statystyki, które przeżywają złą drogę}
+
+\mermaidfig{ch16-shadow}{Obliczona orbita trzyma się blisko prawdziwej
+orbity z pobliskiego startu, a statystyki tamtej orbity to te, które pokazuje
+obraz.}{obliczona orbita i jej cień}
+
+\section{Maszyny, które muszą się powtarzać}
+\label{sec:ch16-random}
+\index{liczby losowe}\index{liniowy generator kongruencyjny}
+
+\noindent
+Najprostsza różnica ze wszystkich: między $0$ a $1$ jest \val{ch16.count.single} liczb pojedynczej precyzji i
+\val{ch16.count.double} liczb podwójnej precyzji: ogromnie dużo, ale
+skończenie wiele. Obliczona orbita musi więc prędzej czy później trafić na
+wartość, którą już spotkała, a ponieważ reguła za każdym razem daje tę samą
+następną wartość, od tej chwili krąży po tej samej pętli bez końca.
+
+W pojedynczej precyzji pętle są dość krótkie, by je znaleźć. Od $\num{0.1}$
+odwzorowanie logistyczne przy $r = 4$ błądzi przez \val{ch16.loop.tail}
+kroki, a potem krąży bez końca po pętli \val{ch16.loop.length} wartości;
+\val{ch16.loop.starts} różnych startów kończy w zaledwie
+\val{ch16.loop.kinds} różnych pętlach. Pętla psuje też statystyki: przebieg
+pojedynczej precyzji spędza ułamek \val{ch16.stats.single} czasu poniżej
+$\num{0.1}$, a nie \val{ch16.stats.exact}, co pokazuje
+rysunek~\ref{fig:ch16-statistics}. Liczby podwójnej precyzji też mają pętle,
+ale o wiele za długie, by do nich dojść, i to jest praktyczny powód, by
+chaos liczyć w podwójnej precyzji.
+
+\begin{think}
+Odwzorowanie logistyczne przy $r = 4$ nigdy się nie powtarza, pokrywa cały
+przedział od $0$ do $1$ i na pierwszy rzut oka wygląda losowo. Czy byłoby
+dobrym generatorem liczb losowych?
+\end{think}
+\reveal{Nie, z trzech powodów, które ten rozdział zmierzył. Jego wartości
+gromadzą się przy $0$ i $1$: mniej więcej jedną piątą czasu spędza poniżej
+$\num{0.1}$, a nie jedną dziesiątą. Każda wartość jest wyznaczona przez
+poprzednią. A w komputerze wpada w pętlę.}
+
+\begin{trapbox}
+\textbf{\enquote{Chaotyczne odwzorowanie to dobry generator liczb losowych.}}
+Chaos czyni przyszłość nieprzewidywalną dla kogoś, kto nie zna dokładnie
+startu, a to część tego, czego potrzebuje losowość, nie całość. Dobry
+generator musi też rozkładać wartości równomiernie, nie pokazywać wzoru
+między kolejnymi wartościami i powtarzać się dopiero po pętli, której nikt
+nigdy nie zdoła obejść. Te własności projektuje się za pomocą teorii liczb i
+sprawdza testami statystycznymi; chaos nie daje ich za darmo.
+\end{trapbox}
+
+\noindent
+Generator liczb losowych to deterministyczna reguła na skończonym zbiorze
+wartości, zbudowana tak, by miała jedną ogromną pętlę. Najprostszy rodzaj,
+\emph{liniowy generator kongruencyjny}, to jeden wiersz: pomnóż przez $a$,
+dodaj $c$ i zachowaj resztę z dzielenia przez $m$. Dla $a = 5$, $c = 3$ i
+$m = 16$, od $0$ dostajesz $3$, potem $5 \times 3 + 3 = 18$, czyli resztę
+$2$, potem $13$, $4$, $7$, $6$, $1$, $8$, $11$, $10$, $5$, $12$, $15$, $14$,
+$9$ i znowu $0$: wszystkie szesnaście możliwych wartości przed pierwszym
+powtórzeniem. Odwzorowanie podwajające jest generatorem tego rodzaju z
+$a = 2$ i $c = 0$, a na $k$ cyfrach dwójkowych ginie w $k$ krokach \dash{}
+to upadek z podrozdziału~\ref{sec:ch16-doubling} w nowym przebraniu. Własny
+generator Pythona, Mersenne Twister Makoto Matsumoto i Takujiego Nishimury
+(1998), ma pętlę długości $2^{19937} - 1$. Ponieważ jest deterministyczny,
+ta sama wartość początkowa, \emph{ziarno}, daje za każdym razem te same
+\enquote{losowe} liczby i tak właśnie losowy eksperyment staje się
+powtarzalny.
+
+\begin{lab}{l16_03_loops}{Każda orbita kończy się pętlą}
+Napisz liniowy generator kongruencyjny i funkcję, która dla dowolnej reguły
+i startu znajduje, po ilu krokach orbita wchodzi w pętlę i jak długa jest ta
+pętla. Wypróbuj ją na generatorze powyżej, a potem sam znajdź pętlę
+odwzorowania logistycznego w pojedynczej precyzji.
+\end{lab}
+
+\noindent
+Praktyczna lekcja mieści się w jednym zdaniu: nigdy nie ufaj pojedynczemu
+długiemu przebiegowi chaotycznego obliczenia. Uruchom je jeszcze raz z
+przestawionym wzorem, z większą i mniejszą precyzją, z mniejszym krokiem, i
+wierz temu, co przetrwa. Droga dalej niż pięćdziesiąt kroków nie przetrwa.
+Statystyki przetrwają.
+
+\begin{summarybox}
+\begin{itemize}
+\item Liczba \textbf{podwójnej precyzji} zachowuje \val{ch16.bits.double}
+  cyfry dwójkowe znaczące. Większość ułamków dziesiętnych, w tym
+  $\num{0.1}$, zapisuje się niedokładnie, a każda suma i iloczyn są
+  \textbf{zaokrąglane}.
+\item \textbf{Odwzorowanie podwajające} odczytuje swój start po jednej
+  cyfrze dwójkowej, więc w komputerze każda orbita ginie w $0$; prawdziwa
+  orbita jednej dziesiątej krąży w pętli bez końca.
+\item Dwa programy dla jednej reguły zaokrąglają inaczej i się rozchodzą.
+  Przy $r = 4$ odwzorowanie logistyczne zużywa \textbf{jedną cyfrę dwójkową
+  na krok}: mniej więcej pięćdziesiąt kroków w podwójnej precyzji,
+  dwadzieścia w pojedynczej.
+\item \textbf{Arytmetyka dokładna} podwaja liczbę cyfr w każdym kroku i nie
+  może skończyć; \textbf{więcej cyfr} kupuje stałą liczbę kroków na cyfrę.
+\item Obliczona orbita ma \textbf{cień}, prawdziwą orbitę z pobliskiego
+  startu, więc jej \textbf{statystyki} są poprawne, choć droga jest błędna.
+\item Skończona maszyna sprawia, że każda orbita kończy się \textbf{pętlą};
+  generator liczb losowych to reguła zbudowana tak, by ta pętla była
+  ogromna.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Dlaczego w komputerze $\num{0.1} + \num{0.2}$ nie równa się
+  $\num{0.3}$?
+  \answerto{Ani $\num{0.1}$, ani $\num{0.2}$ nie ma dokładnej postaci
+  dwójkowej, więc każda jest zapamiętana jako najbliższa liczba podwójnej
+  precyzji, a suma jest jeszcze raz zaokrąglana.}
+\item Komputer zapamiętuje $\num{0.3}$ jako liczbę całkowitą przez
+  $2^{\val{ch16.collapse.three}}$. Kiedy jej orbita w odwzorowaniu
+  podwajającym dochodzi do $0$ i co robi prawdziwa orbita $\tfrac{3}{10}$?
+  \answerto{W kroku \val{ch16.collapse.three}, jeden krok na cyfrę dwójkową.
+  Prawdziwa orbita idzie przez $\tfrac{3}{5}$, $\tfrac{1}{5}$,
+  $\tfrac{2}{5}$, $\tfrac{4}{5}$, $\tfrac{3}{5}$ i krąży w tej pętli bez
+  końca.}
+\item Pojedyncza precyzja zachowuje \val{ch16.bits.single} cyfry dwójkowe.
+  Przez mniej więcej ile kroków odwzorowania logistycznego przy $r = 4$
+  jest dobra?
+  \answerto{Przez około dwadzieścia (zmierzone: \val{ch16.wrong.single}):
+  odwzorowanie podwaja błąd zaokrąglenia w każdym kroku, zużywając jedną
+  cyfrę dwójkową na krok.}
+\item Liczony dokładnie od $\tfrac{1}{10}$ mianownik ma po dziesięciu krokach
+  \val{ch16.exact.ten} cyfr. Mniej więcej ile po dwudziestu?
+  \answerto{Około \val{ch16.exact.twenty}: liczba cyfr podwaja się w każdym
+  kroku, a dziesięć podwojeń mnoży ją mniej więcej przez tysiąc.}
+\item Po milionie kroków chaotycznej symulacji czemu możesz ufać: ostatniej
+  wartości czy ułamkowi czasu spędzonego poniżej $\num{0.1}$?
+  \answerto{Ułamkowi czasu. Droga podąża za inną orbitą mniej więcej od
+  pięćdziesiątego kroku, ale trzyma się blisko prawdziwej orbity z
+  pobliskiego startu, a ta spędza czas tak, jak prawdziwe orbity.}
+\item Dlaczego każda orbita liczona na maszynie musi się w końcu powtórzyć?
+  \answerto{Maszyna mieści tylko skończenie wiele liczb, więc orbita musi
+  wrócić do jakiejś wartości, a reguła powtarza wtedy wszystko, co po niej
+  następuje.}
+\end{checkpoint}

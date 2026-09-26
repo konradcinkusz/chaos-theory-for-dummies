@@ -1,0 +1,5 @@
+r = 2.8:  period 1
+r = 3.2:  period 2
+r = 3.5:  period 4
+r = 3.9:  period None
+r = 4.0:  period None

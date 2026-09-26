@@ -1,0 +1,495 @@
+%% ch09 --- Three equations for the weather: the Lorenz attractor
+%%
+%% Written September 2026. Every number the reader cannot do in their head
+%% comes from code/measure/ch09.py, which imports the SAME functions the
+%% listings print (code/ch09/). Lorenz's rules use only + - * /, so every
+%% trajectory on these pages is the same on every machine; the exponent is
+%% committed to two decimals, which the last bit of a logarithm cannot move.
+%%
+%% WHAT THIS CHAPTER MAY NOT SAY. It shows the attractor and names it, and
+%% hands the word "strange" and the geometry (stretch and fold, zero volume,
+%% layers at every scale) to Chapter 10 and the measuring of such shapes to
+%% Chapter 11. It shows that statistics of the attractor do not depend on
+%% the start; turning that into weather against climate, and into ensemble
+%% forecasts, is Chapter 14's. Why a computed path can be trusted for its
+%% statistics is Chapter 16's; making two Lorenz runs agree is Chapter 17's.
+%% Lorenz's 1961 rounding story and his 1972 butterfly are Chapter 6's.
+%%
+%% Twin: chapters/pl/ch09-lorenz.tex. Section for section, macro for macro,
+%% number for number; tools/parity.py compares them.
+
+\chapter{Three equations for the weather: the Lorenz attractor}
+\label{ch:lorenz}
+\index{Lorenz system}\index{Lorenz, Edward}
+
+\noindent
+Put a wide pan of water on a gentle flame. The warm water at the bottom
+wants to rise and the cool water at the top wants to sink, and past a certain
+heat the water starts to roll: up on one side, down on the other, like a
+slow wheel. Air does the same over a sunny field, and on a grander scale that
+rolling is one of the engines of the weather.
+
+Describe that roll with three numbers and three short rules, exact, with
+nothing random in them. Will it turn steadily, like a wheel? Or can three
+numbers be as irregular as the sky? Part~II found chaos in rules that take
+one step at a time. This chapter finds it in something that flows \dash{} and
+then finds, inside the chaos, something nobody expected: a shape.
+
+\begin{outcomes}
+\outcome{read Lorenz's three rules of change term by term, and say what each
+  term does to the roll}
+\outcome{follow the rules with RK4 and read the result from two views: one
+  number against another, and one number against time}
+\outcome{measure how fast two nearly identical runs separate, and turn that
+  rate into a prediction horizon}
+\outcome{say what an attractor is, and why a chaotic system cannot go
+  anywhere it likes}
+\outcome{compute a statistic of a run and check that it does not depend on
+  where the run began}
+\end{outcomes}
+
+\section{Three numbers for a pan of water}
+\label{sec:ch09-rules}
+\index{convection}
+
+\noindent
+In 1963 Edward Lorenz, a meteorologist at the Massachusetts Institute of
+Technology, published a paper called \enquote{Deterministic Nonperiodic
+Flow}. Its title is this chapter in miniature. \emph{Deterministic}: the
+rules contain no chance. \emph{Nonperiodic}: the motion never repeats.
+\emph{Flow}: time runs smoothly, so the rule gives the speed at which the
+state changes rather than its next value, as in Chapter~\ref{ch:motion}. His
+model is a drastic cut-down of a fluid heated from below, and it keeps three
+numbers:
+
+\begin{itemize}
+\item $x$: how fast the roll turns, and which way (positive one way,
+  negative the other);
+\item $y$: how much warmer the rising side is than the sinking side;
+\item $z$: how far the temperature, from bottom to top, has been bent away
+  from an even slope by the roll's mixing.
+\end{itemize}
+
+\noindent
+Write $\mathrm{d}x/\mathrm{d}t$, read \enquote{the rate of $x$}, for how
+fast $x$ is changing right now; it is a name for a speed, not a fraction to
+simplify. Lorenz's rules are
+\[
+\frac{\mathrm{d}x}{\mathrm{d}t} = \sigma\,(y - x), \qquad
+\frac{\mathrm{d}y}{\mathrm{d}t} = x\,(\rho - z) - y, \qquad
+\frac{\mathrm{d}z}{\mathrm{d}t} = x\,y - \beta\,z,
+\]
+with three fixed numbers named by Greek letters: $\sigma$ (sigma) is $10$,
+$\rho$ (rho) is $28$ and $\beta$ (beta) is $\tfrac{8}{3}$. In words:
+
+\begin{itemize}
+\item \textbf{The roll chases the temperature difference.} When $y$ is bigger
+  than $x$ the roll speeds up, and when it is smaller the roll slows;
+  $\sigma$ says how briskly.
+\item \textbf{The roll builds the difference, and the difference leaks.}
+  Multiplied out, the second rule is $\rho x - xz - y$. A turning roll carries
+  warm water up one side and cool water down the other, building $y$ at the
+  rate $\rho x$, where $\rho$ is how hard the pan is heated ($\rho = 1$ is the
+  least heating that starts a roll at all). The $-y$ is the difference leaking
+  away; the $-xz$ is the mixing fighting back.
+\item \textbf{The roll stirs the layer, and the layer settles.} A roll
+  carrying warm water upwards ($x$ and $y$ of the same sign) bends the
+  temperature profile at the rate $xy$; left alone it relaxes at the rate
+  $\beta z$, where $\beta$ comes from the shape of the rolls.
+\end{itemize}
+
+\noindent
+Only two terms, $xz$ and $xy$, multiply two of the numbers together; every
+other term is a fixed number times one of them. Those two products are the
+whole of the model's nonlinearity, in Chapter~\ref{ch:feedback}'s sense, and
+they will turn out to be enough.
+
+\mermaidfig{ch09-feedback}{The three numbers push one another round a loop.
+The roll builds the temperature difference, the difference drives the roll,
+and together they stir the layer, which weakens the difference.}{three
+numbers in a loop}
+
+\begin{think}
+Suppose the water is perfectly still: $x = 0$, $y = 0$ and $z = 0$. What do
+the three rules say?
+\end{think}
+\reveal{Every rate is zero: $10 \times (0 - 0) = 0$, then $0 - 0 = 0$, then
+$0 - 0 = 0$. Nothing changes.}
+That is the pan passing its heat quietly upwards with no roll at all. A state
+where every rate is zero is a \emph{fixed point} of the flow, in
+Chapter~\ref{ch:iteration}'s words: start there and you stay there. It is
+not the only one.
+
+\begin{think}
+Try $x = y = \sqrt{72}$, which is about \val{ch09.fixed.xy}, and $z = 27$. Are
+all three rates zero? You need only $\tfrac{8}{3} \times 27 = 72$.
+\end{think}
+\reveal{Yes. The first rate is $10 \times 0 = 0$. The second is
+$x \times (28 - 27) - y = x - y = 0$. The third is $x \times x - 72 = 72 -
+72 = 0$.}
+This is a \emph{steady roll}, turning at a constant speed with a constant
+temperature difference. With minus signs, $x = y = -\sqrt{72}$ and $z = 27$,
+it is the same roll turning the other way. For any heating $\rho$ above $1$
+the two steady rolls sit at $x = y = \pm\sqrt{\beta(\rho - 1)}$ and
+$z = \rho - 1$, where $\pm$ means \enquote{plus or minus}.
+
+\begin{lab}{l09_01_rates}{Lorenz's rules, in your own hand}
+Write \code{rates}, which takes the state $(x, y, z)$ and returns the three
+rates, and \code{fixed\_points}, which returns every state where all three
+are zero. The test checks your rates against the book's library, and checks
+that they are zero at every point you return.
+\end{lab}
+
+\section{Following the flow}
+\label{sec:ch09-flow}
+\index{Lorenz system!butterfly}\index{RK4}
+
+\noindent
+Here are the same rules as the book's library writes them. The last three
+lines are the three rules; \api{lorenz} hands back a function that takes a
+state and returns its three rates, which is what your lab asked for.
+
+\pyregion{code/src/chaoslab/systems.py}{lorenz}{Lorenz's 1963 rules in chaoslab}{lst:ch09-field}
+
+\noindent
+To follow them, use Chapter~\ref{ch:motion}'s RK4: \api{integrate} takes
+steps of length \code{DT}, a hundredth of a time unit, and keeps every state.
+The time unit is the model's own, not a second or an hour.
+
+\pyregion{code/ch09/lorenz_run.py}{run}{Forty time units of Lorenz's flow, from the start (1, 1, 1)}{lst:ch09-run}
+
+\begin{think}
+A pendulum with friction spirals into its resting point. Lorenz's pan has
+three fixed points. Started at $(1, 1, 1)$, close to the still water, will
+the run settle onto one of them?
+\end{think}
+\reveal{No. It is pushed away from the still water, circles one steady roll
+in widening loops, is flung across to circle the other, and never settles.}
+At this heating neither steady roll can hold the state; they can only while
+$\rho$ is below $\tfrac{470}{19}$, about \val{ch09.rho.hopf}, a number that
+comes out of the rules by algebra this book does not do. Turn the heating
+down to $20$ and the same start does settle: the last line of the printout is
+a steady roll at $x = y = -\val{ch09.steady.x}$, $z = 19$.
+
+\transcript{ch09-butterfly}
+
+\noindent
+The line marked \code{loops} prints one letter per loop: \code{L} for a loop
+on the side where $x$ is negative, \code{R} for the other. The run makes
+\val{ch09.loops.left} loops on the left before its first on the right, and
+after that the letters come in runs of anything from one to five, with no
+pattern. There is none to find: that is the \emph{nonperiodic} of Lorenz's
+title.
+
+\plotfig{ch09-butterfly}{The run from $(1, 1, 1)$. Left: $x$ against $z$
+from time 5 to time 60, looping round the two steady rolls (crosses) and
+tracing two wings. Right: $x$ against time for the first forty time units;
+the dashed lines are the steady rolls.}{the butterfly from two sides}
+
+\noindent
+The left half of Figure~\ref{fig:ch09-butterfly} has earned the name
+\emph{Lorenz butterfly}. Each wing is the roll turning one way; crossing
+between them is the roll reversing.
+
+\begin{think}
+Weather services today run models carrying many millions of numbers.
+Lorenz's carries three. Is three enough for real chaos, or only for a sketch
+of it?
+\end{think}
+\reveal{Three is enough, and three is the fewest a flow can do it with.}
+Chapter~\ref{ch:motion} stated the lower limit; here is the reason. In a
+plane a path can never cross itself, because two paths through one point
+would have the same future; so a flow with two numbers can only settle,
+spiral or go round a fixed loop. With a third number the path can pass over
+and under itself, and that is room enough.
+
+\begin{trapbox}
+\textbf{\enquote{Chaos needs many variables.}} It needs three numbers and two
+multiplications. The weather is not hard to forecast only because the
+atmosphere is big: a pan of water cut down to three numbers is already
+unpredictable. What chaos does need is Chapter~\ref{ch:strange}'s subject.
+\end{trapbox}
+
+\begin{worldbox}
+The \emph{chaotic waterwheel} is Lorenz's pan built in wood and water: leaky
+cups hang round the rim of a wheel and water pours into the cups at the top.
+Willem Malkus and Louis Howard built one at MIT, and its equations, after
+renaming the quantities, are Lorenz's: the wheel turns, slows and reverses at
+moments nobody can call in advance. The equations of a certain kind of laser
+are Lorenz's too, as Hermann Haken showed in 1975.
+\end{worldbox}
+
+\section{Two starts a hair apart}
+\label{sec:ch09-apart}
+\index{sensitive dependence}\index{Lyapunov exponent!of a flow}
+
+\noindent
+Chapter~\ref{ch:butterfly} measured sensitivity on a map. Here is the same
+measurement on a flow. The run first goes fifty time units, to leave its
+start behind; then it is copied, and the copy is nudged by one part in a
+hundred million in $x$.
+
+\pyregion{code/ch09/two_runs.py}{split}{Two runs, one part in a hundred million apart}{lst:ch09-split}
+
+\noindent
+Both are followed with the same rule, and the program prints the $x$ of each
+and their distance apart every two time units:
+
+\transcript{ch09-two-runs}
+
+\noindent
+Up to time 14 the two runs agree to two decimals; by time 24 they are on
+different wings. The distance grows about tenfold every two or three time
+units, though not smoothly: it swells and shrinks as the pair goes round a
+loop. It first passes $1$ at time \val{ch09.apart.first}.
+
+Chapter~\ref{ch:lyapunov} named that rate the Lyapunov exponent, $\lambda$
+(lambda): the average of the logarithm of how much a small gap is stretched.
+For a flow the average is per unit of time. The library measures it so:
+
+\pyregion{code/src/chaoslab/measure.py}{flowexp}{The Lyapunov exponent of a flow}{lst:ch09-flowexp}
+
+\noindent
+Follow two runs a hair apart. After each step, add up the logarithm of how
+much their gap has grown, then pull the second run back to its first small
+distance, in the same direction, so that the gap never grows to the size of
+the butterfly, where it would stop measuring stretching. The total, divided
+by the time elapsed, is $\lambda$. Here it is from three starts:
+
+\pyregion{code/ch09/exponent.py}{exponent}{The exponent of Lorenz's flow, from three starts}{lst:ch09-exponent}
+
+\transcript{ch09-exponent}
+
+\noindent
+Between \val{ch09.lambda.lo} and \val{ch09.lambda.hi} per time unit, from
+three quite different starts: call it \val{ch09.lambda}. On average the gap
+is multiplied by $e$ to the power \val{ch09.lambda}, about \val{ch09.stretch},
+every time unit.
+
+\begin{think}
+Chapter~\ref{ch:lyapunov}'s horizon: an error grows to a tolerance in about
+$\ln(\text{tolerance} / \text{error}) / \lambda$. With an error of $10^{-8}$,
+a tolerance of $1$ and $\lambda = \val{ch09.lambda}$, how long should two runs
+stay within $1$ of each other? You need $\ln(10^{8})$, which is about
+\val{ch09.ln.eight}.
+\end{think}
+\reveal{About $\val{ch09.ln.eight} / \val{ch09.lambda}$, which is roughly
+\val{ch09.horizon} time units. The pair above took \val{ch09.apart.first}.}
+One pair is one sample. Split the run at \val{ch09.apart.pairs} different
+places along the butterfly and the first passage past $1$ comes anywhere from
+time \val{ch09.apart.min} to time \val{ch09.apart.max}, averaging
+\val{ch09.apart.mean}. The formula predicts the average; the scatter is there
+because the stretching is not the same all round the wings.
+
+\plotfig{ch09-apart}{Two runs that start one part in a hundred million apart.
+Left: their $x$ agree, then part company. Right: their distance, on a
+logarithmic scale, climbs along the dashed line of the exponent until it
+reaches the size of the butterfly.}{two runs parting company}
+
+\noindent
+Nothing in the rule is uncertain, and yet a forecast from a start known to
+eight decimal places is good for about twenty time units. (Two runs that
+have drifted apart can be made to agree again by letting one feel the other:
+that is Chapter~\ref{ch:taming}'s story.)
+
+\section{Unpredictable, but not anywhere}
+\label{sec:ch09-attractor}
+\index{attractor}
+
+\noindent
+If a run cannot be forecast beyond twenty time units, what can be said about
+it at all?
+
+\begin{think}
+By time 24 the two runs above have nothing to do with each other: one has
+$x$ near $-12$, the other near $8$. Let them run a thousand time units more.
+Could one of them turn up at $x = 100$, or at $z = -50$?
+\end{think}
+\reveal{No. Over \val{ch09.long.time} time units, $x$ never gets further
+than \val{ch09.long.x} from zero either way, and $z$ stays between
+\val{ch09.long.zlo} and \val{ch09.long.zhi}. That holds from wherever you
+start.}
+Test the \enquote{from wherever} with eight starts at the corners of a box
+eighty wide, far outside anything in the pictures above:
+
+\pyregion{code/ch09/cloud.py}{cloud}{Eight starts far outside the butterfly}{lst:ch09-cloud}
+
+\noindent
+The program follows each for fifty time units, ignores the first five, and
+prints the room each run lived in:
+
+\transcript{ch09-cloud}
+
+\noindent
+Every run is pulled in from its corner and then lives in the same room as the
+long run. Notice, too, that the rows come in identical pairs:
+$(-40, -40, -40)$ and $(40, 40, -40)$ give the same numbers. The next section
+says why.
+
+\begin{trapbox}
+\textbf{\enquote{A chaotic system can go anywhere.}} Unpredictable is not
+unbounded. You cannot say where on the butterfly a Lorenz run will be in a
+hundred time units, but you can say it will be on the butterfly, and that is
+a real prediction: a thin set of states out of all the ones the three numbers
+could take.
+\end{trapbox}
+
+\noindent
+A set of states that runs are drawn onto, and then never leave, is an
+\emph{attractor}. A pendulum with friction has a single point for its
+attractor; a pendulum clock, kept swinging, has a loop. Lorenz's has the
+butterfly, the same one from almost every start, and a run on it never
+repeats and never leaves. How a path can loop for ever in a bounded region
+without crossing or retracing itself is a puzzle about the shape, which is
+why it is called a \emph{strange attractor}. Chapter~\ref{ch:strange} opens
+the shape up, and Chapter~\ref{ch:fractals} measures shapes like it.
+
+\begin{rigourbox}
+Two things are shown here by running, not proved. That no run can escape
+can be proved with a page of algebra about a quantity that shrinks whenever
+the state is far out. That the butterfly the computer draws really exists,
+and really is chaotic, rather than being an artefact of stepping and
+rounding, stayed open for more than thirty years, until Warwick Tucker
+settled it with a proof in which a computer did the arithmetic with every
+rounding error accounted for.
+\end{rigourbox}
+
+\section{What you can still predict}
+\label{sec:ch09-statistics}
+\index{attractor!statistics of}
+
+\noindent
+The butterfly says where a run lives. The next question is how it spends its
+time there.
+
+\begin{think}
+You cannot say which wing a run will be on at time 50. Can you say what
+fraction of a long run it spends on the right-hand wing, where $x$ is
+positive?
+\end{think}
+\reveal{Yes: a half. Change the signs of $x$ and $y$ together: the first two
+rates change sign with them, and the third, $xy - \beta z$, does not change
+at all, because $(-x)(-y) = xy$.}
+So the rules do not care which way the roll turns. Every run on one wing has
+a mirror-image run on the other, which is why the cloud's rows came in pairs,
+and a long run shares its time between the wings equally.
+
+\begin{trapbox}
+\textbf{\enquote{If the path is unpredictable, nothing about it is
+predictable.}} The path is unpredictable beyond about twenty time units. The
+shape it lives on is not, and neither is how much of its time it spends in
+each part of the shape. Those are \emph{statistics of the attractor}, and they
+come out the same from every start.
+\end{trapbox}
+
+\begin{lab}{l09_02_wings}{Two numbers the start does not decide}
+Write \code{fraction\_right}, the share of a run's states with $x$ above zero,
+and \code{mean\_height}, the average of its $z$. The test runs Lorenz's rules
+from $(1, 1, 1)$ and from a far corner of the cloud, and checks that your two
+summaries agree between the runs.
+\end{lab}
+
+\noindent
+Here are the book's versions:
+
+\pyregion{code/ch09/averages.py}{stats}{Two statistics of a run}{lst:ch09-stats}
+
+\noindent
+The listing runs five starts for 500 time units each, drops the first ten so
+that each start is forgotten, and prints for each run which wing it is on at
+time 50, its fraction of time on the right wing, and its average height:
+
+\transcript{ch09-averages}
+
+\noindent
+The middle column is the unpredictable part: left, left, right, left, right,
+and nothing you could know in advance picks it. The last two columns are the
+predictable part. The fraction on the right is between \val{ch09.frac.lo} and
+\val{ch09.frac.hi} from every start, as the mirror said. The average height
+is between \val{ch09.height.lo} and \val{ch09.height.hi}, and no symmetry
+told you that number: it is simply the same from every start.
+
+A statistic of a finite run wobbles a little. Chop one run of
+\val{ch09.long.time} time units into pieces: in pieces 100 time units long,
+the fraction on the right typically strays from a half by about
+\val{ch09.wobble.short}; in pieces 2000 long, by about
+\val{ch09.wobble.long}; over the whole run it is \val{ch09.long.frac}. The
+longer you watch, the sharper the statistic \dash{} the opposite of the path,
+whose forecast gets worse the further ahead you look.
+
+\plotfig{ch09-histograms}{How much of its time the run spends at each value
+of $x$ and of $z$, from three starts, 500 time units each. The three outlines
+lie on top of one another: the histogram does not care where the run
+began.}{histograms that ignore the start}
+
+\noindent
+The whole histogram of where the run spends its time comes out the same from
+three starts. That is the chapter's hinge and the second big idea of this
+book: \textbf{the individual future of a chaotic
+system is unpredictable, but where the system lives, and how often it visits
+each part, is predictable}. Even $\lambda$ is a number of that kind.
+
+Chapter~\ref{ch:weather} builds on exactly this to separate a question about
+next week's weather from a question about climate, and shows how forecasters
+run many copies at once. Chapter~\ref{ch:computers} asks why a statistic can
+be trusted even though the computer's own rounding soon makes its path a
+different one from the true path.
+
+\begin{summarybox}
+\begin{itemize}
+\item Lorenz's 1963 model of a heated pan keeps three numbers: the roll's
+  speed $x$, the temperature difference $y$ and the mixing $z$. Only two
+  terms of its three \textbf{rules of change}, $xy$ and $xz$, are
+  \textbf{nonlinear}. Its \textbf{fixed points} are the still pan and two
+  \textbf{steady rolls}.
+\item At $\rho = 28$ a run settles on no fixed point: it loops round one
+  steady roll, then the other, switching irregularly and never repeating.
+  Three numbers are the fewest a \textbf{flow} needs for chaos, and enough.
+\item Two runs one part in a hundred million apart separate in about twenty
+  time units. The \textbf{Lyapunov exponent} of the flow is about
+  \val{ch09.lambda} per time unit, and Chapter~\ref{ch:lyapunov}'s horizon
+  formula predicts the average separation time.
+\item Every run is drawn onto the same bounded, butterfly-shaped set: an
+  \textbf{attractor}. A chaotic system cannot go anywhere it likes.
+\item \textbf{Statistics of the attractor}, such as the fraction of time on
+  each wing and the average height, are the same from every start. The path
+  is unpredictable; where the system lives is not.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item In words, what does the rule for the rate of $x$, $\sigma(y - x)$, make
+  the roll do when $y$ is larger than $x$?
+  \answerto{It makes $x$ grow: the roll speeds up towards the temperature
+  difference.}
+\item With $\rho = 28$, where are the three fixed points of Lorenz's rules?
+  \answerto{The still pan, $(0, 0, 0)$, and the two steady rolls,
+  $x = y = \pm\sqrt{72}$ (about \val{ch09.fixed.xy}) with $z = 27$.}
+\item Why can a flow with only two numbers not be chaotic, and how many does
+  Lorenz's model use?
+  \answerto{In a plane a path cannot cross itself, so it can only settle,
+  spiral or go round a fixed loop. Lorenz's model uses three, the fewest that
+  let a path pass over and under itself.}
+\item The exponent is about \val{ch09.lambda} per time unit. If the start
+  were known a thousand times more precisely, how much longer would two runs
+  stay within $1$ of each other?
+  \answerto{About $\ln(1000) / \val{ch09.lambda}$, roughly
+  \val{ch09.gain.thousand} time units more: from about twenty to about
+  twenty-eight, not a thousand times as long.}
+\item Someone says a Lorenz run, being chaotic, might one day reach
+  $z = 200$. What do you tell them?
+  \answerto{It will not: every run is drawn onto the same bounded attractor,
+  where $z$ stays between about \val{ch09.long.zlo} and
+  \val{ch09.long.zhi}.}
+\item What fraction of a long run is spent on the right-hand wing, and how
+  can you know without running anything?
+  \answerto{A half. Changing the signs of $x$ and $y$ together leaves the
+  rules unchanged, so the two wings are mirror images.}
+\item Name a number about a Lorenz run that no symmetry predicts but that
+  comes out the same from every start.
+  \answerto{The average height $z$, between \val{ch09.height.lo} and
+  \val{ch09.height.hi} from five different starts; the Lyapunov exponent,
+  about \val{ch09.lambda}, is another.}
+\end{checkpoint}

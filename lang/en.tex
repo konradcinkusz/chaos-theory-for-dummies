@@ -1,0 +1,84 @@
+% ============================================================
+%  lang/en.tex --- every user-visible string in the English edition
+%
+%  Nothing in chapters/en/ may hard-code a word that a macro also typesets.
+%  If a label is needed and is not here, add it here AND in lang/pl.tex; CI
+%  fails the build when the two files do not define the same macro set (C3).
+% ============================================================
+
+% ---------- Part titles ----------
+\newcommand{\lblPartI}{The clockwork: how mathematics describes the world}
+\newcommand{\lblPartII}{Where prediction breaks}
+\newcommand{\lblPartIII}{The shapes of chaos}
+\newcommand{\lblPartIV}{Chaos in the world}
+\newcommand{\lblPartV}{Living with chaos}
+\newcommand{\lblPartAppendices}{Appendices}
+
+% ---------- Admonition titles ----------
+\newcommand{\lblNote}{Note}
+\newcommand{\lblWarning}{Watch out}
+\newcommand{\lblTrap}{The trap}
+\newcommand{\lblWorld}{Where you meet this}
+\newcommand{\lblRigour}{What we are not proving}
+\newcommand{\lblProject}{chaoslab}
+\newcommand{\lblVerify}{Run this before you trust it}
+\newcommand{\lblLab}{Lab}
+
+% ---------- The method ----------
+\newcommand{\lblThink}{Stop and think}
+\newcommand{\lblThinkCue}{Answer it before you read on.}
+\newcommand{\lblAnswerMark}{Answer.}
+\newcommand{\lblOutcomes}{What you will be able to do}
+\newcommand{\lblOutcomesLead}{When you have finished this chapter you will be able to:}
+\newcommand{\lblSummary}{Summary}
+\newcommand{\lblCanYou}{Can you?}
+\newcommand{\lblCanYouIntro}{%
+  Rate yourself against each item, 1 (no) to 5 (yes, unaided). Anything below
+  4 is not a matter for reflection: go back to the section that taught it and
+  work its questions again before you move on.}
+\newcommand{\lblNoOutcomes}{No outcomes were declared for this chapter.}
+\newcommand{\lblCheckpoint}{Checkpoint}
+\newcommand{\lblCheckpointIntro}{%
+  Answer these on paper before you look at Appendix~A. They test what the
+  chapter taught, in the order it taught it.}
+\newcommand{\lblAnswersIntro}{%
+  The checkpoint answers of every chapter, in chapter order. Each was written
+  beside its question and collected here by the build, so an answer cannot
+  drift away from the question it answers.}
+\newcommand{\lblNoAnswers}{No answers were stored. This is a partial build.}
+
+% ---------- The lab footer ----------
+\newcommand{\lblLabStarter}{Starter}
+\newcommand{\lblLabTest}{Test}
+\newcommand{\lblLabRun}{Run}
+
+% ---------- Build-state markers ----------
+\newcommand{\lblNotWritten}{NOT YET WRITTEN}
+\newcommand{\lblNotRendered}{DIAGRAM NOT RENDERED --- run \texttt{make diagrams}}
+\newcommand{\lblPlotNotRendered}{PLOT NOT RENDERED --- run \texttt{make plots}}
+\newcommand{\lblTranscriptMissing}{TRANSCRIPT NOT GENERATED --- run \texttt{make numbers}}
+\newcommand{\lblValueMissing}{value missing}
+\newcommand{\lblDiagramManifest}{Diagram manifest}
+\newcommand{\lblPlotManifest}{Plot manifest}
+\newcommand{\lblLabManifest}{Lab manifest}
+
+% ---------- Front-matter running heads ----------
+\newcommand{\lblHowToUse}{How to use this book}
+\newcommand{\lblIntroduction}{Introduction}
+
+% The punctuation dash, written \dash{} with a space either side and never
+% typed directly: the English edition sets a spaced em dash and the Polish
+% one a spaced en dash.
+\newcommand{\dash}{---}
+
+% ---------- Index cross-references ----------
+\newcommand{\lblIndexSee}{see}
+\newcommand{\lblIndexSeeAlso}{see also}
+
+% The date the book's facts and pins were last checked.
+\newcommand{\pinnedon}{September 2026}
+
+% ---------- PDF metadata ----------
+\newcommand{\lblPdfSubject}{How mathematics describes the world, and where it stops predicting it: chaos theory from school arithmetic}
+\newcommand{\lblPdfKeywords}{chaos theory, dynamical systems, logistic map, Lorenz attractor, fractals, Lyapunov exponent, prediction, Python}
+\newcommand{\lblPdfLang}{en-GB}

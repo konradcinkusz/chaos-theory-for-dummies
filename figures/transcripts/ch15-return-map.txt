@@ -1,0 +1,4 @@
+values  rule  shuffled   (of 100 squares)
+   100    24        64
+   500    28        93
+  2000    28       100

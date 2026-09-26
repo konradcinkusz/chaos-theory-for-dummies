@@ -1,0 +1,486 @@
+%% ch15 --- Życie, rynki i szum: jak odróżnić chaos od przypadku
+%%
+%% Napisany we wrześniu 2026. Każda liczba, której czytelnik nie policzy w
+%% pamięci, pochodzi z code/measure/ch15.py, który importuje TE SAME funkcje,
+%% które drukują listingi (code/ch15/). Liczby losowe pochodzą z generatora
+%% Pythona z nazwanymi ziarnami, więc tasowania i szum są takie same na każdym
+%% komputerze; błędy prognoz są drukowane z dwiema cyframi znaczącymi.
+%%
+%% Czego ten rozdział nie mówi: patrz nagłówek bliźniaka.
+%%
+%% Bliźniak: chapters/en/ch15-life-noise.tex. Podrozdział za podrozdziałem,
+%% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
+
+\chapter{Życie, rynki i szum: jak odróżnić chaos od przypadku}
+\label{ch:life}
+\index{chaos!odróżnianie od szumu}\index{szum}
+
+\noindent
+Kardiolog patrzy na odstępy między uderzeniami serca, epidemiolog na sto lat
+comiesięcznych zachorowań na odrę, inwestor na cenę akcji. Każdy widzi
+poszarpaną linię, która nigdy dokładnie się nie powtarza, i chce wiedzieć, co
+nią szarpie: reguła, w której kilka liczb popycha się nawzajem, czy przypadek,
+czyli niezliczone drobne przyczyny, których żaden model nigdy nie wymieni.
+Najczęściej jedno i drugie.
+
+Rozdział~\ref{ch:logistic} pokazał, że reguła długości jednej linijki potrafi
+dawać wyniki nieregularne jak losowanie totolotka. Ten rozdział zadaje to
+pytanie od drugiej strony: gdy ktoś poda ci poszarpany szereg liczb bez
+żadnej reguły, czy umiesz stwierdzić, czy zrobiła go reguła? Zbudujesz dwa
+testy, zmierzysz, jak dobrze działają na danych zaszumionych i krótkich, a
+potem odwiedzisz miejsca, w których ogłaszano odkrycie chaosu. Przesłanie nie
+brzmi: chaos jest wszędzie, ani: nie ma go nigdzie. Brzmi: twierdzenie o
+chaosie da się sprawdzić.
+
+\begin{outcomes}
+\outcome{zrobić szereg chaotyczny i szereg losowy z dokładnie tych samych
+  liczb i powiedzieć, dlaczego żaden histogram ich nie rozróżni}
+\outcome{narysować odwzorowanie powrotu, policzyć kratki, w które trafia, i
+  odczytać ten wynik}
+\outcome{prognozować szereg z jego własnej przeszłości metodą analogów i
+  zmierzyć, jak błąd rośnie z liczbą kroków naprzód}
+\outcome{powiedzieć, jak szum pomiarowy i krótki zapis osłabiają oba testy}
+\outcome{ocenić twierdzenie o chaosie w populacjach, epidemiach, sercach czy
+  na rynkach na podstawie przedstawionych dowodów}
+\end{outcomes}
+
+\section{Dwa szeregi, jeden zestaw liczb}
+\label{sec:ch15-twins}
+\index{surogat}
+
+\noindent
+Zacznij od zagadki. Dwa szeregi zawierają po \val{ch15.n} liczb z przedziału
+od $0$ do $1$. Jeden zrobiła reguła logistyczna z rozdziału~\ref{ch:logistic}
+z pokrętłem ustawionym na $r = 4$: jeśli $x_n$ to wartość w kroku $n$, to
+następna wynosi
+\[ x_{n+1} = 4\,x_n\,(1 - x_n), \]
+czyli cztery razy wartość razy jeden minus wartość. Drugi szereg jest losowy.
+Poniżej oba są wydrukowane z dokładnością do czterech miejsc po przecinku;
+program, który je zrobił, przechowuje około szesnastu cyfr znaczących.
+
+\begin{think}
+Szereg~A zaczyna się od \val{ch15.a.1}, \val{ch15.a.2}, \val{ch15.a.3},
+\val{ch15.a.4}. Szereg~B zaczyna się od \val{ch15.b.1}, \val{ch15.b.2},
+\val{ch15.b.3}, \val{ch15.b.4}. Który zrobiła reguła? Czy da się to poznać
+na oko, a czy da się to policzyć?
+\end{think}
+\reveal{B. Na oko się nie da. Rachunkiem tak: $4 \times \num{0.2} \times
+\num{0.8} = \num{0.64}$, czyli druga wartość B, a $4 \times \num{0.64} \times
+\num{0.36}$ to \val{ch15.b.3}, jej trzecia. Dla A reguła daje z pierwszej
+wartości około \val{ch15.a.next}, a druga wartość wynosi \val{ch15.a.2}.}
+Zwróć uwagę, czego użył ten test. Nie wielkości liczb ani tego, jak często
+pojawia się każda wielkość, tylko ich \emph{kolejności}: czy każda wartość
+wynika z poprzedniej. O tym jest cały ten rozdział.
+
+\begin{trapbox}
+\textbf{\enquote{Ciąg, który wygląda na losowy, musi pochodzić z losowości.}}
+Szereg~B wyglądał na równie losowy jak A, a powstał z jednej linijki
+arytmetyki bez grama przypadku. To, że coś wygląda losowo, jest faktem o
+wyglądzie. Nie mówi nic o przyczynie, dopóki nie sprawdzisz, czy jest w nim
+porządek, jaki zostawia po sobie reguła.
+\end{trapbox}
+
+\noindent
+Szereg~A nie powstał z rzutów kostką. Powstał z szeregu~B przez
+przetasowanie:
+
+\pyregion{code/ch15/twins.py}{make}{Dwa szeregi z jednego: reguła i te same liczby przetasowane}{lst:ch15-make}
+
+\noindent
+Pierwsza funkcja iteruje regułę; druga tasuje kopię listy generatorem liczb
+losowych Pythona, uruchomionym od ustalonego \emph{ziarna}, dzięki czemu
+tasowanie jest takie samo na każdym komputerze, a twój wynik zgadza się ze
+stroną. Szereg zbudowany z innego przez pomieszanie kolejności nazywa się
+\emph{surogatem}: to losowy szereg najtrudniejszy do odróżnienia od
+oryginału, bo ma dokładnie te same liczby.
+
+\begin{think}
+Jak histogram przetasowanego szeregu \dash{} ile jego wartości wpada do każdej
+piątej części przedziału od $0$ do $1$ \dash{} wypadnie w porównaniu z
+histogramem szeregu reguły?
+\end{think}
+\reveal{Identycznie, słupek w słupek. Histogram liczy wartości i pomija ich
+kolejność, a tasowanie zmienia tylko kolejność.}
+
+\transcript{ch15-twins}
+
+\noindent
+Spójrz na kształt: \val{ch15.hist.low} spośród \val{ch15.n} wartości leży w
+najniższej piątej części, a tylko \val{ch15.hist.mid} w środkowej, bo reguła
+lubi przebywać blisko $0$ i $1$. Przetasowany szereg ma ten sam przekrzywiony
+histogram, a także tę samą średnią, ten sam rozrzut, tę samą największą i
+najmniejszą wartość. Żadne podsumowanie, które pomija kolejność, nie odróżni
+tych bliźniaków.
+
+\plotfig{ch15-twins}{Szereg reguły i jego przetasowanie. U góry: pierwsze sto
+kroków każdego, równie poszarpane. U dołu: ich histogramy, identyczne.}{dwa
+szeregi, jeden histogram}
+
+\section{Każda wartość względem następnej}
+\label{sec:ch15-return}
+\index{odwzorowanie powrotu}
+
+\noindent
+W zagadce mogłeś sprawdzać każdą wartość względem poprzedniej, bo znałeś
+regułę. Przy prawdziwych danych nikt ci jej nie poda, więc niech dane same ją
+narysują. Postaw punkt w $(x_n, x_{n+1})$ dla każdego kroku $n$: w poziomie
+ta wartość, w pionie następna. Taki rysunek nazywa się \emph{odwzorowaniem
+powrotu}.
+
+\begin{think}
+Gdzie leżą punkty odwzorowania powrotu szeregu reguły? A przetasowanego?
+\end{think}
+\reveal{Punkty reguły leżą na jednej krzywej, garbie $y = 4x(1 - x)$, bo
+każda następna wartość \emph{jest} regułą zastosowaną do poprzedniej. Punkty
+przetasowania rozchodzą się po całym kwadracie, bo po przetasowaniu następna
+wartość nie ma nic wspólnego z obecną.}
+
+\plotfig{ch15-return-maps}{Każda wartość względem następnej. Szereg reguły
+rysuje własną regułę; przetasowany szereg wypełnia kwadrat. Cienkie linie
+dzielą kwadrat na sto małych kratek.}{krzywa i chmura}
+
+\noindent
+Rysunek to ocena; liczba to pomiar. Podziel kwadrat na sto małych kratek i
+policz, w ile z nich trafia odwzorowanie powrotu:
+
+\pyregion{code/ch15/return_map.py}{pairs}{Pary sąsiadów i kratki, w które trafiają}{lst:ch15-pairs}
+
+\transcript{ch15-return-map}
+
+\noindent
+Krzywa może przejść tylko przez ograniczoną liczbę kratek. \val{ch15.n}
+wartości reguły trafia w \val{ch15.sq.rule}, a dłuższy zapis nie zwiększyłby
+tej liczby, bo każdy nowy punkt ląduje na tej samej krzywej. Przetasowanie
+wciąż znajduje nowe kratki, aż zajmie wszystkie \val{ch15.sq.shuf}.
+
+\begin{lab}{l15_01_return}{Krzywa czy chmura?}
+Napisz test odwzorowania powrotu samodzielnie: połącz każdą wartość w parę z
+następną, policz kratki, w które trafiają pary, i zwróć \code{"curve"}, gdy
+zajętych jest mniej niż połowa kratek, a \code{"cloud"} w przeciwnym razie.
+Potem wypróbuj siatkę dwa na dwa na szeregu, który krąży między trzema
+wartościami, i zobacz, jak zbyt gruba siatka wprowadza w błąd.
+\end{lab}
+
+\begin{worldbox}
+Robert Shaw, fizyk z Uniwersytetu Kalifornijskiego w Santa Cruz, mierzył
+czas między kroplami spadającymi z cieknącego kranu. Przy niektórych
+szybkościach przepływu krople spadały w nieregularnych odstępach, a gdy
+zaznaczył każdy odstęp względem następnego, punkty nie wypełniły chmury:
+ułożyły się wzdłuż cienkiego zakrzywionego kształtu. Kuchenny kran stał się
+jednym z najsłynniejszych pokazów chaosu odczytanego z jednej mierzonej
+wielkości.
+\end{worldbox}
+
+\noindent
+Shaw mierzył jedną rzecz, odstęp między kroplami, choć w wodzie dzieje się
+znacznie więcej, niż opisze jedna liczba. To, że w ogóle zobaczył kształt,
+nie jest szczęściem. W 1980 roku Norman Packard, James Crutchfield, Doyne
+Farmer i sam Shaw pokazali, jak odbudować kształt ruchu układu z jednej
+mierzonej wielkości, używając jej opóźnionych kopii \dash{} odczytu teraz,
+chwilę temu i jeszcze chwilę wcześniej \dash{} w zastępstwie liczb, których
+nikt nie zmierzył. W 1981 roku Floris Takens udowodnił, że to działa.
+Odwzorowanie powrotu to przypadek najprostszy: jedna wielkość, jedno
+opóźnienie.
+
+\begin{rigourbox}
+Twierdzenie Takensa słowami: dla gładkiego układu deterministycznego, którego
+stan ma $d$ liczb, $2d + 1$ opóźnionych kopii niemal dowolnego pojedynczego
+pomiaru daje wierną kopię ruchu, wygiętą i rozciągniętą, ale o tym samym
+kształcie. Dowód, w jego pracy z 1981 roku \emph{Detecting strange
+attractors in turbulence}, korzysta z topologii różniczkowej.
+\end{rigourbox}
+
+\section{Prognoza z przeszłości}
+\label{sec:ch15-analogues}
+\index{metoda analogów}\index{najbliższy sąsiad}
+
+\noindent
+Drugi test zadaje pytanie, które obchodzi użytkownika danych: czy da się to
+przewidzieć? Bez reguły możesz przeszukać zapis w poszukiwaniu chwili
+najbardziej podobnej do obecnej i założyć, że to, co wtedy nastąpiło, nastąpi
+i teraz. To \emph{metoda analogów}. W 1969 roku Edward Lorenz wypróbował ją na
+mapach pogody i nie znalazł dnia z przeszłości dość podobnego, by się
+przydał: przy tak wielu liczbach w stanie atmosfera nie wróciła w pobliże
+miejsc, w których już była. Dla szeregu pojedynczych liczb metoda działa:
+
+\pyregion{code/ch15/analogues.py}{forecast}{Prognoza według najbliższego analogu z przeszłości}{lst:ch15-forecast}
+
+\noindent
+\code{forecast} znajduje w przeszłości wartość najbliższą \code{x}, jej
+\emph{najbliższego sąsiada}, i zwraca to, co nastąpiło \code{h} kroków po
+nim. \code{mean\_error} uczy się na pierwszym tysiącu wartości, prognozuje
+każdą wartość po nich i uśrednia wielkości chybień.
+
+\begin{think}
+Dla szeregu reguły średnie chybienie o krok naprzód wynosi około
+\val{ch15.fc.rule}, czyli jedną tysięczną. Strzał na ślepo \dash{} dowolna
+wartość wzięta z histogramu \dash{} chybia średnio o około \val{ch15.fc.shuf}.
+Rozdział~\ref{ch:lyapunov} zmierzył, że przy $r = 4$ mały błąd mniej więcej
+podwaja się w każdym kroku. O ile kroków naprzód może sięgnąć prognoza, zanim
+jej chybienia dojdą do połowy chybień strzału na ślepo?
+\end{think}
+\reveal{Około dziewięciu: jedna tysięczna podwojona dziewięć razy to mniej
+więcej połowa, bo $2^{9} = 512$. Pomiar się zgadza: chybienia po raz pierwszy
+przekraczają połowę chybień przetasowania w kroku \val{ch15.fc.half}.}
+
+\transcript{ch15-analogues}
+
+\plotfig{ch15-forecast}{Średnie chybienie prognozy metodą analogów w
+zależności od liczby kroków naprzód, w skali logarytmicznej. Przetasowanie to
+strzał na ślepo przy każdym horyzoncie; szereg reguły prognozuje się dobrze i
+z każdym krokiem gorzej.}{błąd prognozy a liczba kroków naprzód}
+
+\noindent
+Dla przetasowanego szeregu prognoza chybia o około \val{ch15.fc.shuf} przy
+każdym horyzoncie: jego przeszłość nie niesie żadnej informacji o następnej
+wartości. Dla szeregu reguły chybienie o krok naprzód jest około
+\val{ch15.fc.times} razy mniejsze i rośnie mniej więcej \val{ch15.fc.double}
+razy na krok \dash{} to rozciąganie, które rozdział~\ref{ch:lyapunov} zmierzył
+od środka, widziane z zewnątrz \dash{} aż po kilkunastu krokach też staje się
+strzałem na ślepo.
+
+Chaos i szum różnią się więc w obie strony. Szum jest równie nieprzewidywalny
+przy każdym horyzoncie. Chaos jest przewidywalny na kilka kroków naprzód,
+gdzie szum nie jest, i traci tę przewidywalność w stałym, mierzalnym tempie:
+to znacznie mocniejszy odcisk palca chaosu niż jakakolwiek nieregularność.
+
+\section{Prawdziwe dane to mieszanina}
+\label{sec:ch15-noisy}
+\index{szum!pomiarowy}
+
+\noindent
+Nic nie jest mierzone dokładnie. Waga, termometr czy urzędnik przepisujący
+rejestr przesuwają każdą wartość trochę, losowo. Żeby zobaczyć, co to robi,
+przesuń każdą wartość szeregu reguły o losową wielkość nie większą niż pewien
+rozmiar:
+
+\pyregion{code/ch15/noisy.py}{noise}{Szum pomiarowy: każda wartość przesunięta losowo}{lst:ch15-noise}
+
+\begin{think}
+Dodaj do szeregu reguły szum o rozmiarze do \val{ch15.noise.small}: jedną
+setną, mniej niż grubość krzywej na wydrukowanym odwzorowaniu powrotu. Co się
+stanie ze średnim chybieniem o krok naprzód, które wynosiło \val{ch15.fc.rule}?
+\end{think}
+\reveal{Wzrośnie do \val{ch15.noise.small.err}, wielokrotnie. Analog, który
+znajduje prognoza, sam jest przesunięty nawet o jedną setną, podobnie jak
+prognozowana wartość, i to zanim podwajanie reguły w ogóle się zacznie.}
+
+\plotfig{ch15-noisy}{Odwzorowania powrotu szeregu reguły oglądane przez szum
+pomiarowy trzech rozmiarów. Krzywa grubieje w pas, a przy największym
+rozmiarze pas prawie wypełnia kwadrat.}{krzywa grubiejąca w szumie}
+
+\transcript{ch15-noisy}
+
+\noindent
+W górnej tabeli, dla całego zapisu, krzywa w miarę wzrostu szumu grubieje w
+pas: przy szumie do \val{ch15.noise.big}, jednej piątej całego zakresu,
+zajmuje \val{ch15.noise.big.sq} kratki. Mimo to przy \val{ch15.n} wartościach
+prognoza wciąż jest lepsza od strzału na ślepo: \val{ch15.noise.big.err}
+wobec \val{ch15.fc.shuf}.
+
+Dolna tabela to część okrutna. Tnie zapis na krótkie kawałki i liczy, na sto
+kawałków, jak często każdy test uznaje kawałek reguły za mniej losowy od jego
+własnego przetasowania. Przy czterdziestu zaszumionych wartościach test
+prognozy ma rację \val{ch15.short.fc.forty} razy. Przy dziesięciu ma rację
+\val{ch15.short.fc} razy, a test kratek tylko \val{ch15.short.sq} \dash{}
+gorzej niż rzut monetą. Krótkie, zaszumione dane potrafią sprawić, że porządek
+wygląda jak przypadek, a przypadek jak porządek.
+A to najłatwiejszy chaos, jaki istnieje, z jedną liczbą na krok; układ z
+wieloma liczbami w stanie potrzebuje znacznie dłuższego zapisu.
+
+\begin{lab}{l15_02_forecast}{Zapytaj kilka analogów}
+Gdy w zapisie jest szum, najbliższy analog może być bliski przypadkiem.
+Napisz prognozę, która znajduje kilka najbliższych wartości z przeszłości i
+uśrednia to, co po nich nastąpiło. Test sprawdza ją na małej bibliotece,
+którą przeliczysz ręcznie, a potem sprawdza, że uśrednienie pięciu analogów
+jest lepsze od zaufania jednemu na zaszumionym szeregu.
+\end{lab}
+
+\section{Populacje, epidemie, serca}
+\label{sec:ch15-life}
+\index{dynamika populacji}\index{epidemia}\index{model SIR}
+
+\noindent
+Praca Roberta Maya z 1976 roku o odwzorowaniu logistycznym była pisana dla
+ekologów. Jej lekcja brzmiała: populacja, której liczebność skacze
+nieregularnie z roku na rok, nie musi być popychana przez pogodę czy
+szczęście; może to robić jej własna reguła rozmnażania.
+
+\begin{think}
+Wiele prawdziwych populacji owadów rzeczywiście rośnie i maleje nieregularnie
+z roku na rok. Czy to czyni je chaotycznymi?
+\end{think}
+\reveal{Nie. Nieregularne liczby daje chaos, ale daje je też populacja w
+równowadze szarpana przez pogodę, choroby i przypadek. Nieregularność nie
+odróżni tych dwóch; mogą to zrobić tylko testy porządku.}
+
+\begin{trapbox}
+\textbf{\enquote{Nieregularne dane dowodzą chaosu.}} Każdy szereg w tym
+rozdziale był nieregularny, a połowa z nich to przetasowania. Chaos to
+twierdzenie, że nieregularność tworzy reguła z niewieloma liczbami, i wymaga
+dowodów na tę regułę: struktury w odwzorowaniu powrotu, prognozy, która jest
+dobra na początku i pogarsza się równomiernie, oraz zapisu dość długiego i
+czystego, by jedno i drugie coś znaczyło.
+\end{trapbox}
+
+\noindent
+Najmocniejsze dowody przyszły z laboratorium, gdzie regułę można zmieniać
+celowo. W 1997 roku Robert Costantino ze współpracownikami opisali w
+\emph{Science} trojszyki, drobne chrząszcze żyjące w mące, hodowane w
+słojach, którym eksperymentatorzy ręcznie ustalali tempo śmierci dorosłych i
+dołączania nowych dorosłych. Gdy te tempa się zmieniały, kolonie przechodziły
+od stałej liczebności przez cykle do nieregularnych wahań, tam gdzie
+przewidywał ich model. Dzika populacja liczona raz do roku przez kilka
+dziesięcioleci daje mniej więcej tak mało wartości jak dolna tabela powyżej.
+
+Drugi klasyczny przykład to epidemie. \emph{Model SIR} dzieli ludzi na
+podatnych, którzy mogą się zarazić, zakaźnych, którzy chorują, i
+ozdrowieńców. Nowe zakażenia każdego dnia są proporcjonalne do tego, ilu jest
+podatnych i zakaźnych, którzy mogą się spotkać, chory zaraża średnio przez
+\val{ch15.sir.days} dni, a narodziny dostarczają nowych podatnych. Weź
+chorobę podobną do odry, w której jeden chory wśród ludzi bez odporności
+zaraża około \val{ch15.sir.r0} innych, i długość życia \val{ch15.sir.life}
+lat. Potem dodaj rok szkolny: dzieci stykają się częściej w czasie nauki niż
+w wakacje, więc niech tempo kontaktów rośnie i maleje raz w roku o ułamek
+nazwany \emph{sezonowością}.
+
+\pyregion{code/ch15/epidemic.py}{rule}{Epidemia z rokiem szkolnym: reguła SIR krokami po ćwierć doby}{lst:ch15-sir}
+
+\transcript{ch15-epidemic}
+
+\noindent
+Bez roku szkolnego model się ustala: \val{ch15.sir.steady} zachorowań na
+tysiąc osób, co roku tyle samo. Przy sezonowości \val{ch15.sir.two} lata duże
+i małe występują na przemian, jak odra w Anglii i Walii, zanim w 1968 roku
+wprowadzono szczepienia. Przy \val{ch15.sir.four} wzór powtarza się co cztery
+lata, a przy \val{ch15.sir.wild} nie powtarza się wcale, a pchnięcie o jedną
+miliardową na starcie posyła lata w inną stronę. To droga do chaosu z
+rozdziału~\ref{ch:bifurcations}, przebyta przez epidemię.
+
+Tu też potrzebna jest uczciwość. W chaotycznym ustawieniu epidemie modelu
+wypalają się tak dokładnie, że w najniższym punkcie zakaźna jest mniej niż
+jedna osoba na $10^{\val{ch15.sir.trough}}$. Żadne miasto nie ma milionowej
+części człowieka: prawdziwa choroba by wygasła. Czy odra kiedykolwiek
+była chaotyczna, wciąż jest przedmiotem sporu. W 1990 roku George Sugihara i
+Robert May zastosowali prognozę metodą analogów do comiesięcznych zachorowań
+na odrę w Nowym Jorku i znaleźli podpis z tego rozdziału, dobrą prognozę,
+która równomiernie pogarsza się z horyzontem, podczas gdy ospa wietrzna w tym
+samym mieście wyglądała jak roczny cykl z szumem na wierzchu.
+
+Z sercem jest jeszcze trudniej. W doświadczeniach laboratoryjnych opisanych w
+1981 roku skupiska komórek serca pobudzane regularnymi impulsami elektrycznymi
+przechodziły przez podwojenie okresu do nieregularnego bicia. Zdrowe serce też
+nie bije jak metronom, ale niegdyś popularne twierdzenie, że jego zmienność to
+chaos, opiera się na testach z tego rozdziału zastosowanych do krótkich,
+zaszumionych zapisów i pozostaje sporne. Zmienność to nie to samo co chaos.
+
+\section{Rynki i czego wymaga twierdzenie o chaosie}
+\label{sec:ch15-evidence}
+\index{rynki}
+
+\noindent
+Ceny to najpilniej obserwowane poszarpane linie na świecie i przez pewien czas
+wielu miało nadzieję, że to chaos jest wzorem ukrytym pod nimi.
+
+\begin{think}
+Przypuśćmy, że ktoś udowodnił, że cenę akcji tworzy chaotyczna reguła z
+zaledwie kilkoma liczbami w stanie. Czy mógłbyś się wzbogacić na jej
+prognozowaniu?
+\end{think}
+\reveal{Niewiele. Chaos da się prognozować tylko na kilka kroków naprzód,
+tylko tak dobrze, jak pozwalają pomiary, i wcale poza swoim horyzontem. A
+każdy inwestor, który znalazłby tę samą regułę, grałby według niej i zmieniał
+ceny, które ona opisuje.}
+
+\begin{trapbox}
+\textbf{\enquote{Chaos na rynkach oznacza, że da się je przewidzieć.}}
+Chaotyczne ceny obiecywałyby krótki horyzont z twardą granicą za nim, a nie
+szklaną kulę. W rzeczywistości ekonomiści, którzy szukali, znaleźli stopy
+zwrotu trudne do przewidzenia oraz okresy spokoju i burzy skupione razem, ale
+dowody na chaotyczną regułę z niewieloma liczbami w stanie są słabe i sporne.
+Nieregularne, skokowe i trudne do przewidzenia to razem jeszcze nie chaotyczne.
+\end{trapbox}
+
+\noindent
+Zbierz cały rozdział, a twierdzenie o chaosie w prawdziwych danych wymaga:
+
+\begin{itemize}
+\item \textbf{długiego zapisu}, długiego w porównaniu z liczbą wielkości,
+  które mają znaczenie;
+\item \textbf{małego szumu} albo testów, które go uwzględniają;
+\item \textbf{uczciwego porównania}: szereg musi wygrać ze swoimi surogatami,
+  także z takimi, które zachowują jego powolne wzrosty i spadki, bo szereg z
+  pamięcią, jak dobowa temperatura, daje się prognozować na dzień naprzód bez
+  żadnego chaosu;
+\item \textbf{właściwego kształtu błędu prognozy}: małego o krok naprzód i
+  rosnącego w stałym tempie;
+\item a najlepiej \textbf{mechanizmu}, najlepiej z pokrętłem, które da się
+  przekręcić, jak u chrząszczy.
+\end{itemize}
+
+\noindent
+Niewiele twierdzeń o sercach, mózgach czy gospodarkach spełnia wszystkie
+pięć. To teoria chaosu wykonująca swoją pracę: mówi ci, do jakich wniosków
+poszarpana linia cię uprawnia, a do jakich nie.
+
+\begin{summarybox}
+\begin{itemize}
+\item \textbf{Surogat} zrobiony przez tasowanie ma te same liczby, więc ten
+  sam \textbf{histogram}. Tylko \textbf{kolejność} odróżni regułę od
+  przypadku.
+\item \textbf{Odwzorowanie powrotu} przedstawia każdą wartość względem
+  następnej: reguła rysuje krzywą, szum wypełnia kwadrat. \textbf{Zanurzenie
+  z opóźnieniem} (Takens, 1981) odbudowuje kształt układu z jednej mierzonej
+  wielkości.
+\item \textbf{Metoda analogów} prognozuje według najbliższej wartości z
+  przeszłości. Chaos prognozuje się dobrze o krok naprzód i gorzej w stałym
+  tempie; szum jest strzałem na ślepo przy każdym horyzoncie.
+\item \textbf{Szum pomiarowy} i \textbf{krótkie zapisy} osłabiają oba testy;
+  przy dziesięciu zaszumionych wartościach test kratek wypada gorzej niż
+  moneta.
+\item Chaos przekonująco pokazano w populacjach laboratoryjnych; dla odry,
+  serc i rynków dowody są mieszane, sporne albo słabe. \textbf{Nieregularne to
+  nie chaotyczne}.
+\item Twierdzenie o chaosie wymaga długiego, czystego zapisu, uczciwego
+  porównania z surogatami, właściwego kształtu błędu prognozy, a najlepiej
+  mechanizmu.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Co tasowanie szeregu zachowuje, a co niszczy?
+  \answerto{Zachowuje każdą wartość, więc i histogram. Niszczy kolejność, a to
+  w niej widać by było regułę łączącą każdą wartość z następną.}
+\item Odwzorowanie powrotu pewnego szeregu leży na jednej cienkiej krzywej. Co
+  to mówi o tym, jak powstał szereg?
+  \answerto{Że każdą wartość wyznacza poprzednia: zrobiła go reguła jednej
+  liczby. Szum rozrzuciłby punkty po kwadracie.}
+\item Jeden szereg zajmuje $30$ ze stu kratek przy $500$ wartościach i nadal
+  $30$ przy $5000$. Inny zajmuje $80$, a potem $100$. Który zachowuje się jak
+  szereg reguły?
+  \answerto{Pierwszy: krzywa przechodzi tylko przez ograniczoną liczbę kratek,
+  ile by punktów na niej nie wylądowało. Drugi wciąż wypełnia kwadrat, jak
+  szum.}
+\item Prognoza metodą analogów chybia o około \num{0.001} o krok naprzód, a
+  jej chybienia podwajają się w każdym kroku. Po ilu mniej więcej krokach
+  chybienie dojdzie do \num{0.25}?
+  \answerto{Po około ośmiu: $2^{8} = 256$, a $\num{0.001} \times 256$ to
+  około \num{0.26}.}
+\item Dlaczego zapis z dziesięciu zaszumionych wartości jest słabym dowodem za
+  chaosem albo przeciw niemu?
+  \answerto{Oba testy są przy tak małej liczbie zawodne: w pomiarze z tego
+  rozdziału test kratek na dziesięciu zaszumionych wartościach miał rację
+  rzadziej niż rzucona moneta.}
+\item Co dzieje się z modelową epidemią, gdy rok szkolny staje się silniejszy,
+  i co czyni jej chaotyczne ustawienie wątpliwym obrazem prawdziwej odry?
+  \answerto{Jej lata przechodzą od jednakowych, przez naprzemienne i
+  powtarzające się co cztery lata, do niepowtarzających się wcale; a jej
+  chaotyczne dołki są tak głębokie, że prawdziwa choroba by wygasła.}
+\item Ktoś pokazuje ci, że cena akcji jest nieregularna. Czy to dowód chaosu?
+  Co byłoby dowodem?
+  \answerto{Nie: szum też jest nieregularny. Dowodem byłaby prognoza, która
+  wygrywa z surogatami, z błędem, który zaczyna od małego i rośnie
+  równomiernie, w długim, czystym zapisie.}
+\end{checkpoint}

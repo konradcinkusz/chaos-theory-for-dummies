@@ -1,0 +1,7 @@
+method   step   seconds   rule calls   energy change
+Euler   0.100       10         100   +170 %
+Euler   0.010       10        1000   +10.5 %
+Euler   0.010      100       10000   +172 %
+Euler   0.025       10         400   +28.4 %
+RK4     0.100       10         400   -0.000139 %
+RK4     0.100     1000       40000   -0.0139 %

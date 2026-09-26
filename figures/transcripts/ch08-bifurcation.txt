@@ -1,0 +1,7 @@
+    r  period  where the orbit lives
+  2.8       1  0.6429
+  3.2       2  0.5130 0.7995
+  3.5       4  0.3828 0.5009 0.8269 0.8750
+ 3.56       8  8 values from 0.35 to 0.89
+3.567      16  16 values from 0.34 to 0.89
+  3.9       -  anywhere from 0.10 to 0.97

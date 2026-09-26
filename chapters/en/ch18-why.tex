@@ -1,0 +1,510 @@
+%% ch18 --- Why you need chaos: a field guide to prediction
+%%
+%% Written September 2026, as the book's closing chapter. It turns the book
+%% into five questions to ask of any prediction (and two more, collected in
+%% the field guide), each answered with a number computed HERE: every value
+%% comes from code/measure/ch18.py, which imports the SAME functions the
+%% listings print (code/ch18/), so the page and the listings cannot disagree.
+%%
+%% WHAT THIS CHAPTER DOES NOT SAY. It quotes no number measured in another
+%% chapter. The exponents, horizons and odds are recomputed here, and a
+%% figure the book does not measure (the weather's two weeks, the planets'
+%% five-million-year Lyapunov time, a double pendulum's seconds) is labelled
+%% as quoted or as an order of magnitude. The derivations belong to the
+%% chapters cited: the exponent and the horizon to Chapter 7, the attractor
+%% to Chapter 9, the ensemble to Chapter 14, chaos against noise to Chapter
+%% 15, control and synchronisation to Chapter 17.
+%%
+%% Twin: chapters/pl/ch18-why.tex. Section for section, macro for macro,
+%% number for number; tools/parity.py compares them.
+
+\chapter{Why you need chaos: a field guide to prediction}
+\label{ch:why}
+\index{prediction!field guide}\index{forecast}
+
+\noindent
+Here are four predictions you might meet in a single week. A table says
+there will be a total eclipse of the Sun on 2 August 2027. A weather app
+gives a 70 per cent chance of rain on Saturday. A pension statement says
+what your savings will be worth in 2060. And a computer program answers a
+question about next year's interest rates without a flicker of doubt.
+
+Which of them would you trust, and how far? You can now answer that with
+numbers you computed yourself. This chapter turns the book into a field
+guide: five questions to ask of any prediction, each answered by a
+measurement, and then the case for why everybody needs them.
+
+\begin{outcomes}
+\outcome{ask of any prediction whether a small change in its start grows}
+\outcome{compute a prediction horizon, and say what better data buys}
+\outcome{say what can be predicted beyond the horizon, and read odds}
+\outcome{separate chaos from noise, and a small cause from a big effect}
+\outcome{apply the field guide's seven questions to a forecast or a model}
+\outcome{explain, with numbers you computed, why some things can be
+  predicted for centuries and others only for days}
+\end{outcomes}
+
+\section{Question one: does a small change grow?}
+\label{sec:ch18-grow}
+\index{sensitive dependence!test for}
+
+\noindent
+Start with the cleanest pair in the list: the eclipse and the rain. Both are
+forecast the same way. A computer takes a measured present, applies exact
+laws of physics, and steps forward in time.
+
+\begin{think}
+An eclipse table is good for thousands of years and a detailed weather
+forecast for about a week. Both come from exact laws stepped forward from a
+measured start. In the language of this book, what is the difference?
+\end{think}
+\reveal{How fast a small error in the start grows. In the motions of the
+Earth and the Moon it grows so slowly that it stays small for millennia; in
+the air it grows until it is as large as the weather itself.}
+The test is the one Chapter~\ref{ch:butterfly} turned into a measurement:
+run the rule twice, from two starts closer than any instrument could tell
+apart, and watch the gap. Here are three rules the book has met, each
+started twice a billionth apart:
+
+\pyregion{code/ch18/grows.py}{twice}{The first question, asked of three rules}{lst:ch18-twice}
+
+\transcript{ch18-grows}
+
+\noindent
+The cooling tea forgets its disturbance: the gap is multiplied by
+\num{0.9} every minute. The logistic map at $r = \num{2.8}$ forgets too,
+because it settles to its fixed point. At $r = 4$ the billionth grows until
+it is as big as the map allows. If the gap shrinks, the path is predictable
+for as long as the rule is right. If it grows, the next question is how
+fast.
+
+Question one has a question in front of it: is there an exact rule at all?
+For the planets and for Lorenz's three equations there is. For an economy or
+an epidemic the rule itself changes as people react to the forecast, which
+is a different difficulty from chaos.
+
+\section{Question two: how far is the horizon?}
+\label{sec:ch18-horizon}
+\index{prediction horizon}\index{Lyapunov exponent}
+
+\noindent
+A growing error usually grows by roughly the same factor each step, and
+Chapter~\ref{ch:lyapunov} turned that factor into one number: the Lyapunov
+exponent, written $\lambda$ (the Greek letter lambda), which is the natural
+logarithm $\ln$ of the average factor. A factor of $2$ is an exponent of
+$\ln 2$, about \val{ch18.ln.two}. Suppose your start is wrong by $e_0$ and
+the forecast is useless once the error passes a tolerance $T$. After $n$
+steps the error is $e_0$ times the factor $n$ times over, so it reaches $T$
+when
+\[ n \approx \frac{\ln(T / e_0)}{\lambda}. \]
+In words: the horizon is the logarithm of how many times too small your
+error is, divided by the exponent. The book's library has it in one line
+(\code{e**exponent} there is the factor, rebuilt from the exponent):
+
+\pyregion{code/src/chaoslab/measure.py}{horizon}{The horizon formula in the book's library}{lst:ch18-horizon-lib}
+
+\noindent
+Try it on the logistic map at $r = 4$, whose exponent this chapter measures
+as \val{ch18.lam.logistic} per step ($\ln 2$, as
+Chapter~\ref{ch:lyapunov} shows). Know the start to six decimal places, so
+$e_0$ is a millionth, and call the forecast useless once it is out by more
+than $T = \num{0.1}$. Then $T / e_0 = 100\,000$, and $n \approx
+\val{ch18.ln.six} / \val{ch18.lam.logistic} \approx \val{ch18.hor.six}$
+steps.
+
+\begin{think}
+You buy an instrument a thousand times more precise, and now know the start
+to nine decimal places. How long does the forecast last: a thousand times as
+long, about three times as long, or a few steps longer?
+\end{think}
+\reveal{A few steps longer: about \val{ch18.hor.gain} more, so
+\val{ch18.hor.nine} in all. Dividing $e_0$ by a thousand adds $\ln 1000 /
+\lambda = \val{ch18.ln.thousand} / \val{ch18.lam.logistic}$ steps, and
+nothing more.}
+That is the formula's answer. Here is the map's own, measured the long way
+over \val{ch18.apart.starts} different starts:
+
+\pyregion{code/ch18/thousandfold.py}{measure}{A thousand times better data, measured}{lst:ch18-thousandfold}
+
+\transcript{ch18-thousandfold}
+
+\plotfig{ch18-digits}{How far ahead a forecast lasts, against how many
+decimal places of the start are right. Lines are the formula, dots the
+median of many measured pairs of runs. Each extra digit buys the same few
+steps.}{horizon against correct digits}
+
+\noindent
+The formula said \val{ch18.hor.six} and \val{ch18.hor.nine}; the map says
+\val{ch18.apart.six} and \val{ch18.apart.nine}, a gain of
+\val{ch18.apart.gain}. Every extra correct digit
+buys the same number of steps, $\ln 10 / \lambda = \val{ch18.ln.ten} /
+\val{ch18.lam.logistic}$, about \val{ch18.per.digit} here. The horizon
+grows like the logarithm of your precision, so better instruments and
+bigger computers can only add a fixed stretch. A small calculator puts three
+of the book's systems side by side:
+
+\pyregion{code/ch18/horizon.py}{calculator}{The horizon calculator}{lst:ch18-calculator}
+
+\transcript{ch18-horizon}
+
+\noindent
+The Hénon map's errors grow more slowly, at \val{ch18.lam.henon} per step,
+so each digit buys it
+\val{ch18.per.digit.henon} steps; Lorenz's system, at
+\val{ch18.lam.lorenz} per unit of time, gains \val{ch18.per.digit.lorenz}
+units of time per digit. Plotted against the number of correct digits,
+every horizon is a straight line (Figure~\ref{fig:ch18-digits}).
+
+The same arithmetic explains the eclipse. Jacques Laskar's 1989 computation
+of the solar system, quoted in Chapter~\ref{ch:mechanics}, gave the inner
+planets an exponent of about one fifth per million years: a Lyapunov time,
+one over the exponent, of about five million years. Know the Earth's
+position to a metre, and call the forecast useless when the error is the
+size of its orbit, 150 million kilometres. The horizon is five million
+years times $\ln 150\,000\,000\,000 \approx \val{ch18.planets.ln}$, some
+\val{ch18.planets.hor} million years, and a millimetre would add only about
+\val{ch18.planets.gain} million. The solar system is chaotic; on the scale
+of an eclipse table its errors have not yet begun to matter.
+
+\begin{lab}{l18_01_horizon}{The horizon calculator}
+Write \code{forecast\_length}, which turns an exponent and a number of
+correct digits into a horizon; \code{extra\_steps}, which says what a more
+precise measurement buys; and \code{digits\_needed}, which runs the formula
+backwards. Then ask how many digits a hundred steps of the logistic map
+would need, against the roughly sixteen decimal digits a computer's ordinary
+numbers carry (Chapter~\ref{ch:computers}).
+\end{lab}
+
+\section{Question three: what survives the horizon?}
+\label{sec:ch18-beyond}
+\index{ensemble forecast}\index{attractor!statistics}
+
+\noindent
+Past the horizon the path is lost. That is not the same as knowing nothing,
+and it is the part of chaos theory most often missed.
+
+\begin{think}
+Forty steps ahead, the logistic map's path is lost several times over. Is
+there anything about step forty you can still predict?
+\end{think}
+\reveal{Yes: the odds. The chance that $x$ is below \num{0.25} at step
+forty is about one in three, and so is the fraction of time any long run
+spends there. The path is gone; its statistics are not.}
+Forecasters get such odds by running the model many times, from starts
+spread across everything the measurement allows, and counting. That is an
+ensemble, and Chapter~\ref{ch:weather} builds one for the weather. Here is
+the smallest version:
+
+\pyregion{code/ch18/beyond.py}{ensemble}{A forecast made from an ensemble, and one long run}{lst:ch18-ensemble}
+
+\transcript{ch18-beyond}
+
+\noindent
+With the start right to six digits, all \val{ch18.ens.members} runs agree
+until step \val{ch18.ens.sure.six}, and the forecast is one certain answer.
+Then they spread, the forecast becomes odds, and within a few steps the
+odds settle at \val{ch18.ens.clim}: the fraction of time one long run spends
+below \num{0.25}, from either start. With nine digits the runs agree until
+step \val{ch18.ens.sure.nine}, and then the same thing happens
+(Figure~\ref{fig:ch18-odds}).
+
+\plotfig{ch18-odds}{An ensemble forecast of the chance that $x$ is below
+\num{0.25}. It is certain while the runs agree, gives odds as they spread,
+and settles at the long-run fraction. Three more digits delay this and do
+not prevent it.}{a forecast turning into odds}
+
+So a forecast of a chaotic system comes in three forms, one after another:
+a path while the runs agree, odds as they spread, and the long-run
+statistics after that. The last is what Chapter~\ref{ch:lorenz} calls the
+statistics of the attractor, and for the weather it is the climate.
+
+\begin{trapbox}
+\textbf{\enquote{Unpredictable means unknowable.}} Beyond the horizon the
+path cannot be known, and nearly everything else can: where the system can
+go and where it cannot, how often it visits each region, the odds for any
+question you care to ask. A 70 per cent chance of rain is not a forecaster
+hedging; it is the correct answer to a question chaos has made impossible to
+answer with a yes or a no. A climate projection forecasts statistics, not
+Tuesdays.
+\end{trapbox}
+
+\begin{worldbox}
+The \enquote{cone of uncertainty} the US National Hurricane Center draws
+around a storm's forecast track widens with every day of lead time. It is
+sized from the errors of the centre's own recent forecasts, so that the
+storm's centre can be expected to stay inside it about two times in three:
+a horizon and a set of odds in one picture, published for millions of
+people to act on.
+\end{worldbox}
+
+\section{Question four: chaos, noise, or a small cause?}
+\label{sec:ch18-noise}
+\index{noise}\index{butterfly effect}
+
+\noindent
+Irregular data invites a story, and two stories need a question each.
+
+The first says \enquote{this is chaos}. Chapter~\ref{ch:life} shows that a
+chaotic series and a random one can share a histogram, and that structure
+tells them apart: plot each value against the next and chaos draws a curve
+where noise draws a cloud, and chaos can be forecast a step or two ahead
+where noise cannot. It matters which you have, and how much data there is:
+a short, noisy record can look like almost anything.
+
+The second story runs backwards, from a big effect to a small cause.
+
+\begin{think}
+Nudge the cooling tea and the logistic map at $r = 4$ by a billionth each,
+as in Section~\ref{sec:ch18-grow}. Forty steps later, which nudge has
+changed something? Has it changed the fraction of time the map spends below
+\num{0.25}?
+\end{think}
+\reveal{Only the logistic map's, and only its path: the gap has grown to the
+size of the map. The fraction of time below \num{0.25} is still about a
+third from either start. The tea's nudge has faded away.}
+
+\begin{trapbox}
+\textbf{\enquote{Small causes always matter.}} In a stable system they die
+away, as the tea's did. In a chaotic one a small cause changes the details
+beyond the horizon and nothing about the statistics, and because every
+other small cause changes the details too, no single one can be picked out
+afterwards as the reason. The butterfly of Chapter~\ref{ch:butterfly} did
+not cause the storm. Blaming one small cause for a big effect after the
+fact is a story, not a measurement.
+\end{trapbox}
+
+\section{Question five: can it be steered?}
+\label{sec:ch18-steer}
+\index{control of chaos}\index{synchronisation}
+
+\noindent
+The last question turns the limit into a tool.
+
+\begin{think}
+If a tiny change in the start changes the future completely, is that bad
+news or good news for somebody who wants to control the system?
+\end{think}
+\reveal{Both. It is why you cannot forecast the system far ahead, and it is
+why a tiny push, well timed, can move it a long way.}
+Edward Ott, Celso Grebogi and James Yorke made that the idea of their 1990
+paper on controlling chaos: wait until the system passes near one of the
+unstable cycles hidden in its attractor, nudge a parameter slightly, and it
+can be held on that cycle. Chapter~\ref{ch:taming} does it with nudges
+under one per cent, and makes two chaotic systems keep in step, as Louis
+Pecora and Thomas Carroll showed in the same year. So chaos is no excuse
+for fatalism. A system you cannot forecast may be one you can steer, and
+changing a parameter, such as the forcing in a climate model, moves the
+statistics even when no path can be forecast.
+
+\section{The field guide on one page}
+\label{sec:ch18-guide}
+\index{prediction!field guide}
+
+\noindent
+Here are the five questions, two more the book has earned, and where you
+measured each:
+
+\begin{enumerate}[itemsep=2pt]
+\item Is there an exact rule, and does a small change in the start grow?
+  (Chapter~\ref{ch:butterfly})
+\item How far is the horizon, and what would better data buy?
+  (Chapter~\ref{ch:lyapunov})
+\item What survives the horizon: the attractor, the statistics, the odds?
+  (Chapters~\ref{ch:lorenz} and~\ref{ch:weather})
+\item Is the irregularity chaos or noise, and is there enough data to tell?
+  (Chapter~\ref{ch:life})
+\item Can it be steered, or can a parameter move its statistics?
+  (Chapter~\ref{ch:taming})
+\item Does the answer survive a smaller step and more digits?
+  (Chapters~\ref{ch:motion} and~\ref{ch:computers})
+\item Is a small cause being blamed for a big effect after the fact?
+  (Chapter~\ref{ch:butterfly})
+\end{enumerate}
+
+\mermaidfig{ch18-field-guide}{The field guide in three moves. If a small
+error does not grow, the path itself survives; if it does, the horizon says
+for how long, and beyond it you ask for the statistics and the
+odds.}{the field guide in three moves}
+
+\noindent
+And here are familiar forecasts sorted by horizon. Only one figure is worked
+out in this chapter; the rest are orders of magnitude, some of them
+folklore, labelled by where they come from.
+
+\medskip
+\noindent
+{\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}p{2.9cm}
+  >{\raggedright\arraybackslash}p{2.9cm}
+  >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Forecast} & \textbf{Horizon} & \textbf{Source of the figure}
+  & \textbf{Beyond it, ask for} \\
+\midrule
+Where the planets are & about \val{ch18.planets.hor} million years
+  & worked above & where their orbits lie \\ \addlinespace[3pt]
+Eclipses & thousands of years & published tables & nothing more \\ \addlinespace[3pt]
+The astronomical tide & years & published tables
+  & the storm surge, which is weather \\ \addlinespace[3pt]
+Detailed weather & a week in practice, two weeks at best
+  & quoted (Lorenz, 1969) & the odds, then the climate \\ \addlinespace[3pt]
+A double pendulum & seconds & order of magnitude
+  & where its energy lets it go \\ \addlinespace[3pt]
+A share price, day to day & none established & irregular is not chaos
+  & the spread of past moves \\ \addlinespace[3pt]
+\bottomrule
+\end{tabularx}\par}
+
+\medskip
+\noindent
+Now the pension statement and the confident program. A pension projection
+is what an assumed rate of return would give, so ask for the range of rates.
+A confident answer about next year's economy has no horizon until somebody
+says what its rule is, and a confident tone is not an error bar.
+
+\begin{lab}{l18_02_guide}{The field guide, on a model you write}
+Write \code{error\_grows}, \code{growth\_rate} and
+\code{long\_run\_fraction}: the first three questions as code you can point
+at any rule that turns one number into the next. The test runs them on the
+cooling tea and the logistic map. Then write a rule of your own at the
+bottom of the file (a tent, a sine, a population with a harvest) and put all
+seven questions to it.
+\end{lab}
+
+\section{Why everyone needs it}
+\label{sec:ch18-everyone}
+\index{chaos!why it matters}
+
+\noindent
+\emph{It ended the clockwork}, without adding a single random ingredient:
+an exact rule and a nearly exact start give a future known only as far as a
+horizon that grows like the logarithm of your precision.
+
+\emph{It says which forecasts to trust, and for how long.} An eclipse and a
+thunderstorm obey laws of the same kind; what differs is the exponent. That
+teaches humility about long-range certainty, because a single number far
+beyond the horizon is a guess dressed as a measurement, and trust in
+short-range models, because inside the horizon they are astonishingly
+good.
+
+\emph{It makes probabilities respectable.} Odds are what a correct forecast
+looks like beyond the horizon, not a failure of forecasting.
+
+\emph{It is beautiful and universal.} Feigenbaum's constant comes out of a
+line of algebra and out of real fluids and circuits
+(Chapter~\ref{ch:bifurcations}); fractals give a coastline a dimension
+between one and two (Chapter~\ref{ch:fractals}); the Mandelbrot set holds
+the whole road to chaos (Chapter~\ref{ch:mandelbrot}).
+
+\emph{And it is a resource}: control, synchronisation, and the scrambling a
+computer's random numbers are designed to have (though
+Chapter~\ref{ch:computers} warns that a chaotic map alone is a poor source
+of them).
+
+Chaos theory is not a theory of everything, nor of disorder in general:
+most of the world's irregularity is noise, ignorance or a rule that keeps
+changing.
+
+\begin{think}
+A colleague says: \enquote{The economy is chaotic, so any forecast is as
+good as any other.} What is wrong with that?
+\end{think}
+\reveal{Both halves. Nobody has shown that an economy follows a fixed
+chaotic rule, and even a chaotic system is not free to do anything: it
+keeps to its attractor, its odds are fixed, and a short-range forecast of it
+can be very good.}
+
+\begin{trapbox}
+\textbf{\enquote{Chaos means anything goes.}} Chaos is an exact rule whose
+motion stays inside a bounded attractor, with steady statistics and a
+horizon you can compute. Calling something chaotic is a claim that can be
+tested, not a licence to call anything unpredictable butterfly-shaped, and
+not a reason to stop forecasting.
+\end{trapbox}
+
+\section{Laplace's demon, one last time}
+\label{sec:ch18-demon}
+\index{Laplace's demon}
+
+\noindent
+Chapter~\ref{ch:models} ended by planting a question, and you can now answer
+it.
+
+\begin{think}
+Suppose the rule is exact and you know it perfectly. Is the future then
+known, as far ahead as you like?
+\end{think}
+\reveal{No. It is known only as far as the horizon, which grows like the
+logarithm of how precisely you know the start. Beyond it, what is known is
+the attractor, the statistics and the odds.}
+Laplace's demon needs an infinitely precise present, and every extra digit
+buys it only a few more steps. The clockwork is real for the eclipse and the
+tide, and it runs out for the weather, the double pendulum and a single line
+of algebra.
+
+That leaves the forecasts you meet every day: the train seven minutes away,
+the rain on Saturday, the projection, the confident answer. Ask each the
+five questions. You will trust some forecasts more than you used to and some
+a great deal less, and for the first time you will be able to say why, with
+a number.
+
+\begin{summarybox}
+\begin{itemize}
+\item \textbf{Question one}: run the rule twice from starts a hair apart. If
+  the gap shrinks, the path can be forecast as far as the rule is right.
+\item \textbf{Question two}: the \textbf{horizon} is about $\ln(T/e_0)$
+  divided by the exponent $\lambda$, so each correct digit buys the same few
+  steps.
+\item \textbf{Question three}: beyond the horizon the \textbf{statistics}
+  and the \textbf{odds} survive, and an ensemble shows a path turning into
+  odds.
+\item \textbf{Question four}: irregular is not chaos until structure shows
+  it, and a big effect cannot be pinned on one small cause afterwards.
+\item \textbf{Question five}: sensitivity makes chaos \textbf{steerable}.
+\item The \textbf{field guide} adds two questions and sorts familiar
+  forecasts by horizon.
+\item Chaos ended the \textbf{clockwork} and makes odds respectable; it is
+  not a licence for \enquote{anything goes}.
+\item \textbf{Laplace's demon} would know the future only to the horizon.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Two runs of a rule start a billionth apart; thirty steps later they
+  are a trillionth apart. What does question one say?
+  \answerto{The error shrinks, so the path can be forecast as far ahead as
+  the rule itself is right.}
+\item Errors in a system grow with an exponent of \num{0.5} per day. You
+  know the start to within \num{0.001} and can tolerate an error of $1$.
+  Given that $\ln 1000 \approx \val{ch18.ln.thousand}$, what is the horizon?
+  \answerto{About $\val{ch18.ln.thousand} / \num{0.5} \approx \num{13.8}$
+  days.}
+\item You now measure that start ten times more precisely. Given that
+  $\ln 10 \approx \val{ch18.ln.ten}$, how much longer does the forecast
+  last?
+  \answerto{About $\val{ch18.ln.ten} / \num{0.5} \approx \num{4.6}$ days
+  more: a fixed extra stretch, not ten times as long.}
+\item Far beyond its horizon, an ensemble of the logistic map at $r = 4$
+  gives a one-in-three chance that $x$ is below \num{0.25}. Is that forecast
+  worthless?
+  \answerto{No. It is the correct forecast: the fraction of time the map
+  spends there, the same from any start.}
+\item A series of daily measurements looks irregular. Name two things to
+  check before calling it chaos.
+  \answerto{Whether each value plotted against the next draws a curve rather
+  than a cloud; whether it can be forecast a step or two ahead from similar
+  past moments; and whether the record is long enough to tell.}
+\item Why does the property that ruins long-range forecasts of a chaotic
+  system make it possible to steer?
+  \answerto{It is sensitive to small changes: a tiny error grows, and so
+  does the effect of a tiny, well-timed push.}
+\item Explain why eclipses can be predicted for thousands of years and the
+  weather only for about a week.
+  \answerto{The horizon is $\ln(T/e_0)$ divided by the exponent. The solar
+  system's exponent is about one fifth per million years, which gives a
+  horizon of about a hundred million years; the atmosphere's errors grow as
+  much in days. Better data adds a fixed stretch to either.}
+\end{checkpoint}

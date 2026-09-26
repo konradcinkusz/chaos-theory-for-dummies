@@ -1,0 +1,6 @@
+line   at x =   0.0: slope 0.5000
+line   at x = 150.0: slope 0.5000
+line   at x = 400.0: slope 0.5000
+square at x =   0.5: slope 1.0000
+square at x =   1.5: slope 3.0000
+square at x =   3.0: slope 6.0000

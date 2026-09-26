@@ -1,0 +1,485 @@
+%% ch16 --- Chaos inside the computer
+%%
+%% Written September 2026. Every chaotic picture in the book was drawn by a
+%% machine that rounds at every step; this chapter asks what that does, and
+%% measures it. Floating point from scratch; the doubling map dying on a
+%% computer; one rule written two ways parting company within about fifty
+%% steps, against a truth carried to a hundred digits; why exact and
+%% extended arithmetic cannot rescue a long chaotic run; the rescue that does
+%% work (shadowing, stated in a rigourbox and illustrated by finding a shadow
+%% and by statistics that agree); and finite machines, loops and
+%% random-number generators. Every number comes from code/measure/ch16.py,
+%% which imports the same functions the listings print.
+%%
+%% WHAT THIS CHAPTER DOES NOT SAY. The Lyapunov exponent and the horizon
+%% formula are Chapter 7's; they are used here, not derived. Lorenz's 1961
+%% rounded restart is Chapter 6's story and is not retold. The Jacobian
+%% products of machine learning, named in the manifest brief, are left out:
+%% the word budget went to the measurements instead.
+%%
+%% Twin: chapters/pl/ch16-computers.tex. Section for section, macro for
+%% macro, number for number; tools/parity.py compares them.
+
+\chapter{Chaos inside the computer}
+\label{ch:computers}
+\index{floating point}\index{rounding}
+
+\noindent
+Every picture of chaos in this book was drawn by a computer, and so was
+every number. Here is an awkward fact about the machine that drew them. It
+cannot store the number $\num{0.1}$. It stores a number very close to it, and
+every time it adds or multiplies two numbers it rounds the answer to one it
+can store.
+
+You have spent several chapters learning that chaos turns the smallest error
+into a large one. So if the computer makes a tiny error at every step, how
+can any of those pictures be right? This chapter measures the answer, which
+is better than you might fear and worse than you might hope.
+
+\begin{outcomes}
+\outcome{say what a computer stores when you type a number, and why
+  $\num{0.1} + \num{0.2}$ does not come out as $\num{0.3}$}
+\outcome{predict the step at which the doubling map dies on a computer}
+\outcome{estimate how many steps a chaotic computation stays right from the
+  number of binary digits it keeps}
+\outcome{say which results of a chaotic simulation you can trust, and why}
+\outcome{describe a random-number generator as a deterministic rule, and say
+  why it must repeat}
+\end{outcomes}
+
+\section{What a computer keeps}
+\label{sec:ch16-keeps}
+\index{binary numbers}\index{double precision}
+
+\noindent
+Write one third as a decimal and you never finish: $\num{0.333}\ldots$, the
+threes running on for ever. Decimals can write exactly only the fractions
+whose bottom is built from twos and fives, the factors of ten. A computer
+counts in twos instead. In \emph{binary} the places after the point are worth
+a half, a quarter, an eighth and so on, so $\tfrac{3}{4}$ is written
+$\num{0.11}$: a half plus a quarter.
+
+\begin{think}
+Which of these can binary write exactly, with a fixed number of places:
+$\tfrac{1}{2}$, $\tfrac{3}{8}$, $\tfrac{1}{10}$?
+\end{think}
+\reveal{$\tfrac{1}{2}$ and $\tfrac{3}{8}$, but not $\tfrac{1}{10}$. Binary
+writes exactly the fractions whose bottom is a power of two, and ten has a
+factor of five.}
+In binary one tenth is $\num{0.000110011}\ldots$, with the block $0011$
+repeating for ever, so a computer has to cut it off. Python, like almost
+every program you use, keeps a number as a \emph{double}:
+\val{ch16.bits.double} significant binary digits, about
+\val{ch16.decimal.double} decimal ones, plus a power of two that says where
+the point goes. For one tenth it keeps the nearest double, which is too large
+by about \val{ch16.tenth.err}. Every sum and product is then \emph{rounded}
+too: the exact answer is replaced by the nearest double.
+
+\begin{think}
+Both $\num{0.1}$ and $\num{0.2}$ are stored slightly wrong, and their sum is
+rounded once more. Does the computer agree that $\num{0.1} + \num{0.2}$ is
+$\num{0.3}$?
+\end{think}
+\reveal{No. The sum prints as a number a whisker above $\num{0.3}$, and the
+comparison answers \code{False}.}
+
+\pyregion{code/ch16/floats.py}{store}{What the computer stores, and what it does with it}{lst:ch16-floats}
+
+\transcript{ch16-floats}
+
+\noindent
+The third line is the exact value kept for $\num{0.1}$; the fourth writes it
+as a fraction, whose bottom is $2^{\val{ch16.tenth.power}}$. Every double is
+a whole number divided by a power of two. The sixth line adds three numbers
+in two orders and gets two answers: once every step rounds, the grouping that
+school said cannot matter does matter. The last shows the room running out:
+past $2^{53}$ a double cannot hold every whole number.
+
+\begin{note}
+These rounding rules were fixed in 1985 in a standard called IEEE~754, which
+almost every computer follows. It requires $+$, $-$, $\times$, $\div$ and the
+square root to give the exact answer rounded to the nearest double. That is
+why your computer should agree with every number this book prints: the book's
+own measurements use only those operations.
+\end{note}
+
+\section{A map the computer cannot run}
+\label{sec:ch16-doubling}
+\index{doubling map}
+
+\noindent
+The simplest chaotic rule there is fits in a line: double the number, and if
+the answer is $1$ or more, take $1$ away. In symbols, $x \to 2x \bmod 1$,
+read \enquote{$2x$ with its whole part thrown away}. This \emph{doubling map}
+doubles the gap between any two nearby starts at every step. In binary you
+can watch it work: doubling moves every digit one place left, and taking away
+$1$ drops the digit that crossed the point, so $\num{0.1011}$ becomes
+$\num{0.011}$, then $\num{0.11}$, then $\num{0.1}$. The map reads out its
+start one binary digit at a time.
+
+\begin{think}
+Work the doubling map by hand from $\tfrac{1}{10}$, in fractions, for five
+steps. What does its orbit do for ever after?
+\end{think}
+\reveal{$\tfrac{1}{5}$, $\tfrac{2}{5}$, $\tfrac{4}{5}$, $\tfrac{3}{5}$,
+$\tfrac{1}{5}$: it goes round the same four values for ever, and never
+reaches $0$.}
+The computer's $\num{0.1}$, though, is a whole number divided by
+$2^{\val{ch16.tenth.power}}$: it has a last binary digit, and every step
+pushes one digit out past the point.
+
+\begin{think}
+What will the computer's orbit of $\num{0.1}$ be after sixty steps?
+\end{think}
+\reveal{Exactly $0$. When the last binary digit leaves, at step
+\val{ch16.collapse.tenth}, nothing is left, and $0$ doubled is $0$ for ever.}
+
+\pyregion{code/ch16/doubling.py}{race}{The doubling map from one tenth, on the computer and in exact fractions}{lst:ch16-doubling}
+
+\transcript{ch16-doubling}
+
+\noindent
+For forty steps the two agree to six decimal places; then the computer
+drifts, and dies. A computed orbit can be wrong in its whole character: a
+loop has become a fall to nothing.
+
+The strange part is that the computer's arithmetic made no error at all.
+Doubling a double and taking away $1$ never needs rounding, and the chapter's
+measurement script checks, step by step, that the computer's orbit is exactly
+the true orbit of the number it stored. What is wrong is the start. A storable
+number has finitely many binary digits, so every storable start is swallowed
+by $0$, while almost every true start has infinitely many digits and never
+is. From each of the \val{ch16.collapse.starts} starts $\tfrac{1}{997}$,
+$\tfrac{2}{997}$, and so on, the computer's orbit died in between
+\val{ch16.collapse.min} and \val{ch16.collapse.max} steps, most often in
+\val{ch16.collapse.mode}.
+
+\plotfig{ch16-collapse}{The doubling map from one tenth. The truth (open
+circles) loops for ever; the computer (dots) agrees for about forty steps,
+drifts, and at step \val{ch16.collapse.tenth} falls to $0$ for
+good.}{the doubling map dying on a computer}
+
+\begin{lab}{l16_01_collapse}{When does the doubling map die?}
+Write the doubling map, a function that counts the steps until an orbit is
+exactly $0$, and one that predicts the count without running anything, from
+\code{x.as\_integer\_ratio()}, which gives the stored number as a whole
+number over a power of two. The test checks that the two always agree.
+\end{lab}
+
+\section{One rule, two programs}
+\label{sec:ch16-formulas}
+\index{logistic map!on a computer}\index{reproducibility}
+
+\noindent
+The doubling map never rounds. The logistic map of
+Chapter~\ref{ch:logistic} is more typical: nearly every step rounds. Here it
+is at $r = 4$, written two ways.
+
+\pyregion{code/ch16/two_formulas.py}{rules}{The logistic map at r = 4, written two ways}{lst:ch16-rules}
+
+\noindent
+Multiply out the bracket in the first and you get the second:
+$4x(1 - x) = 4x - 4x^{2}$. On paper they are one rule.
+
+\begin{think}
+Start both from $\num{0.1}$ on the same computer and run them for seventy
+steps. Will the two programs print the same numbers?
+\end{think}
+\reveal{No. They differ in the last binary digit from step
+\val{ch16.formulas.first}, and by step \val{ch16.formulas.apart} they are
+more than $\num{0.1}$ apart.}
+The first formula rounds $1 - x$ and then a product; the second rounds
+$4x^{2}$ and then a difference. Each error is about one part in $10^{16}$,
+and the map doubles it every step. The right-hand column below is the truth:
+the orbit of exactly one tenth, carried to a hundred significant digits.
+
+\transcript{ch16-two-formulas}
+
+\noindent
+Which formula is right? Both, for forty steps. By step \val{ch16.wrong.a}
+the first has left the truth, and by step \val{ch16.wrong.b} so has the
+second. Neither formula is wrong; each is right for about fifty steps, and
+after that it is following a different orbit.
+
+\begin{trapbox}
+\textbf{\enquote{A deterministic program always gives the same answer.}}
+Run the same program on the same machine and it does, to the last digit. But
+change the computer, the compiler, a maths library or the order in which a
+long sum is added, and you change which roundings happen, as the two formulas
+did. Compilers may rearrange arithmetic for speed, or fuse a multiplication
+and an addition into one step with one rounding. In most programs the
+difference stays in the last digit. In a chaotic one it reaches the first.
+\end{trapbox}
+
+\noindent
+Fifty is not an accident, and you can predict it.
+
+\begin{think}
+At $r = 4$ an error roughly doubles every step, as
+Chapter~\ref{ch:butterfly} measured. A double's rounding error is about
+$10^{-16}$, and ten doublings multiply an error by about a thousand. Roughly
+how many steps until an error of $10^{-16}$ has grown to $\num{0.1}$?
+\end{think}
+\reveal{About fifty. From $10^{-16}$ to $10^{-1}$ is fifteen factors of ten,
+and every three factors of ten take about ten doublings.
+Chapter~\ref{ch:lyapunov}'s horizon, with the rounding error as the error in
+the start, gives \val{ch16.predict.double}.}
+In one sentence: at $r = 4$ the map uses up one binary digit of accuracy per
+step, so a double's \val{ch16.bits.double} digits last about fifty steps.
+\emph{Single precision}, which graphics cards and much machine-learning
+software use because it takes half the memory, keeps \val{ch16.bits.single}
+binary digits, about \val{ch16.decimal.single} decimal ones; the same arithmetic predicts \val{ch16.predict.single} steps,
+and it lasts \val{ch16.wrong.single}.
+
+\plotfig{ch16-parting}{Distance from the true orbit of one tenth, on a
+logarithmic scale, for the logistic map at $r = 4$. Every run's error doubles
+each step, along the dotted line, until it fills the whole interval: after
+about twenty steps in single precision, fifty in double.}{two precisions
+parting company}
+
+\begin{lab}{l16_02_single}{Single against double}
+Round a number to single precision by packing it into four bytes and reading
+it back (the starter shows how). Write the logistic map at $r = 4$ with every
+operation rounded that way, run it beside the double version, and find the
+first step at which they differ by more than $\num{0.1}$.
+\end{lab}
+
+\begin{worldbox}
+Machine learning meets this daily. A neural network is trained by adding up
+millions of small numbers on a graphics card, whose parallel threads can
+finish in a different order each time, so a sum rounds differently from run
+to run. Two runs of the same program from the same random seed can end with
+networks whose weights differ throughout \dash{} and which usually score
+about the same. The documentation of PyTorch, a widely used library, says
+that fully reproducible results are not guaranteed across platforms and
+releases, and offers a switch that forces a fixed order, at a cost in speed.
+\end{worldbox}
+
+\section{Why more digits cannot save you}
+\label{sec:ch16-exact}
+\index{exact arithmetic}
+
+\noindent
+The obvious cure is to stop rounding. Python's \pkg{fractions} module keeps
+every number as an exact fraction. One tenth stays one tenth, and
+$4x(1 - x)$ from it gives $\tfrac{9}{25}$, then $\tfrac{576}{625}$, with no
+error at all.
+
+\begin{think}
+From $\tfrac{9}{25}$ to $\tfrac{576}{625}$ the bottom went from $25$ to
+$625 = 25 \times 25$. If it is squared at every step, what happens to its
+number of digits?
+\end{think}
+\reveal{It roughly doubles at every step: squaring a number about doubles
+its number of digits.}
+
+\pyregion{code/ch16/more_digits.py}{exact}{Exact fractions: the bottom is squared at every step}{lst:ch16-exact}
+
+\transcript{ch16-more-digits}
+
+\noindent
+After ten steps the bottom has \val{ch16.exact.ten} digits. After fifty it
+would have about \val{ch16.exact.fifty}, and storing it would take some
+\val{ch16.exact.fifty.tb} terabytes. Exact arithmetic gets every step right
+and cannot finish. The last four lines try the practical cure: keep a fixed
+but larger number of digits, with Python's \pkg{decimal} module, and compare
+with a thousand-digit run. Sixteen digits last \val{ch16.right.sixteen}
+steps, like a double; twice the digits last twice as long. Every decimal
+digit buys about \val{ch16.right.per.digit} steps, because it is worth about
+\val{ch16.right.per.digit} binary ones.
+
+\begin{trapbox}
+\textbf{\enquote{More decimal places make a simulation exact.}} They make it
+right for longer, by a fixed number of steps per digit, never for ever. To
+follow a chaotic orbit for a thousand steps you must carry about three
+hundred decimal digits, and know the start that precisely too, which no
+measurement will give you. It is Chapter~\ref{ch:lyapunov}'s cruel arithmetic
+seen from the computer's side: precision buys a horizon that grows by a
+constant, not in proportion.
+\end{trapbox}
+
+\section{Wrong path, right picture}
+\label{sec:ch16-shadow}
+\index{shadowing}
+
+\noindent
+So every long chaotic computation in this book followed the wrong orbit. Did
+it draw the wrong picture? The way to find out rests on one observation.
+
+\begin{think}
+Running the logistic map forwards doubles a small error every step, on
+average. What does running it backwards, from each value to the one before
+it, do to a small error?
+\end{think}
+\reveal{Halves it, on average. Whatever a forward step stretches, the
+backward step squeezes.}
+So start at the end of a computed orbit and walk back. Two numbers lead to
+any value in one step, one below $\tfrac{1}{2}$ and one above; take the one on
+the same side as the computed value. Walking back shrinks errors, so the walk
+stays close to the computed orbit all the way to the start, and what it finds,
+worked to four hundred digits, is a genuine orbit of the rule.
+
+\pyregion{code/ch16/shadow.py}{back}{Walking a computed orbit backwards to find the true orbit it follows}{lst:ch16-back}
+
+\transcript{ch16-shadow}
+
+\noindent
+The computed orbit of $\num{0.1}$ left the truth after \val{ch16.wrong.a}
+steps. But a start differing from one tenth by about \val{ch16.shadow.start}
+has an exact orbit that stays within \val{ch16.shadow.gap} of every one of the
+\val{ch16.shadow.steps} computed values. The computer did not follow the
+orbit it was asked for. It followed, faithfully, the orbit of a start so close
+that no measurement could tell the two apart. That true orbit is its
+\emph{shadow}.
+
+\begin{rigourbox}
+The \emph{shadowing lemma}, proved by Dmitri Anosov and Rufus Bowen, covers
+systems that stretch in some directions and squeeze in others at every point,
+at rates that never weaken (\emph{uniformly hyperbolic} ones, such as the
+doubling map). It says that however closely you want a computed orbit to be
+shadowed, a small enough error per step guarantees it, for ever. The logistic
+map at $r = 4$ is not quite of that kind: near $x = \tfrac{1}{2}$ its curve is
+flat, and there the backward walk stretches. For it, shadowing was confirmed
+by careful computation over long but finite stretches, notably by Hammel,
+Yorke and Grebogi in 1987. This book proves neither; the proofs live in
+graduate texts on dynamical systems.
+\end{rigourbox}
+
+\noindent
+Now the payoff. A shadow is a true orbit, so it spends its time as true
+orbits do. The last two lines of the output measure that: over a million
+steps the first formula spends the fraction \val{ch16.stats.a} of its time
+below $\num{0.1}$, the second \val{ch16.stats.b}, and the exact answer, from
+a formula this book does not derive, is \val{ch16.stats.exact}. Two programs whose paths parted after fifty steps
+agree about where the orbit lives. That is why the lobe fractions of
+Chapter~\ref{ch:lorenz} and the climate statistics of
+Chapter~\ref{ch:weather} can be trusted when no single computed path can.
+
+\plotfig{ch16-statistics}{Left: where two double-precision runs of a million
+steps spend their time, against the exact answer. Right: the share of steps
+below \num{0.1} as the runs lengthen. The double runs settle on the exact
+value; the single-precision run, caught in a loop, on a wrong
+one.}{statistics that survive a wrong path}
+
+\mermaidfig{ch16-shadow}{A computed orbit stays close to the true orbit of a
+nearby start, and that orbit's statistics are the ones the picture
+shows.}{a computed orbit and its shadow}
+
+\section{Machines that must repeat}
+\label{sec:ch16-random}
+\index{random numbers}\index{linear congruential generator}
+
+\noindent
+The plainest difference of all: between $0$ and $1$ there are \val{ch16.count.single} single-precision
+numbers and \val{ch16.count.double} doubles: enormous, and finite. So a
+computed orbit must sooner or later meet a value it has met before, and since
+the rule gives the same next value every time, it then goes round the same
+loop for ever.
+
+In single precision the loops are short enough to find. From $\num{0.1}$ the
+logistic map at $r = 4$ wanders for \val{ch16.loop.tail} steps, then goes
+round a loop of \val{ch16.loop.length} values for ever; \val{ch16.loop.starts}
+different starts end in only \val{ch16.loop.kinds} different loops. The loop
+spoils the statistics too: the single-precision run spends the fraction
+\val{ch16.stats.single} of its time below $\num{0.1}$, not
+\val{ch16.stats.exact}, as Figure~\ref{fig:ch16-statistics} shows. Doubles
+loop as well, but their loops are far too long to reach, which is the
+practical reason to compute chaos in double precision.
+
+\begin{think}
+The logistic map at $r = 4$ never repeats, covers the whole of $0$ to $1$ and
+looks random at a glance. Would it make a good random-number generator?
+\end{think}
+\reveal{No, for three reasons this chapter has measured. Its values pile up
+near $0$ and $1$: about a fifth of its time is below $\num{0.1}$, not a
+tenth. Each value is fixed by the one before it. And on a computer it falls
+into a loop.}
+
+\begin{trapbox}
+\textbf{\enquote{A chaotic map makes a good random-number generator.}} Chaos
+makes the future unpredictable to someone who does not know the start
+exactly, which is part of what randomness needs and not all of it. A good
+generator must also spread its values evenly, show no pattern from one value
+to the next, and repeat only after a loop nobody could ever go round. Those
+properties are designed with number theory and checked with statistical
+tests; they do not come free with chaos.
+\end{trapbox}
+
+\noindent
+A random-number generator is a deterministic rule on a finite set of values,
+built to have one enormous loop. The simplest kind, the \emph{linear
+congruential generator}, is one line: multiply by $a$, add $c$, and keep the
+remainder after dividing by $m$. With $a = 5$, $c = 3$ and $m = 16$, from
+$0$ you get $3$, then $5 \times 3 + 3 = 18$, remainder $2$, then $13$, $4$,
+$7$, $6$, $1$, $8$, $11$, $10$, $5$, $12$, $15$, $14$, $9$ and $0$ again: all
+sixteen possible values before a repeat. The doubling map is a generator of
+this kind with $a = 2$ and $c = 0$, and on $k$ binary digits it dies in $k$
+steps \dash{} the collapse of Section~\ref{sec:ch16-doubling} in a new
+costume. Python's own generator, the Mersenne Twister of Makoto Matsumoto and
+Takuji Nishimura (1998), has a loop of $2^{19937} - 1$ values. Because it is
+deterministic, the same starting value, the \emph{seed}, gives the same
+\enquote{random} numbers every time, which is how a random experiment is made
+repeatable.
+
+\begin{lab}{l16_03_loops}{Every orbit ends in a loop}
+Write a linear congruential generator and a function that finds, for any
+rule and start, how many steps the orbit takes to enter its loop and how long
+the loop is. Try it on the generator above, then find the loop of the
+single-precision logistic map for yourself.
+\end{lab}
+
+\noindent
+The practical lesson fits in a sentence: never trust a single long run of a
+chaotic computation. Run it again with the formula rearranged, with more
+precision and less, with a smaller step, and believe what survives. The path
+past fifty steps will not survive. The statistics will.
+
+\begin{summarybox}
+\begin{itemize}
+\item A \textbf{double} keeps \val{ch16.bits.double} significant binary
+  digits. Most decimals, $\num{0.1}$ among them, are stored inexactly, and
+  every sum and product is \textbf{rounded}.
+\item The \textbf{doubling map} reads out its start one binary digit at a
+  time, so on a computer every orbit dies at $0$; the true orbit of one tenth
+  loops for ever.
+\item Two programs for one rule round differently and part company. At
+  $r = 4$ the logistic map uses \textbf{one binary digit per step}: about
+  fifty steps in double precision, twenty in single.
+\item \textbf{Exact arithmetic} doubles its digits every step and cannot
+  finish; \textbf{more digits} buy a fixed number of steps each.
+\item A computed orbit is \textbf{shadowed} by a true orbit from a nearby
+  start, so its \textbf{statistics} are right when its path is wrong.
+\item A finite machine makes every orbit end in a \textbf{loop}; a
+  random-number generator is a rule built to make that loop enormous.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Why does $\num{0.1} + \num{0.2}$ not equal $\num{0.3}$ on a computer?
+  \answerto{Neither $\num{0.1}$ nor $\num{0.2}$ has an exact binary form, so
+  each is stored as the nearest double, and the sum is rounded again.}
+\item The computer stores $\num{0.3}$ as a whole number over
+  $2^{\val{ch16.collapse.three}}$. When does its doubling-map orbit reach
+  $0$, and what does the true orbit of $\tfrac{3}{10}$ do?
+  \answerto{At step \val{ch16.collapse.three}, one step per binary digit. The
+  true orbit goes $\tfrac{3}{5}$, $\tfrac{1}{5}$, $\tfrac{2}{5}$,
+  $\tfrac{4}{5}$, $\tfrac{3}{5}$ and loops for ever.}
+\item Single precision keeps \val{ch16.bits.single} binary digits. Roughly
+  how many steps of the logistic map at $r = 4$ is it good for?
+  \answerto{About twenty (measured: \val{ch16.wrong.single}): the map doubles
+  the rounding error every step, using up one binary digit per step.}
+\item Run exactly from $\tfrac{1}{10}$, the bottom of the fraction has
+  \val{ch16.exact.ten} digits after ten steps. About how many after twenty?
+  \answerto{About \val{ch16.exact.twenty}: the digits double every step, and
+  ten doublings multiply them by about a thousand.}
+\item After a million steps of a chaotic simulation, which can you trust:
+  the last value, or the fraction of time spent below $\num{0.1}$?
+  \answerto{The fraction of time. The path has followed a different orbit
+  since about step fifty, but it stays close to a true orbit from a nearby
+  start, and that orbit spends its time as true orbits do.}
+\item Why must every orbit computed on a machine eventually repeat?
+  \answerto{The machine holds only finitely many numbers, so the orbit must
+  revisit a value, and the rule then repeats everything after it.}
+\end{checkpoint}

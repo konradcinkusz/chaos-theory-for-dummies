@@ -1,0 +1,407 @@
+%% ch01 --- A model is a machine for predicting
+%%
+%% Written September 2026, as the exemplar every later chapter follows. Every
+%% number the reader cannot do in their head comes from code/measure/ch01.py,
+%% which imports the SAME rules the listings print (code/ch01/), so the page
+%% and the listing cannot disagree about what the model says.
+%%
+%% WHAT THIS CHAPTER MAY NOT SAY. It plants the book's question -- if the rule
+%% is exact and known, is the future known? -- and answers it only for the
+%% two gentle models here, where an error in the start dies away or stays the
+%% same size. That errors can GROW is Chapter 6's measurement; saying so here
+%% as a finding would spend it.
+%%
+%% Twin: chapters/pl/ch01-models.tex. Section for section, macro for macro,
+%% number for number; tools/parity.py compares them.
+
+\chapter{A model is a machine for predicting}
+\label{ch:models}
+\index{model}
+
+\noindent
+You use mathematical models every day without calling them that. The app
+that says your train arrives in seven minutes is running one. So is the
+oven timer, the tide table, the dosage on a medicine packet and the little
+voice that tells you to leave at ten past eight if you want to be there by
+nine. Each of them takes a few numbers about now, applies a rule, and hands
+you a number about later.
+
+This book is about what happens to that promise. Its first four chapters
+show how well it works \dash{} how a line of algebra can tell you where a
+stone will be, how hot your tea will be, and when a comet will come back.
+The rest of the book shows where it breaks, why it breaks even when the rule
+is perfect, and what you can still predict when it does. That last part is
+the reason to read it: the breaking is not a failure of mathematics, and
+knowing its shape changes what you should believe about every forecast you
+are given.
+
+\begin{outcomes}
+\outcome{name the state, the rule and the prediction of any model put in
+  front of you}
+\outcome{run a model written in Python and read what it prints}
+\outcome{say what it means for a model to be wrong, and why a wrong model can
+  still be useful}
+\outcome{say what happens to a small error in the start for the two models in
+  this chapter}
+\outcome{state the clockwork claim that Laplace made in 1814, and the question
+  the rest of the book asks of it}
+\end{outcomes}
+
+\section{Three parts of every model}
+\label{sec:ch01-parts}
+\index{model!state}\index{model!rule}\index{model!prediction}
+
+\noindent
+Drop a stone from a bridge. How far has it fallen after three seconds?
+
+A physicist answers with a formula you may remember from school: a stone
+falling freely near the Earth's surface covers a distance
+\[ d = \tfrac{1}{2}\, g\, t^{2} \]
+in $t$ seconds, where $g$ is about \val{ch01.g} metres per second per second.
+That one line is a complete model, and it has three parts you will find in
+every model in this book.
+
+\begin{itemize}
+\item \textbf{The state}: the numbers that say where things are now. Here it
+  is a single number, the time $t$ since the stone was let go.
+\item \textbf{The rule}: how those numbers turn into the thing you want to
+  know. Here it is the formula.
+\item \textbf{The prediction}: what the rule says. Here, a distance.
+\end{itemize}
+
+\begin{think}
+Use the formula for $t = 3$. Roughly how far has the stone fallen: about
+$10$ metres, about $30$, or about $45$?
+\end{think}
+\reveal{About \val{ch01.stone.three} metres: half of \val{ch01.g}, times
+$3 \times 3 = 9$.}
+If you guessed ten or thirty, you are in good company: most people
+underestimate, because the stone does not fall at a steady speed. It keeps
+speeding up, so the distance grows with the \emph{square} of the time. Three
+times as long a fall is nine times as far.
+
+That is the first thing a model buys you: it catches the intuition that was
+going to mislead you. Nobody has a feeling for $t^{2}$. The formula does not
+need one.
+
+\begin{trapbox}
+\textbf{\enquote{A model is a copy of reality.}} It is not, and nothing about
+the formula above resembles a stone. A model is a machine for answering
+questions: you put numbers in, it gives numbers out, and the only fair test
+of it is whether those numbers agree with what you then measure. A map is
+not the territory, and a model is not even a map \dash{} it is a map that
+also tells you the time you will arrive.
+\end{trapbox}
+
+\section{Your laboratory}
+\label{sec:ch01-lab}
+\index{Python}\index{laboratory}
+
+\noindent
+Every number in this book that you could not work out in your head was
+computed by a small program, and every one of those programs is in the
+book's repository under \code{code/}. You do not need to be a programmer to
+read them. They are short, they are written to be read, and each is
+explained the first time it appears. Here is the stone.
+
+\pyregion{code/ch01/falling_stone.py}{model}{The falling stone as a model: one constant, one rule}{lst:ch01-stone}
+
+\noindent
+Read it the way you read the formula. The line that starts \code{G =} sets a
+constant. The lines that start \code{def distance} define the rule: give it a
+time \code{t} and it gives back \code{0.5 * G * t * t}, which is the formula
+with the multiplications written out. The text in triple quotes is a note to
+the reader, and everything after a \code{\#} is a comment. The program then
+asks the rule the question for every whole second from $0$ to $5$:
+
+\pyregion{code/ch01/falling_stone.py}{table}{Asking the model six questions}{lst:ch01-table}
+
+\noindent
+\code{for t in range(6)} means \enquote{do the next line with \code{t} set to
+$0$, then $1$, and so on up to $5$}. Run it from the \code{code/} directory
+with \code{uv run python ch01/falling\_stone.py} and it prints:
+
+\transcript{ch01-falling-stone}
+
+\noindent
+Look at the right-hand column. The stone falls about five metres in the
+first second and \val{ch01.stone.five} metres in five seconds. If you have
+ever dropped something from a height and counted, that second number feels
+too large, and it is not.
+
+\begin{note}
+The front matter says how to install the laboratory: one tool, \pkg{uv},
+which installs the exact version of Python the book was checked on
+(\pypatch) and every package at the exact version printed on the copyright
+page. After that, \code{uv run python} followed by a file name runs any
+listing in the book. If you would rather not run anything, the output of
+every listing is printed beside it; running them is how you find out that
+the book is not asking you to take its word for anything.
+\end{note}
+
+\begin{lab}{l01_01_stone}{The stone, both ways round}
+A model answers questions in more than one direction. Given the time, it
+gives the distance; given the distance, it gives the time; and given a
+measured drop, it tells you what gravity must be. The starter has the three
+functions with their descriptions and no bodies. Fill them in until the test
+passes. The second one needs a square root, which Python spells
+\code{math.sqrt}.
+\end{lab}
+
+\section{A model that steps}
+\label{sec:ch01-steps}
+\index{model!stepping}\index{Newton's law of cooling}
+
+\noindent
+The stone's formula lets you jump straight to any time you like. Most
+models do not. Pour a cup of tea at \val{ch01.tea.start}\,°C in a room at
+\val{ch01.tea.room}\,°C. Isaac Newton described in 1701 how it cools, and in
+the form this book uses his rule says: \emph{each minute, the tea loses a
+fixed fraction of the gap between itself and the room}. Take the fraction to
+be \val{ch01.tea.k}, a tenth.
+
+\begin{think}
+The gap at the start is $90 - 20 = 70$ degrees. What is the temperature one
+minute later?
+\end{think}
+\reveal{\val{ch01.tea.one}\,°C. A tenth of the gap is $7$, and $90 - 7 = 83$.}
+To know the temperature after two minutes you do the same thing again, to
+$83$: the gap is now $63$, a tenth of it is \num{6.3}, and the tea is at
+\num{76.7}. There is no shortcut you are expected to know. The rule tells you
+how to get from one minute to the next, and to get anywhere else you take one
+step at a time.
+
+\pyregion{code/ch01/cooling_cup.py}{rule}{The rule of the next minute}{lst:ch01-rule}
+
+\noindent
+The function \code{next\_minute} is the whole model. Given the temperature
+now, it returns the temperature a minute later. To see the future you call it
+again and again, feeding each answer back in:
+
+\pyregion{code/ch01/cooling_cup.py}{run}{Feeding each answer back in, thirty times}{lst:ch01-run}
+
+\transcript{ch01-cooling-cup}
+
+\noindent
+The line \code{temp = next\_minute(temp)} is the most important line in this
+book, and you will see it in every chapter under a different name. It
+replaces the state with the next state. Doing that over and over is called
+\emph{iteration}, and Chapter~\ref{ch:iteration} is about nothing else.
+
+\begin{think}
+From the printout, the tea is above $60$\,°C at minute $5$. Is it below
+$60$ at minute $6$? What would you have to do to be sure?
+\end{think}
+\reveal{Yes: it first drops below $60$ at minute \val{ch01.tea.drinkable}. To
+be sure you take one more step with the rule, or ask the program for every
+minute rather than every fifth.}
+That is how you ask a stepping model a question: you step until the answer
+appears. It is also why stepping models were rare before computers and are
+everywhere now. A machine does not mind taking a million steps.
+
+\plotfig{ch01-two-models}{Two models of the same kind of question. The stone's
+formula gives any time directly; the tea's rule gives the next minute, and the
+curve is its steps joined up.}{a formula and a stepping rule}
+
+\begin{lab}{l01_02_cooling}{How long until I can drink it?}
+Write \code{cool}, which runs the rule for a number of minutes and keeps every
+temperature, and \code{minutes\_until}, which answers the question a person
+actually asks. Your answer for a cup at $90$\,°C, a room at $20$ and a
+fraction of \num{0.1} should agree with the one above.
+\end{lab}
+
+\section{Wrong, and useful}
+\label{sec:ch01-wrong}
+\index{model!error}
+
+\noindent
+Neither model is true. The stone's formula ignores the air, and a feather
+dropped beside the stone shows you how much that can matter. The tea's rule
+ignores the cup, the saucer, the steam and your spoon. Measure carefully and
+you will find both are wrong.
+
+\begin{think}
+Since the stone's formula ignores the air, and air obviously matters, is the
+formula useless?
+\end{think}
+\reveal{No. For a stone falling a few seconds it is right to within the width
+of a hand; for a feather it is badly wrong. A model is useful for the
+questions it answers well enough, and it is your job to know which those
+are.}
+
+\begin{trapbox}
+\textbf{\enquote{A model that is wrong is useless.}} Every model is wrong,
+because every model leaves something out \dash{} that is what makes it small
+enough to use. The statistician George Box's often-quoted line says the same
+thing more briefly: all models are wrong, but some are useful. The useful
+question is never \enquote{is it true?} but \enquote{is it good enough, for
+this question, over this range?} Keep that question. Part~II of this book is
+about a range over which a model with no error at all in its rule stops being
+good enough, and the reason is not what you would guess.
+\end{trapbox}
+
+\noindent
+You can check a model against a measurement, and the check can run in either
+direction. Drop a stone from a ten-metre wall and the formula says it lands
+after \val{ch01.stone.ten.time} seconds. Time a real one and get a slightly
+different number, and you can turn the formula round and ask what $g$ would
+have to be. That is the third function in the first lab above, and it is how a model
+earns trust: by making predictions sharp enough to be wrong, and then not
+being.
+
+\section{What happens to a small mistake?}
+\label{sec:ch01-error}
+\index{error!in the start}
+
+\noindent
+Here is the question the whole book turns on, asked of the gentlest model in
+it. You never know the start exactly. Your thermometer says $90$\,°C; the tea
+is really at $91$. How wrong is your prediction half an hour later?
+
+\begin{think}
+Two cups start one degree apart and cool by the same rule. After thirty
+minutes, is the gap between them bigger than one degree, still one degree, or
+smaller?
+\end{think}
+\reveal{Smaller: about \val{ch01.gap.thirty}\,°C. Each minute the gap is
+multiplied by \val{ch01.gap.factor}, because each cup loses a tenth of its
+own distance from the room.}
+
+\pyregion{code/ch01/two_cups.py}{gap}{Two cups, one degree apart}{lst:ch01-gap}
+
+\transcript{ch01-two-cups}
+
+\noindent
+The error does not merely stay small; it disappears. Every minute it is
+multiplied by \val{ch01.gap.factor}, so after ten minutes it is about a
+third of a degree and after \val{ch01.gap.hundredth} minutes it is less than
+a hundredth of one. On a logarithmic scale, where each step down is a factor
+of ten, the gap falls along a straight line:
+
+\plotfig{ch01-gap-shrinks}{The gap between two cups that started one degree
+apart. On a logarithmic scale it falls along a straight line: the same
+fraction is lost every minute.}{an error that dies away}
+
+\noindent
+Keep that straight line in your head. A model whose errors shrink forgives
+you for not knowing the start. The stone's model is nearly as kind: get the
+moment of release wrong by a tenth of a second and your prediction is off by
+a fixed amount of time for ever, never by more. Most of the mathematics you
+met at school describes systems like these, and it is why the idea that
+nature is predictable feels like common sense.
+
+\begin{worldbox}
+The dosing instructions on a medicine packet rest on a model of this kind.
+Most drugs are cleared from the blood by a roughly fixed fraction every hour,
+exactly as the tea loses a fixed fraction of its gap (alcohol is the famous
+exception), so a dose taken a little late or a little large leaves an error
+that shrinks rather than grows. That forgiveness is why a schedule can be
+printed on a packet at all.
+\end{worldbox}
+
+\section{The clockwork}
+\label{sec:ch01-clockwork}
+\index{Laplace's demon}\index{Halley's comet}\index{clockwork universe}
+
+\noindent
+Models like these did something astonishing in the eighteenth century.
+Edmond Halley, using Newton's laws of motion and gravity, argued that the
+comets seen in 1531, 1607 and 1682 were one object on one orbit, and
+predicted that it would return around 1758. He died in 1742. The comet was
+seen again on Christmas night 1758, and it has carried his name ever since.
+
+A rule on paper had reached seventy-six years into the future and been
+right. Pierre-Simon Laplace drew the conclusion in 1814, in a passage that
+reads, in its classic English translation:
+
+\begin{quote}
+Given for one instant an intelligence which could comprehend all the forces
+by which nature is animated and the respective situation of the beings who
+compose it \dash{} an intelligence sufficiently vast to submit these data to
+analysis \dash{} it would embrace in the same formula the movements of the
+greatest bodies of the universe and those of the lightest atom; for it,
+nothing would be uncertain and the future, as the past, would be present to
+its eyes.
+\end{quote}
+
+\noindent
+The imagined intelligence is known as \emph{Laplace's demon}, and the picture
+behind it as the \emph{clockwork universe}: know the rule and the present,
+and the future follows, as surely as the hands of a clock. In 1960 the
+physicist Eugene Wigner wrote of \enquote{the unreasonable effectiveness of
+mathematics in the natural sciences}, and he meant the same wonder: rules
+written by people at desks keep turning out to be right about the world.
+
+\mermaidfig{ch01-model-loop}{Every model in this book has this shape. A state
+goes in, a rule turns it into a prediction, and a measurement decides whether
+to trust it.}{state, rule, prediction, check}
+
+\begin{think}
+Suppose the rule is exact \dash{} not approximately right, but perfectly
+right \dash{} and you know it. Can you then predict the future as far ahead as
+you like?
+\end{think}
+\reveal{Only if you also know the start exactly, and you never do. For the
+tea and the stone that hardly matters, because the error in the start
+shrinks or stays the same size. Whether it always behaves that kindly is the
+question the rest of this book answers.}
+
+\noindent
+Most people answer yes, and so did most scientists for two hundred years
+after Laplace. Hold on to your answer. In Chapter~\ref{ch:logistic} you will
+meet a rule one line long, simpler than the tea's, whose errors do not shrink
+at all; in Chapter~\ref{ch:butterfly} you will measure how fast they grow; and
+by the end of the book you will be able to say, with numbers you computed,
+why some things can be predicted for a century and others not for a
+fortnight. That is chaos theory, and it is not a theory of disorder. It is
+the mathematics of exactly this question.
+
+\begin{summarybox}
+\begin{itemize}
+\item Every model has three parts: a \textbf{state} (the numbers that say
+  where things are now), a \textbf{rule} (how they change, or how they turn
+  into an answer), and a \textbf{prediction} (what the rule says).
+\item Some models are formulas you can evaluate at any time you like. Most
+  are \textbf{stepping rules}: they tell you how to get from now to the next
+  moment, and you reach the future by applying them over and over. That is
+  iteration.
+\item Every model is wrong, because every model leaves something out. The
+  useful question is whether it is good enough for this question over this
+  range.
+\item For the cooling tea, an error in the start \textbf{shrinks} by the same
+  factor every minute; for the stone it stays the same size. Models like these
+  forgive you for not knowing the start exactly.
+\item Laplace's demon is the clockwork claim: know the rule and the present
+  exactly, and the future follows. The rest of the book tests it.
+\end{itemize}
+\end{summarybox}
+
+\canyou
+
+\begin{checkpoint}
+\item Name the state, the rule and the prediction of a bus timetable.
+  \answerto{The state is the time now and the stop you are at; the rule is
+  the timetable (together with the assumption that the bus keeps to it); the
+  prediction is when the next bus arrives.}
+\item How far does a stone fall in the first two seconds, air ignored? And in
+  four?
+  \answerto{About \num{19.6} metres in two seconds and about \num{78.5} in
+  four. Twice the time, four times the distance.}
+\item Tea at $80$\,°C cools in a room at $20$\,°C, losing a tenth of the gap
+  each minute. What is its temperature after one minute, and after two?
+  \answerto{$74$\,°C and then \num{68.6}\,°C: the gap goes from $60$ to $54$
+  to \num{48.6}.}
+\item Two cups start two degrees apart in the same room and cool by that rule.
+  How far apart are they after one minute?
+  \answerto{\num{1.8} degrees: each cup loses a tenth of its own gap to the
+  room, so their difference loses a tenth too.}
+\item Why can a model that is known to be wrong still be useful?
+  \answerto{Because every model leaves something out, and usefulness is a
+  question of whether its answers are close enough for the question being
+  asked, over the range it is used for.}
+\item What would Laplace's demon need to know to predict the future, and which
+  of those does the rest of this book say can never be had exactly?
+  \answerto{The rule and the exact present state. The rule may be known
+  exactly; the present state never is, because every measurement has an
+  error.}
+\end{checkpoint}

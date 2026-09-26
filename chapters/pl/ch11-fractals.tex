@@ -1,0 +1,513 @@
+%% ch11 --- Fraktale: mierzenie czegoś, co nie ma długości
+%%
+%% Napisany we wrześniu 2026. Każda liczba, której czytelnik nie policzy w
+%% pamięci, pochodzi z code/measure/ch11.py, który importuje TE SAME funkcje,
+%% które drukują listingi (code/ch11/), więc strona i listing nie mogą się
+%% rozejść. Zliczenia dla odwzorowania Hénona używają tylko +, - i * oraz
+%% pudełek o bokach będących potęgami dwójki, więc są identyczne na każdej
+%% maszynie; wymiary są zapisane z dwoma miejscami po przecinku.
+%%
+%% CZEGO TEN ROZDZIAŁ NIE MOŻE POWIEDZIEĆ. Mierzy atraktor Hénona i mówi, że
+%% atraktory dziwne są fraktalami; to, że atraktor ma zerowe pole i
+%% nieskończoną długość, należy do rozdziału 10 i jest tu przytoczone, a nie
+%% wyprowadzane. Zbiór Mandelbrota i zbiory Julii należą do rozdziału 12:
+%% ten rozdział wymienia zbiór w jednym zdaniu na końcu i nie rysuje niczego
+%% na płaszczyźnie zespolonej.
+%%
+%% Bliźniak: chapters/en/ch11-fractals.tex. Podrozdział za podrozdziałem,
+%% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
+
+\chapter{Fraktale: mierzenie czegoś, co nie ma długości}
+\label{ch:fractals}
+\index{fraktal}\index{paradoks linii brzegowej}
+
+\noindent
+Jak długie jest wybrzeże Wielkiej Brytanii? Brzmi to jak pytanie do atlasu.
+Sprawdź jednak w dwóch źródłach, a możesz znaleźć dwie liczby tak od siebie
+odległe, że żadna nie jest zaokrągleniem drugiej, i żadna nie jest błędem
+drukarskim. Dlaczego?
+
+Ten rozdział na to odpowiada, a potem zastępuje długość liczbą, która
+naprawdę opisuje kształty takie jak wybrzeże. Zbudujesz dwa takie kształty,
+powtarzając jedną regułę, zmierzysz nową liczbę, licząc pudełka, a potem tak
+samo zmierzysz kształt, który chaos zostawił po sobie w
+rozdziale~\ref{ch:strange}.
+
+\begin{outcomes}
+\outcome{zmierzyć krzywą linijkami różnej długości i powiedzieć, czy jej
+  długość się ustala}
+\outcome{zbudować krzywą Kocha i zbiór Cantora, powtarzając regułę, i ustalić,
+  co każda runda robi z ich długością}
+\outcome{wyznaczyć wymiar z tego, z ilu kopii składa się kształt i ile razy
+  każda kopia jest pomniejszona}
+\outcome{obliczyć wymiar pudełkowy z listy punktów, odczytać go z wykresu w
+  skali logarytmicznej i powiedzieć, na ile mu ufać}
+\outcome{powiedzieć, co twierdzi wymiar między jeden a dwa, i w jakim zakresie
+  rozmiarów prawdziwy obiekt może na niego zasłużyć}
+\end{outcomes}
+
+\section{Wybrzeże i linijka}
+\label{sec:ch11-coast}
+\index{Richardson, Lewis Fry}\index{Mandelbrot, Benoit}
+
+\noindent
+Pierwszym, kto potraktował to pytanie poważnie, był Lewis Fry Richardson,
+angielski fizyk. Pod koniec życia badał wojny i chciał wiedzieć, czy kraje o
+dłuższej wspólnej granicy częściej ze sobą walczą. Odkrył, że sąsiedzi
+potrafią podawać dla tej samej granicy wyraźnie różne długości. Jego pomiary
+opublikowano w 1961 roku, po jego śmierci.
+
+Krzywą na mapie mierzy się cyrklem: dwiema ostrymi nóżkami rozstawionymi na
+stałą odległość. Przestawiasz je wzdłuż wybrzeża, liczysz kroki i mnożysz
+przez długość kroku. Ta stała odległość to twoja linijka.
+
+\Needspace*{8\baselineskip}
+\begin{think}
+Mierzysz ten sam odcinek wybrzeża dwa razy na tej samej dokładnej mapie: raz
+z cyrklem rozstawionym na $10$ kilometrów, raz na $1$ kilometr. Który pomiar
+jest dłuższy, czy też się zgadzają?
+\end{think}
+\reveal{Pomiar z $1$-kilometrową linijką. Długa linijka przeskakuje prosto
+nad każdą zatoką węższą od siebie; krótka wchodzi w zatokę i z niej wychodzi,
+a każdy taki objazd dodaje długości.}
+W 1967 roku Benoit Mandelbrot oparł na pomiarach Richardsona artykuł w
+czasopiśmie \emph{Science} zatytułowany \enquote{How long is the coast of
+Britain?}, czyli \enquote{Jak długie jest wybrzeże Wielkiej Brytanii?}. Jego
+odpowiedź, do której prowadzi ten rozdział, brzmiała: to pytanie nie ma
+odpowiedzi, ale lepsze pytanie ją ma.
+
+Najpierw zobacz, co ten eksperyment robi z krzywą bez ukrytych szczegółów:
+półokręgiem o promieniu jeden, którego długość to $\pi$, około \val{ch11.pi}
+(połowa z $2\pi$ obwodu całego okręgu). Postaw na nim punkty, przejdź od
+każdego do następnego po prostej i dodaj kroki. Oto cała linijka:
+
+\Needspace*{10\baselineskip}
+\pyregion{code/ch11/_ruler.py}{length}{Linijka: dodaj proste kroki}{lst:ch11-length}
+
+\noindent
+\code{pairwise(points)} podaje pętli każdy punkt razem z następnym, a wiersz
+oznaczony \code{Pythagoras} to odległość między nimi: kwadrat przesunięcia w
+poziomie plus kwadrat przesunięcia w pionie, spierwiastkowane. Następny
+listing zaczyna od trzech punktów na półokręgu i w każdej rundzie dokłada
+punkt na okręgu w połowie między każdymi dwoma sąsiadami, co skraca linijkę
+o połowę:
+
+\Needspace*{9\baselineskip}
+\pyregion{code/ch11/semicircle.py}{table}{Półokrąg mierzony coraz krótszymi linijkami}{lst:ch11-semicircle}
+
+\Needspace*{10\baselineskip}
+\transcript{ch11-semicircle}
+
+\noindent
+Każda krótsza linijka mierzy więcej, jak na wybrzeżu. Ale każda runda dodaje
+mniej więcej \val{ch11.semi.gain} tego, co dodała poprzednia, więc przyrosty
+wygasają, a pomiary ustalają się na $\pi$. To ustalanie się jest tym, czym
+długość \emph{jest}: liczbą, do której zbliżają się pomiary, gdy linijka się
+skraca. Gładka krzywa ją ma. Wybrzeża Richardsona jej nie miały: dla każdego
+wybrzeża i każdej granicy, które sprawdził, zmierzona długość rosła dalej,
+gdy linijka się skracała.
+
+\section{Krzywa, która się nie ustala}
+\label{sec:ch11-koch}
+\index{krzywa Kocha}\index{samopodobieństwo}
+
+\noindent
+Nie da się rozumować o szczegółach, których jeszcze nie naniesiono na mapę,
+więc zbuduj wybrzeże z reguły, w której każda skala szczegółów jest znana z
+góry. Helge von Koch opisał taką w 1904 roku. Zacznij od odcinka o długości
+jeden. Podziel go na trzy równe części i zastąp środkową dwoma górnymi
+bokami trójkąta, każdym tak długim jak zastępowana część, jak namiot
+rozbity na środkowej trzeciej. To pierwsza runda. Druga robi to samo z każdą
+z czterech części i tak dalej, bez końca.
+
+\Needspace*{8\baselineskip}
+\begin{think}
+Każda runda zastępuje każdy prosty odcinek czterema odcinkami, każdym trzy
+razy krótszym. Przez jaką liczbę mnoży się całkowita długość w każdej
+rundzie?
+\end{think}
+\reveal{Przez $\tfrac{4}{3}$: cztery odcinki, każdy o długości
+$\tfrac{1}{3}$ zastępowanego, dają razem $4 \times \tfrac{1}{3}$ jego
+długości.}
+
+\plotfig{ch11-koch-stages}{Krzywa Kocha po rundach od $0$ do $5$. Każda runda
+rozbija namiot na środkowej trzeciej każdego prostego odcinka; przerywany
+prostokąt, wysoki jak pierwszy namiot, mieści każdą rundę.}{krzywa Kocha runda po rundzie}
+
+\noindent
+Spójrz na rundę $5$: krzywa składa się z czterech mniejszych kopii samej
+siebie, a każda z nich znów z czterech mniejszych kopii. To
+\emph{samopodobieństwo}, reguła prześwitująca w każdej skali. Listing buduje
+rundy od $0$ do $6$ i mierzy każdą linijką z listingu~\ref{lst:ch11-length}:
+
+\Needspace*{11\baselineskip}
+\pyregion{code/ch11/koch_length.py}{table}{Krzywa Kocha mierzona runda po rundzie}{lst:ch11-koch}
+
+\Needspace*{9\baselineskip}
+\transcript{ch11-koch-length}
+
+\noindent
+Po rundzie $n$ każdy odcinek ma długość $\tfrac{1}{3^{n}}$, więc mierzenie
+tej rundy to mierzenie krzywej Kocha linijką tej długości. Kolumna
+\code{length} to za każdym razem $\tfrac{4}{3}$ wiersza wyżej: po rundzie $6$
+wynosi \val{ch11.koch.six}, a po rundzie $20$ wynosiłaby
+\val{ch11.koch.twenty}. Wysokość, \code{height}, stoi na
+\val{ch11.koch.height}, wysokości pierwszego namiotu. Pole, \code{area},
+między krzywą a jej podstawą (funkcja wyżej w tym samym pliku) pełznie ku
+\val{ch11.koch.area} i dalej nie idzie: każda runda rozbija cztery razy
+więcej namiotów, każdy o polu dziewięć razy mniejszym, więc dodaje
+$\tfrac{4}{9}$ tego, co dodała poprzednia, a te przyrosty wygasają jak
+przyrosty półokręgu.
+
+Sama reguła to \api{koch} w \pkg{chaoslab}. Jedyny nieznany wiersz to
+wierzchołek namiotu: pół odcinka wzdłuż środkowej trzeciej, potem w bok o
+\code{h} razy odcinek, czyli o wysokość trójkąta równobocznego.
+
+\Needspace*{18\baselineskip}
+\pyregion{code/src/chaoslab/fractals.py}{koch}{Reguła Kocha w chaoslab}{lst:ch11-kochrule}
+
+\Needspace*{8\baselineskip}
+\begin{think}
+Załóżmy, że potrafisz narysować każdą rundę, bez końca, i zmierzyć gotową
+krzywą linijką tak krótką, jak zechcesz. Jaką długość dostaniesz?
+\end{think}
+\reveal{Żadnej. Za każdym razem, gdy linijka skraca się trzykrotnie, pomiar
+rośnie $\tfrac{4}{3}$ razy i nigdy się nie ustala. Gotowa krzywa jest
+dłuższa od każdej liczby, jaką zechcesz wymienić, a wciąż mieści się w
+przerywanym prostokącie.}
+
+\Needspace*{10\baselineskip}
+\begin{trapbox}
+\textbf{\enquote{Wybrzeże ma długość, tylko trudno ją zmierzyć.}} Długość to
+wartość, na której ustalają się pomiary, gdy linijka się skraca, a pomiary
+wybrzeża się nie ustalają: każda dokładniejsza mapa znajduje zatoki w
+zatokach. Długość wybrzeża to fakt o wybrzeżu \emph{i o linijce} naraz, więc
+liczba podana bez linijki albo bez skali mapy nie jest w ogóle faktem o
+wybrzeżu.
+\end{trapbox}
+
+\section{Liczenie kopii}
+\label{sec:ch11-dimension}
+\index{zbiór Cantora}\index{wymiar!z liczby kopii}
+
+\noindent
+Georg Cantor opisał drugi kształt w 1883 roku i ten idzie w przeciwną
+stronę. Weź odcinek od $0$ do $1$, podziel go na trzy części i wyrzuć
+środkową, zostawiając jej końce. Zrób to samo z każdym kawałkiem, który
+został, bez końca.
+
+\Needspace*{8\baselineskip}
+\begin{think}
+Wyrzucaj środkowe trzecie bez końca. Ile z długości odcinka zostanie na
+końcu? I czy w ogóle coś zostanie?
+\end{think}
+\begin{revealblock}
+Długości nie zostanie: każda runda zachowuje $\tfrac{2}{3}$ tego, co było,
+więc po $20$ rundach \val{ch11.cantor.pieces} kawałków mieści
+\val{ch11.cantor.left} długości, a całość dąży do zera. Ale zostają punkty.
+Końce każdego kawałka, takie jak $\tfrac{1}{3}$ i $\tfrac{2}{3}$, nigdy nie
+są wyrzucane. Nie jest też wyrzucana $\tfrac{1}{4}$, która nigdy nie jest
+końcem: leży w lewej trzeciej; rozciągnij tę trzecią trzykrotnie, a
+$\tfrac{1}{4}$ trafi na $\tfrac{3}{4}$, do prawej trzeciej; rozciągnij tę, a
+wróci na $\tfrac{1}{4}$. Omija każdą środkową trzecią bez końca.
+\end{revealblock}%
+To, co zostaje, to \emph{zbiór Cantora}: pył nieskończenie wielu punktów,
+więcej, niż dałoby się kiedykolwiek wypisać na liście, bez żadnej długości.
+Długość to złe pytanie dla obu kształtów: jeden ma jej za dużo, drugi za
+mało. Oto lepsze.
+
+Pomniejsz odcinek trzykrotnie, a trzy kopie odbudują oryginał. Pomniejsz
+kwadrat trzykrotnie, a potrzeba dziewięciu; sześcian potrzebuje $27$. To
+$3^{1}$, $3^{2}$ i $3^{3}$, a wykładnik to wymiar. Kształt złożony z kopii
+samego siebie, każdej pomniejszonej tyle samo razy, ma więc wymiar $D$, dla
+którego
+\[ \text{pomniejszenie}^{D} = \text{kopie}. \]
+
+\Needspace*{8\baselineskip}
+\begin{think}
+Krzywa Kocha to cztery kopie samej siebie, każda pomniejszona trzykrotnie.
+Jeśli $3^{D} = 4$, to czy $D$ wynosi $1$, $2$, czy coś pomiędzy?
+\end{think}
+\reveal{Coś pomiędzy: $3^{1} = 3$ kopie to za mało, a $3^{2} = 9$ to za dużo.
+Potęga $3$, która daje $4$, to około \val{ch11.koch.dim}.}
+Znalezienie tej potęgi to zadanie logarytmu, który w
+rozdziale~\ref{ch:iteration} odpowiadał na pytanie \enquote{ile kroków,
+zanim}, a tu odpowiada na pytanie \enquote{ile czynników trzy daje cztery}:
+\[ D = \frac{\ln 4}{\ln 3} \approx \val{ch11.koch.dim}, \]
+gdzie $\ln$ to logarytm naturalny z każdego kalkulatora. Zbiór Cantora to
+dwie kopie samego siebie, każda pomniejszona trzykrotnie, więc jego wymiar
+to $\ln 2 / \ln 3$, około \val{ch11.cantor.dim}: więcej niż osobne punkty,
+które mają wymiar $0$, i mniej niż odcinek.
+
+\Needspace*{10\baselineskip}
+\begin{trapbox}
+\textbf{\enquote{Wymiar musi być liczbą całkowitą.}} Jest liczbą całkowitą
+dla kształtów, które poznałeś w szkole, bo są gładkie: przybliż gładką
+krzywą, a wygląda jak odcinek. Licz kopie zamiast kierunków, a wymiar staje
+się pomiarem, który może wyjść jakikolwiek. Wymiar krzywej Kocha,
+\val{ch11.koch.dim}, mówi coś precyzyjnego: za długa, żeby mieć długość, za cienka, żeby
+mieć pole. Kształt, którego wymiar nie jest liczbą całkowitą, Mandelbrot
+nazwał w 1975 roku \emph{fraktalem}, od łacińskiego \emph{fractus},
+złamany.
+\end{trapbox}
+
+\noindent
+Wymiar wyjaśnia też linijki Richardsona. Skróć linijkę trzykrotnie, a
+zmierzona długość pomnoży się przez $3^{D - 1}$: przez $\tfrac{4}{3}$ dla
+krzywej Kocha, przez $1$ dla wszystkiego, co gładkie, przez $\tfrac{2}{3}$
+dla zbioru Cantora. Na osiach, na których każdy krok to dziesięciokrotność,
+każdy z tych przypadków jest prostą, a rysunek~\ref{fig:ch11-three-fates}
+pokazuje wszystkie trzy. Wybrzeża Richardsona dawały właśnie takie proste,
+a Mandelbrot odczytał z ich nachyleń wymiary: około \num{1.25} dla
+zachodniego wybrzeża Wielkiej Brytanii.
+
+\plotfig{ch11-three-fates}{Co dzieje się ze zmierzoną długością, gdy linijka
+się skraca (w prawo). Gładka krzywa się ustala; krzywa Kocha rośnie bez końca,
+a zbiór Cantora kurczy się do zera, każda wzdłuż prostej, której nachylenie to
+jej wymiar minus jeden.}{trzy losy długości}
+
+\Needspace*{12\baselineskip}
+\begin{lab}{l11_01_cantor}{Zbiór Cantora z reguły}
+Napisz \code{cantor}, który zwraca kawałki pozostałe po danej liczbie rund,
+oraz \code{length\_left}, który je sumuje. Potem napisz
+\code{similarity\_dimension}, który zamienia \enquote{tyle kopii, każda
+pomniejszona tyle razy} na wymiar za pomocą \code{math.log}. Test sprawdza
+odcinek, kwadrat, krzywą Kocha i zbiór Cantora oraz to, że $\tfrac{1}{4}$
+przetrwa każdą rundę.
+\end{lab}
+
+\section{Liczenie pudełek}
+\label{sec:ch11-boxes}
+\index{zliczanie pudełek}\index{wymiar!pudełkowy}
+
+\noindent
+Liczenie kopii wymaga reguły, a żadna reguła nie zbudowała wybrzeża. Na
+wszystko, co da się narysować, działa \emph{zliczanie pudełek}: nałóż na
+kształt siatkę kwadratów o boku $s$, policz kwadraty, których dotyka, nazwij
+tę liczbę $N$, zmniejsz $s$ o połowę i policz znowu.
+
+\mermaidfig{ch11-box-recipe}{Zliczanie pudełek w trzech krokach. Przepis
+potrzebuje tylko listy punktów, więc działa na kształtach, których nie
+zbudowała żadna reguła.}{pokryj, policz, nachylenie}
+
+\noindent
+Dla odcinka zmniejszenie pudełka o połowę podwaja liczbę pudełek; dla
+wypełnionego kwadratu mnoży ją przez cztery. W ogólności zmniejszenie
+pudełka o połowę mnoży $N$ przez $2^{D}$ i tak odczytuje się $D$.
+
+\Needspace*{8\baselineskip}
+\begin{think}
+Jeśli wymiar krzywej Kocha naprawdę wynosi \val{ch11.koch.dim}, to mniej
+więcej ile razy więcej pudełek powinna potrzebować po każdym zmniejszeniu
+pudełka o połowę?
+\end{think}
+\reveal{Około $2^{\val{ch11.koch.dim}}$, czyli \val{ch11.koch.halve}: więcej
+niż $2$ dla odcinka i mniej niż $4$ dla kwadratu.}
+Następny listing pokrywa \val{ch11.koch.corners} wierzchołków krzywej z
+rundy $8$ pudełkami od $\tfrac{1}{2}$ do $\tfrac{1}{1024}$, celowo
+połówkami: krzywa jest zbudowana z trzecich, a pomiar, który by to wiedział,
+byłby słabszym sprawdzianem.
+
+\Needspace*{12\baselineskip}
+\pyregion{code/ch11/koch_boxes.py}{count}{Zliczanie pudełek na krzywej Kocha}{lst:ch11-kochboxes}
+
+\Needspace*{13\baselineskip}
+\transcript{ch11-koch-boxes}
+
+\noindent
+Ostatnia kolumna waha się wokół \val{ch11.koch.halve}, bo
+trzecie i połówki do siebie nie pasują. Żeby uśrednić to wahanie, narysuj
+logarytm każdej liczby pudełek względem logarytmu każdego $1/s$. Jeśli $N$
+rośnie jak $(1/s)^{D}$, logarytm zamienia tę potęgę w prostą o nachyleniu
+$D$, a \api{fit\_slope} prowadzi prostą, która przechodzi jak najbliżej
+wszystkich dziesięciu punktów. Jej nachylenie to \val{ch11.koch.boxdim};
+$\ln 4 / \ln 3$ to \val{ch11.koch.dim}.
+
+Nie ufaj tej zgodności bardziej, niż na to zasługuje. Dopasuj prostą do
+dowolnych pięciu sąsiednich rozmiarów zamiast wszystkich dziesięciu, a
+nachylenie wyląduje gdziekolwiek od \val{ch11.koch.five.lo} do
+\val{ch11.koch.five.hi}. Ten rozrzut to uczciwa wielkość błędu i dlatego wymiar
+pudełkowy dopasowuje się w tak szerokim zakresie rozmiarów, na jaki pozwalają
+dane.
+
+\Needspace*{12\baselineskip}
+\begin{lab}{l11_02_boxes}{Policz pudełka sam}
+Napisz \code{count\_boxes}, który mówi, ile kwadratów o danym boku zawiera co
+najmniej jeden punkt, oraz \code{box\_dimension}, który dopasowuje nachylenie
+dla listy rozmiarów. Test sprawdza odcinek, wypełniony kwadrat, krzywą Kocha
+i zbiór Cantora, którego wymiar pudełkowy powinien zgodzić się z wymiarem z
+kopii z pierwszego laboratorium.
+\end{lab}
+
+\section{Kształt, który zostawia chaos}
+\label{sec:ch11-henon}
+\index{atraktor Hénona!wymiar}\index{atraktor dziwny!jako fraktal}
+
+\noindent
+W rozdziale~\ref{ch:strange} punkty odwzorowania Hénona, które przenosi punkt
+$(x, y)$ płaszczyzny w $(1 - \num{1.4}x^{2} + y,\ \num{0.3}x)$, osiadały na
+atraktorze bez żadnego pola, któremu rozciąganie odbiera też skończoną
+długość. Nikt nie zbudował tego kształtu kopia po kopii. To dokładnie ten
+rodzaj obiektu, do którego służy zliczanie pudełek.
+
+\Needspace*{8\baselineskip}
+\begin{think}
+Bez pola i bez skończonej długości. Zanim policzysz choć jedno pudełko: czy
+spodziewasz się, że wymiar atraktora Hénona wynosi $1$, $2$, czy coś
+pomiędzy?
+\end{think}
+\reveal{Coś pomiędzy $1$ a $2$: brak skończonej długości czyni go czymś
+więcej niż krzywą, a brak pola czymś mniej niż powierzchnią. Listing mierzy
+około \val{ch11.henon.dim}.}
+
+\Needspace*{12\baselineskip}
+\pyregion{code/ch11/henon_boxes.py}{count}{Zliczanie pudełek na atraktorze Hénona}{lst:ch11-henonboxes}
+
+\Needspace*{10\baselineskip}
+\transcript{ch11-henon-boxes}
+
+\noindent
+Funkcja \code{attractor} uruchamia odwzorowanie z $(0, 0)$ i zachowuje
+każdy punkt po pierwszym tysiącu kroków. Dla \val{ch11.henon.many} punktów
+nachylenie przez wszystkie dziewięć rozmiarów pudełek wynosi
+\val{ch11.henon.dim}, a przez dowolne pięć sąsiednich leży między
+\val{ch11.henon.five.lo} a \val{ch11.henon.five.hi}. Dla
+\val{ch11.henon.few} punktów spada do \val{ch11.henon.dim.few}: najmniejsze
+pudełka potrzebują wielu punktów, zanim każda cienka warstwa atraktora
+zostanie odwiedzona, więc za mało punktów zostawia pudełka niepoliczone i
+spłaszcza prostą.
+
+Staranne opublikowane pomiary, z dużo większą liczbą punktów i mniejszymi
+pudełkami, dają wymiar około \num{1.26}. Nasz jest nieco niższy, ma rozrzut
+i ma znany powód, by być zaniżony: tak wygląda uczciwy pomiar wymiaru. To,
+że opublikowana wartość zgadza się z wymiarem krzywej Kocha, jest zbiegiem
+okoliczności: te dwa kształty nic o sobie nie wiedzą.
+
+\plotfig{ch11-box-counts}{Z lewej: atraktor Hénona pokryty pudełkami o boku
+$\tfrac{1}{16}$. Z prawej: liczba zajętych pudełek względem liczby pudełek na
+jednostkę długości, na osiach, na których każdy krok to dziesięciokrotność.
+Oba kształty leżą na prostych między przerywanymi prostymi o nachyleniu $1$
+i $2$.}{zliczenia pudełek w skali logarytmicznej}
+
+W tym właśnie sensie atraktory tej części książki są dziwne. Rozciąganie
+czyni je długimi, składanie trzyma je w pudełku, a kształt za długi, by mieć
+długość, i za cienki, by mieć pole, jest fraktalem.
+
+\section{Fraktale w świecie}
+\label{sec:ch11-world}
+\index{fraktal!w przyrodzie}
+
+\noindent
+Kiedy już znasz ten kształt, widzisz go wszędzie. Liść paproci składa się z
+mniejszych listków. Rzeka zbiera strumienie, które zbierają mniejsze
+strumienie. Kalafior romanesco to spirala stożków, z których każdy jest
+spiralą mniejszych stożków. Naczynia krwionośne rozgałęziają się i
+rozgałęziają znowu.
+
+\Needspace*{8\baselineskip}
+\begin{think}
+Twoje płuca muszą przepuszczać tlen do krwi przez cienką powierzchnię, a
+cała ta powierzchnia musi zmieścić się w klatce piersiowej. Dlaczego płuco
+mogłoby być zbudowane jak fraktal, rozgałęziając się raz za razem?
+\end{think}
+\reveal{Bo fraktal mieści ogromną powierzchnię w małej przestrzeni, tak jak
+krzywa Kocha mieści nieograniczoną długość w swoim przerywanym prostokącie.
+Każda runda rozgałęzień mnoży powierzchnię, a klatka piersiowa zostaje tej
+samej wielkości.}
+
+\Needspace*{10\baselineskip}
+\begin{trapbox}
+\textbf{\enquote{Fraktale to ozdoba: ładne obrazki, żadnego pożytku.}}
+Rozgałęzienia w płucach, naczyniach krwionośnych i sieciach rzecznych
+wykonują pracę: docierają do każdego punktu objętości albo krajobrazu i
+mieszczą dużą powierzchnię albo długi brzeg w ograniczonej przestrzeni.
+Kształt jest rozwiązaniem problemu, a jego wymiar to liczba, którą można
+zmierzyć i porównać.
+\end{trapbox}
+
+\Needspace*{9\baselineskip}
+\begin{worldbox}
+W twoich płucach drogi oddechowe dzielą się na dwie mniej więcej
+dwadzieścia trzy razy między tchawicą a maleńkimi pęcherzykami płucnymi, w
+których gaz przechodzi do krwi, i tak mieszczą w klatce piersiowej
+powierzchnię kilkudziesięciu metrów kwadratowych. Fizjolodzy opisują drzewo
+oskrzelowe pojęciami z tego rozdziału: każde pokolenie rozgałęzień to
+mniejsza kopia poprzedniego.
+\end{worldbox}
+
+\noindent
+Każdy z tych kształtów jest fraktalem tylko w pewnym zakresie rozmiarów.
+Krzywa Kocha ma namioty w namiotach aż do samego dołu, bo reguła się nie
+męczy; wybrzeże przestaje pokazywać nowe szczegóły mniej więcej na poziomie
+kamyków i ziaren piasku, paproć na swoich najmniejszych listkach, płuco na
+pęcherzykach o średnicy ułamka milimetra. Kiedy więc ktoś nazywa prawdziwy
+obiekt fraktalem, zapytaj: w jakim zakresie rozmiarów i jak zmierzony?
+Zliczanie pudełek w zakresie tysiąckrotnym to wynik; w zakresie
+trzykrotnym to zgadywanie.
+
+Najsłynniejszy fraktal ze wszystkich powstaje z iterowania reguły na
+punktach płaszczyzny zamiast prostej i jest tematem
+rozdziału~\ref{ch:mandelbrot}.
+
+\begin{summarybox}
+\begin{itemize}
+\item \textbf{Długość} krzywej to wartość, na której ustalają się jej
+  pomiary, gdy linijka się skraca. Gładka krzywa się ustala; wybrzeże rośnie
+  dalej, co odkrył Richardson i o co Mandelbrot zapytał w 1967 roku.
+\item \textbf{Krzywa Kocha} mnoży swoją długość przez $\tfrac{4}{3}$ w każdej
+  rundzie, więc nie ma skończonej długości, a jej wysokość i pole, które
+  ogranicza, pozostają stałe. Jest \textbf{samopodobna}: złożona z mniejszych
+  kopii samej siebie.
+\item \textbf{Zbiór Cantora} zachowuje $\tfrac{2}{3}$ długości w każdej
+  rundzie, więc długości nie zostaje, ale nieskończenie wiele punktów tak.
+  Kształt złożony z kopii samego siebie, każdej pomniejszonej tyle samo
+  razy, ma \textbf{wymiar} $D$, dla którego
+  $\text{pomniejszenie}^{D} = \text{kopie}$: około \val{ch11.koch.dim} dla
+  Kocha i \val{ch11.cantor.dim} dla Cantora. Kształt, którego wymiar nie
+  jest liczbą całkowitą, to \textbf{fraktal}.
+\item \textbf{Zliczanie pudełek} mierzy wymiar z samych punktów: to
+  nachylenie $\ln N$ względem $\ln(1/s)$, gdzie $N$ pudełek o boku $s$
+  dotyka kształtu. Rozrzut dla różnych zakresów rozmiarów to uczciwy błąd.
+\item \textbf{Atraktor Hénona} daje w pomiarze około \val{ch11.henon.dim}
+  (w publikacjach: około \num{1.26}): atraktory dziwne są fraktalami.
+\item Prawdziwe obiekty \textbf{są fraktalami w pewnym zakresie rozmiarów},
+  nigdy aż do samego dołu, a fraktalne rozgałęzienia mieszczą dużą
+  powierzchnię w małej przestrzeni.
+\end{itemize}
+\end{summarybox}
+
+\Needspace*{16\baselineskip}
+\canyou
+
+\Needspace*{9\baselineskip}
+\begin{checkpoint}
+\item Dwa atlasy podają długość tego samego wybrzeża jako $800$ i $1100$
+  kilometrów. Czy oba mogą mieć rację i co każdy powinien był ci powiedzieć?
+  \answerto{Oba mogą mieć rację, jeśli mierzyły różnymi linijkami (na mapach
+  w różnej skali): krótsza linijka obchodzi więcej zatok. Każdy powinien był
+  podać, jakiej linijki albo jakiej skali mapy użył.}
+\item Krzywa Kocha zaczyna jako odcinek o długości $1$. Jak długa jest po
+  trzech rundach?
+  \answerto{$\bigl(\tfrac{4}{3}\bigr)^{3} = \tfrac{64}{27}$, około
+  \num{2.37}.}
+\item Inna reguła dzieli każdy kawałek odcinka na pięć równych części i
+  wyrzuca drugą i czwartą. Ile długości zostaje po jednej rundzie i jaki
+  wymiar ma to, co zostaje na zawsze?
+  \answerto{$\tfrac{3}{5}$ długości. Trzy kopie, każda pomniejszona
+  pięciokrotnie, dają $D = \ln 3 / \ln 5$, około \val{ch11.five.dim}.}
+\item Kształt składa się z $8$ kopii samego siebie, każda pomniejszona
+  $2$ razy. Jaki ma wymiar i jaki znany kształt go ma?
+  \answerto{$2^{3} = 8$, więc $D = 3$: pełny sześcian.}
+\item Zmniejszenie pudełka o połowę zmienia liczbę pudełek ze $100$ na
+  $283$. Jaki jest w przybliżeniu wymiar?
+  \answerto{Około \num{1.5}, bo $2^{\num{1.5}} = 2 \times \sqrt{2}$, czyli
+  około \num{2.83}.}
+\item Dlaczego zmierzony wymiar atraktora Hénona wzrósł, gdy zwiększyła się
+  liczba punktów?
+  \answerto{Za mało punktów zostawia część najmniejszych pudełek
+  nieodwiedzonych, co je zaniża i spłaszcza dopasowaną prostą. Więcej punktów
+  je wypełnia.}
+\item Ktoś mówi ci, że główka brokułu to fraktal. O co powinieneś zapytać?
+  \answerto{W jakim zakresie rozmiarów i jak zmierzony. Prawdziwy obiekt może
+  być fraktalem tylko między pewnym największym a najmniejszym rozmiarem.}
+\end{checkpoint}

@@ -1,0 +1,65 @@
+# ============================================================
+#  code/ -- every listing, lab, measurement and plot in the book, as one uv
+#  project locked to the versions on the copyright page.
+#
+#  The pins here are the SAME versions preamble.tex prints, and
+#  tools/check_structure.py --pins fails when the two disagree. Change a
+#  version in both places or in neither.
+#
+#  Run from this directory:
+#      uv sync --locked                      # the environment, exactly as CI has it
+#      CHAOS_SOLUTIONS=1 uv run pytest       # every listing, every lab SOLUTION
+#      CHAOS_STARTERS=fail uv run pytest labs   # every lab STARTER must fail
+#      uv run ruff check .                   # lint at 79 columns, because the page is
+# ============================================================
+# --8<-- [start:project]
+[project]
+name = "chaos-from-zero"
+version = "0.1.0"
+description = "Listings, labs, measurements and plots for Chaos from Zero"
+readme = "README.md"
+requires-python = ">=3.14,<3.15"
+license = "MIT"
+dependencies = [
+    "numpy==2.5.3",
+    "matplotlib==3.11.2",
+]
+# --8<-- [end:project]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "ruff==0.16.9",
+]
+
+[build-system]
+requires = ["uv_build>=0.8,<0.13"]
+build-backend = "uv_build"
+
+# The one package this project builds is the companion library the book's
+# listings share. Listings, labs and measurements are plain files run by
+# tests and are not packaged.
+[tool.uv.build-backend]
+module-name = "chaoslab"
+module-root = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "labs"]
+pythonpath = ["."]
+addopts = "-q"
+
+[tool.ruff]
+# 79, not 88: that is what fits a listing on the page at \footnotesize
+# without wrapping, and tools/check_structure.py --lines holds every file to it.
+line-length = 79
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+# A measurement or plot script imports the chapter's own listings -- the
+# same rule the page prints, never a second copy -- by putting the chapter's
+# directory on sys.path first. That is an import after code, by design.
+[tool.ruff.lint.per-file-ignores]
+"measure/*.py" = ["E402"]
+"plots/*.py" = ["E402"]

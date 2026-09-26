@@ -1,0 +1,5 @@
+fixed point      0.7436
+one step later   0.7436
+slope there      -1.90
+steps within 0.01 of it, out of 10000: 112
+the first ten: [25, 175, 176, 177, 285, 546, 547, 548, 549, 703]
