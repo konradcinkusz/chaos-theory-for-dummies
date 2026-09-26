@@ -17,7 +17,28 @@ repositories' `CLAUDE.md`, and it is not repeated here.
 
 ## Status
 
-<!-- STATUS-TABLE -->
+| | Done | Remaining |
+|---|---|---|
+| Structure | `body.tex` read by both main files, shared preamble, generated `structure*.tex`, Makefile, CI, parity and structure gates, Mermaid and plot pipelines, lab mechanism | — |
+| Front matter | Title page, copyright, *How to use this book*, Introduction — **both editions** | — |
+| Chapters | **All 18 written, both editions** | — |
+| Appendices | **All 5 written.** A and B generated; C, D, E written; E's ledger computed by `code/measure/ledgers.py` | — |
+| Code | `code/` is a locked uv project: every chapter's listings and labs, `chaoslab` with known-answer tests, a measurement script and a plot script per chapter, and CI runs all of it | — |
+
+**Two editions, one paper size**: A4 at 12pt, one-sided, read on a screen.
+Measured on TeX Live 2023 (Debian) with `newtx`, `inconsolata`, `tex-gyre`
+and `lmodern` installed. CI compiles on a newer full TeX Live, so its page
+counts may differ by a page or two; the zeros are what must agree:
+
+| | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
+|---|---|---|---|---|---|
+| `main-en` | 269 | 0 | 0 | 0 | 0 |
+| `main-pl` | 279 | 0 | 0 | 0 | 0 |
+
+`reflist.py`: 313 labels in each edition, 0 mismatches. Appendix E prints
+the book's own ledgers (listings, labs, tests, questions, values, the
+`verifybox` count) from the tree, so they are not repeated here: a second
+copy of a count is the next thing to go stale.
 
 **Re-measure every row from the build in front of you** after any change,
 and say which TeX installation you measured on (inherited: a bare TeX Live
