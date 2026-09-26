@@ -173,6 +173,21 @@ Source to *GitHub Actions*, once); `release.yml` attaches both to a `v*` tag.
   sets `UV_SYSTEM_CERTS=1`. Not a repository file; recreate it if needed.
 - **A description list with a long bold label overflows.** Appendix D's
   author lists are set `before=\raggedright`.
+- **The Polish decimal comma must be braced.** `\ifpl{,}{.}` hands siunitx a
+  bare comma, which maths mode sets as punctuation with a space after it:
+  "9, 81". The marker is `\ifpl{{,}}{.}`.
+- **A region marker starts at column 0.** An indented `# --8<-- [end:x]` is
+  dropped by listings but its indentation is not, so the listing ends on an
+  empty numbered line. A comment's column is free in Python and ruff does not
+  mind.
+- **Room before a listing is `\Needspace`, not `\needspace`.** The capital
+  form measures the space left exactly; the lower-case one works through glue
+  and turned pages early. `\listingpath` asks for six lines, so a path is
+  never stranded at the foot of a page with its listing overleaf.
+- **A box may not break straight after its title**: both box styles carry
+  `lines before break=4`.
+- **A generator takes argparse or nothing.** `gen_traps.py` once treated any
+  argument other than `--check`, `--help` included, as write mode.
 - Inherited and handled in the preamble: `amssymb` beside `newtxmath`,
   `\IfFileExists` branches needing `##1`, `babel` with a missing language,
   `upquote`, the `--` ligature in typewriter type (disabled for `tt*`), and
@@ -182,4 +197,113 @@ Source to *GitHub Actions*, once); `release.yml` attaches both to a `v*` tag.
 
 ## Resolved questions
 
-<!-- PASS-NOTES -->
+### The first pass, September 2026 --- the whole book, written in parallel
+
+**Chapter 1 was written first and alone, as the exemplar**, into a scaffold
+that already had every gate; chapters 2 to 18 were then written at the same
+time by separate passes that could not see each other, each against its brief
+in `tools/chapters.json` and against `notes/03-authoring-contract.md`, which
+was written for exactly that situation. The front matter and the appendices
+were written by the integrating pass.
+
+**Both sibling books paid for parallel passes in merges**, one per overtaking,
+because every pass appended to the same shared files. This book was laid out
+so that a chapter pass writes only files it owns: its two chapter files, its
+`code/chNN/`, `code/labs/chNN/`, `code/measure/chNN.py`, `code/plots/chNN.py`,
+its diagrams, its value and transcript files, and **its own trap file,
+`notes/traps/chNN.json`**. Nothing a chapter pass writes is written by any
+other, so the whole book merged with no conflicts at all. The two files that
+are genuinely shared --- Appendix B and `notes/02-traps.md` --- are
+*generated* from the per-chapter trap files by `tools/gen_traps.py`, and only
+the integrator runs it.
+
+**The trap numbering cannot collide, by construction.** The Python book's
+catalogue collided three times because each pass took "the next free number"
+from a maximum that was stale on its branch. Here Chapter N numbers its
+entries from `10N + 1`, and `gen_traps.py` refuses an entry outside its
+chapter's block. It is the Python book's final fix applied before the first
+chapter rather than after the third collision.
+
+#### The determinism rule, which neither sibling book needed
+
+A chaotic run amplifies the last-bit differences between two machines'
+`sin`, `exp` and `log` (which are not correctly rounded, and differ between
+libm implementations) into a different trajectory within a few dozen steps.
+So a committed value taken from a chaotic run uses only `+ - * /` and `sqrt`,
+which IEEE 754 rounds correctly everywhere, or it is a robust summary: an
+average over a long run, an exponent to two decimals, a count. Several
+chapter passes went further and **tested their values for robustness** ---
+Chapter 13 nudged every start by 10^-12 rad, changed the step size and added
+random one-ulp noise to `sin` and `cos`, and every committed value survived.
+That is the right test, and it is worth copying: the rule says what not to
+do, and the perturbation says whether you did it.
+
+#### Build traps met in this pass
+
+Recorded in *Build traps* above, with the fixes; the list here is what was
+learnt from them.
+
+- **A diagram render is clamped to mmdc's viewport**, so every wide diagram
+  came out exactly 600 pt and its text shrank to fit. The natural width was
+  unmeasurable until `-w 1600` was passed.
+- **The Polish decimal comma printed as "9, 81".** `\ifpl{,}{.}` strips the
+  argument's braces, so siunitx received a bare comma, which in maths mode is
+  punctuation and gets a thin space after it. `\ifpl{{,}}{.}` keeps it an
+  ordinary symbol. Visible only on the page, in one edition, and in every
+  decimal that edition prints.
+- **A listing's path could be stranded at the foot of a page** with the
+  listing overleaf. `\listingpath` now asks for six lines with `\needspace`.
+- **An indented `# --8<-- [end:x]` marker ends the listing on an empty
+  numbered line**: listings drops the marker text and keeps the indentation.
+  Every region marker under `code/` starts at column 0, which Python allows
+  for a comment anywhere and ruff does not flag.
+- **A breakable box could break straight after its title**, leaving a think
+  question's heading at the foot of one page and its question on the next.
+  Both box styles now carry `lines before break=4`.
+- **`tools/gen_traps.py --help` regenerated the shared files**, because its
+  only argument test was `"--check" in sys.argv`, so anything else meant
+  write mode. It uses argparse now and refuses an unknown argument.
+- **A single-chapter Polish build printed "Answers"**; `build_chapter.py`
+  localises the heading.
+
+#### Overlap between chapters written at the same time
+
+Two passes written in parallel will each introduce what they both need.
+Chapter 2 and Chapter 3 both introduced the slope, used different arrows for
+a rule, and Chapter 2's text printed the answer to Chapter 3's first lab. The
+owner is the earlier chapter: Chapter 3 was rewritten to refer back to
+Chapter 2's slope, to use `\mapsto` throughout, and to replace its first lab.
+**The contract's ownership table is what made this decidable**, and a brief
+that says "introduce X" in two chapters is the thing to look for first when
+the next chapter is revised.
+
+#### Where the chapters departed from their briefs, and why
+
+Each departure was made because the brief would have printed something the
+pass could not verify or that was not true as stated:
+
+- Chapter 8 finds Feigenbaum's delta from the *superstable* parameters (where
+  the orbit passes through the top of the map), by bisection with `+ - * /`
+  only, because split points found by watching an orbit settle come out
+  early, and says why in the chapter.
+- Chapter 12 computes the Mandelbrot bulb centres itself and checks each
+  against the logistic map rather than reading Chapter 8's values; the gap
+  ratio comes out at 4.669 and the Feigenbaum point at c = -1.401. The area
+  of the set is given as grid estimates, because it is not known exactly;
+  why 2 is the escape radius is a sketch in a rigour box.
+- Chapter 11 measured the Hénon attractor's box-counting dimension at 1.23
+  with a million points, and lower with fewer, against the published figure
+  of about 1.26. The chapter quotes the published value, prints its own and
+  says why a finite cloud of points reads low, rather than tuning the
+  measurement until it agreed.
+- Chapter 13 hedged "the release angle grows chaotic with energy" to "higher
+  up", which is what the measurements support, and says that conserved energy
+  does not prove a computed path right: the same release at two step sizes
+  parts after about fifteen seconds.
+- Chapter 3 reads "continuous growth stepped finely" as one law paid in ten
+  instalments, which keeps Euler's method for Chapter 4.
+
+**No history was written from memory that could not be checked.** Where a
+pass was unsure of a date (Shishikura's result, in Chapter 12) it left the
+date out rather than guessing.
+

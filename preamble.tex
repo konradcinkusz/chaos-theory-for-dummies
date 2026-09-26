@@ -261,9 +261,19 @@
 % overleaf: \nobreak alone does not hold, because listings opens with its own
 % vertical material. \needspace asks for room for the path and the first few
 % lines of code, and turns the page first when there is not.
-\IfFileExists{needspace.sty}{\usepackage{needspace}}{\providecommand{\needspace}[1]{}}
+% \Needspace (capital N) measures \pagegoal-\pagetotal exactly; lower-case
+% \needspace works through glue and penalties and was measured, by the
+% Chapter 11 pass, turning pages early and leaving gaps. It must be used
+% between paragraphs, which \listingpath's own \par guarantees. Chapters use
+% \Needspace* too, so the fallback for a machine without the package defines
+% both forms (the star swallowed with its argument).
+\makeatletter
+\IfFileExists{needspace.sty}{\usepackage{needspace}}{%
+  \providecommand{\needspace}[1]{}%
+  \providecommand{\Needspace}{\@ifstar\@gobble\@gobble}}
+\makeatother
 \newcommand{\listingpath}[1]{%
-  \par\medskip\needspace{6\baselineskip}\noindent
+  \par\medskip\Needspace{6\baselineskip}\noindent
   {\ttfamily\footnotesize\color{mgrey}\detokenize{#1}}%
   \par\nobreak}
 
