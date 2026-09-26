@@ -7,9 +7,9 @@ in Chapter 2, and here applied to a curved rule at its fixed points.
 """
 # transcript: ch03-settle
 
-from chaoslab import slope
-
 from crowding import next_gen
+
+from chaoslab import slope
 
 
 # --8<-- [start:measure]

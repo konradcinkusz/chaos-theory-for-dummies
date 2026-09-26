@@ -16,11 +16,11 @@
     "label": "sec:ch12-mset",
     "en": {
       "habit": "Infinite detail means infinite information.",
-      "truth": "Every detail of the edge of the Mandelbrot set follows from one line of algebra, $z \\mapsto z^2 + c$, and one question: does the orbit of $0$ escape? The detail is generated, not stored, and a short description can have an endless consequence."
+      "truth": "Every detail of the edge of the Mandelbrot set follows from one line of algebra, $z \\to z^{2} + c$, and one question: does the orbit of $0$ escape? The detail is generated, not stored, and a short description can have an endless consequence."
     },
     "pl": {
       "habit": "Nieskończenie wiele szczegółów to nieskończenie wiele informacji.",
-      "truth": "Każdy szczegół brzegu zbioru Mandelbrota wynika z jednej linijki algebry, $z \\mapsto z^2 + c$, i jednego pytania: czy orbita $0$ ucieka? Szczegóły są wytwarzane, a nie przechowywane, a krótki opis może mieć nieskończone konsekwencje."
+      "truth": "Każdy szczegół brzegu zbioru Mandelbrota wynika z jednej linijki algebry, $z \\to z^{2} + c$, i jednego pytania: czy orbita $0$ ucieka? Szczegóły są wytwarzane, a nie przechowywane, a krótki opis może mieć nieskończone konsekwencje."
     }
   },
   {
