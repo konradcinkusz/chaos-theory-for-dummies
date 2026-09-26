@@ -41,12 +41,12 @@ def control(lang: str):
     bottom.text(ON + 4, 0.45, T(lang, "controller on",
                                 "sterowanie włączone"),
                 color=RED, fontsize=8)
-    top.set_ylabel("x")
+    top.set_ylabel("$x$")
     top.set_ylim(0, 1)
     bottom.plot(steps, pct, "-", color=RED, lw=0.8)
     bottom.set_ylim(-1.1, 1.1)
     bottom.set_xlabel(T(lang, "step", "krok"))
-    bottom.set_ylabel(T(lang, "change to r (%)", "zmiana r (%)"))
+    bottom.set_ylabel(T(lang, "change to $r$ (%)", "zmiana $r$ (%)"))
     fig.tight_layout()
     return fig
 

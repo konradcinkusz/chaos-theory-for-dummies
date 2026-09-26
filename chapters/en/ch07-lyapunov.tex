@@ -254,9 +254,10 @@ and averages $\ln 4$. A computer run can illustrate the theorem, as the
 figure does, but not prove it. The second is why $r = 4$
 gives exactly $\ln 2$. Write $x$ as $\sin^{2}\theta$ for an angle $\theta$,
 and one line of school trigonometry turns $4x(1 - x)$ into
-$\sin^{2}(2\theta)$: at $r = 4$ the map is doubling an angle in disguise.
-Doubling stretches every error in the angle by exactly $2$, and changing the
-disguise does not change the average rate.
+$\sin^{2}(2\theta)$: at $r = 4$ the map is doubling an angle in disguise,
+which is the doubling map of Chapter~\ref{ch:butterfly} with the angle
+counted in half-turns. Doubling stretches every error in the angle by exactly
+$2$, and changing the disguise does not change the average rate.
 \end{rigourbox}
 
 \begin{lab}{l07_01_exponent}{The exponent, from an orbit}
@@ -334,8 +335,9 @@ slowly once it stops being small. The last two columns are a warning:
 individual starts differ, some by a lot, because the horizon, like the
 exponent, is an average. But look down the rows. Each thousandfold
 improvement adds the same ten steps; measured, the rows are
-\val{ch07.hz.gained} steps apart on average, against a formula's $\ln 1000/\ln 2$, which is
-\val{ch07.ln.thousand} divided by \val{ch07.ln.two}: \val{ch07.extra.thousand}.
+\val{ch07.hz.gained} steps apart on average, against the formula's
+$\ln 1000/\ln 2$, which is \val{ch07.ln.thousand} divided by
+\val{ch07.ln.two}: \val{ch07.extra.thousand}.
 
 \plotfig{ch07-horizon-line}{The horizon against the error in the start, on a
 logarithmic scale with better measurements to the right. The count (dots,
