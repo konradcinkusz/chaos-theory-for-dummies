@@ -2,30 +2,28 @@
 
 A fixed point is a population the rule leaves unchanged. Whether the
 population stays there depends on what one step does to a tiny nudge away
-from it, and that is measured here rather than worked out with calculus.
+from it: the slope, measured by nudging with chaoslab's slope exactly as
+in Chapter 2, and here applied to a curved rule at its fixed points.
 """
 # transcript: ch03-settle
 
+from chaoslab import slope
+
 from crowding import next_gen
 
-# --8<-- [start:slope]
-H = 1e-6  # the nudge: a millionth of the room
 
-
+# --8<-- [start:measure]
 def slope_at(x: float, r: float) -> float:
-    """How much one generation multiplies a tiny nudge at x: nudge x by H
-    to each side and see how far apart the next generations land."""
-    return (next_gen(x + H, r) - next_gen(x - H, r)) / (2 * H)
-# --8<-- [end:slope]
+    """The slope of the crowding rule at x, measured by nudging."""
+    return slope(lambda y: next_gen(y, r), x)
 
 
 def main() -> None:
-    # --8<-- [start:table]
     for r in (1.5, 2.0):
         for x in (0.0, 1 - 1 / r):
             print(f"r = {r}: at x = {x:.4f} the slope is"
                   f" {slope_at(x, r):6.3f}")
-    # --8<-- [end:table]
+# --8<-- [end:measure]
 
 
 if __name__ == "__main__":

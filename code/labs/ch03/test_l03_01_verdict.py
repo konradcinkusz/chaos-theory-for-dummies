@@ -16,7 +16,7 @@ def observed(r: float) -> str:
         sides.append(x > level)
     if abs(x - level) > 0.001:
         return "pushed away"
-    flips = sum(a != b for a, b in zip(sides, sides[1:]))
+    flips = sum(a != b for a, b in zip(sides, sides[1:], strict=False))
     return "swings in" if flips > 5 else "creeps in"
 
 
