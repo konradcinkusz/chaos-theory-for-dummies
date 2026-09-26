@@ -41,7 +41,7 @@ def main() -> None:
         print(line)
     print(f"slope of ln N against ln(1/s): {dimension(SIZES, ns):.3f}")
     print(f"ln 4 / ln 3:                   {math.log(4) / math.log(3):.3f}")
-    # --8<-- [end:count]
+# --8<-- [end:count]
 
 
 if __name__ == "__main__":

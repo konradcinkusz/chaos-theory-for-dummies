@@ -1,5 +1,5 @@
-  error    formula   counted:  mean   fastest  slowest
-  1e-03      6.6              7.4       4       43
-  1e-06     16.6             17.4      13       24
-  1e-09     26.6             27.3      24       34
-  1e-12     36.5             37.3      33       44
+  error   formula   counted: mean   fastest   slowest
+  1e-03       6.6             7.4         4        43
+  1e-06      16.6            17.4        13        24
+  1e-09      26.6            27.3        24        34
+  1e-12      36.5            37.3        33        44

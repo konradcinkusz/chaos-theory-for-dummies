@@ -282,6 +282,11 @@ that belongs to the sine?
 \reveal{The same number. The sine map's gaps shrink by \val{ch08.sine.first}
 at first and then close in, landmark by landmark, on \val{ch08.sine.delta},
 where the logistic map's ratios settle too.}
+\plotfig{ch08-ratios}{Each gap between landmarks divided by the next, for two
+rules with nothing in common but a single smooth hump. They start apart and
+end on the same number.}{the ratios for two rules converging}
+
+\noindent
 The listing knows nothing about the sine map but its family and two brackets
 read off its diagram:
 
@@ -294,10 +299,6 @@ The two roads end in different places (the last row: \val{ch08.end} and
 \val{ch08.sine.end}) and start differently, yet they settle on the same ratio
 to every digit printed. The function \code{ratios} divides each gap by the
 next; the second lab asks you to write it.
-
-\plotfig{ch08-ratios}{Each gap between landmarks divided by the next, for two
-rules with nothing in common but a single smooth hump. They start apart and
-end on the same number.}{the ratios for two rules converging}
 
 \begin{trapbox}
 \textbf{\enquote{A different equation gives a different route.}} It gives

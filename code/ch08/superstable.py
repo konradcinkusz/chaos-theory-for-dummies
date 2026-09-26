@@ -51,12 +51,9 @@ def returns(family: Family, steps: int) -> Callable[[float], float]:
 def landmarks(family: Family, first: tuple[float, float],
               second: tuple[float, float], count: int,
               base: int = 1) -> list[float]:
-    """The superstable landmarks for periods base, 2*base, 4*base, ...
-
-    `first` and `second` bracket the first two, read off the diagram. After
-    that each gap is smaller than the one before, so the next landmark is
-    looked for between a tenth and a half of the last gap further on.
-    """
+    """The landmarks for periods base, 2*base, 4*base, ... `first` and
+    `second` bracket the first two; each later one is sought between a
+    tenth and a half of the last gap beyond the last landmark found."""
     found = [bisect(returns(family, base), *first),
              bisect(returns(family, 2 * base), *second)]
     for n in range(2, count):

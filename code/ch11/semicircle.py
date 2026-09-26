@@ -42,7 +42,7 @@ def main() -> None:
         steps = len(pts) - 1
         ruler = length(pts[:2])       # one step, from the first point
         print(f"{steps:6d}   {ruler:.4f}   {length(pts):.5f}")
-    # --8<-- [end:table]
+# --8<-- [end:table]
 
 
 if __name__ == "__main__":

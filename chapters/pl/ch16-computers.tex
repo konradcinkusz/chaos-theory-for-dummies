@@ -302,9 +302,9 @@ kroku, bo jest warta mniej więcej \val{ch16.right.per.digit} cyfry dwójkowej.
 \begin{trapbox}
 \textbf{\enquote{Więcej miejsc po przecinku czyni symulację dokładną.}}
 Czyni ją poprawną dłużej, o stałą liczbę kroków na cyfrę, nigdy na zawsze.
-Żeby śledzić chaotyczną orbitę przez tysiąc kroków, trzeba nieść mniej więcej
-trzysta cyfr dziesiętnych i znać start równie dokładnie, a tego nie da ci
-żaden pomiar. To okrutna arytmetyka z rozdziału~\ref{ch:lyapunov} od strony
+Żeby śledzić chaotyczną orbitę przez tysiąc kroków, trzeba nieść około
+trzystu cyfr dziesiętnych i znać start równie dokładnie, czego nie da żaden
+pomiar. To okrutna arytmetyka z rozdziału~\ref{ch:lyapunov} od strony
 komputera: precyzja kupuje horyzont dłuższy o stałą, a nie proporcjonalnie.
 \end{trapbox}
 
@@ -330,7 +330,7 @@ powyżej; bierz tę po tej samej stronie co wartość obliczona. Marsz wstecz
 zmniejsza błędy, więc trzyma się blisko obliczonej orbity aż do startu, a to,
 co znajduje, liczone z czterystoma cyframi, jest prawdziwą orbitą reguły.
 
-\pyregion{code/ch16/shadow.py}{back}{Marsz wstecz po obliczonej orbicie w poszukiwaniu prawdziwej orbity, za którą podąża}{lst:ch16-back}
+\pyregion{code/ch16/shadow.py}{back}{Marsz wstecz w poszukiwaniu prawdziwej orbity, za którą podąża obliczona}{lst:ch16-back}
 
 \transcript{ch16-shadow}
 

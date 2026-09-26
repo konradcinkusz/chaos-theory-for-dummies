@@ -43,7 +43,7 @@ def main() -> None:
               f"{dimension(SIZES, ns):.3f}")
         print(f"   through any five in a row:      "
               f"{min(fives):.3f} to {max(fives):.3f}")
-    # --8<-- [end:count]
+# --8<-- [end:count]
 
 
 if __name__ == "__main__":

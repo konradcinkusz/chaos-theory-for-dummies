@@ -36,7 +36,9 @@ def rk4_step(field: Field, state: State, dt: float) -> State:
 
     k1 is the velocity at the start; k2 and k3 are velocities half a step
     ahead; k4 is a full step ahead. The weights 1, 2, 2, 1 are what make the
-    error shrink sixteen-fold when dt is halved, where Euler's only halves.
+    error in the position shrink sixteen-fold when dt is halved, where
+    Euler's only halves. (The slow drift in a spring's energy shrinks faster
+    still, about thirty-two-fold; Chapter 4 measures it.)
     """
     k1 = field(state)
     k2 = field(_add(state, k1, dt / 2))

@@ -59,6 +59,7 @@ You measure a curve on a map with dividers: two compass points set a fixed
 distance apart. Walk them along the coast, count the steps and multiply by
 the step. That fixed distance is your ruler.
 
+\needspace{8\baselineskip}
 \begin{think}
 You measure a stretch of coast twice on the same detailed map: once with the
 dividers set to $10$ kilometres, once set to $1$ kilometre. Which measurement
@@ -77,6 +78,7 @@ circle of radius one, whose length is $\pi$, about \val{ch11.pi} (half of
 the $2\pi$ round a whole circle). Put points on it, walk from each to the
 next in a straight line, and add up the steps. That is the whole ruler:
 
+\needspace{10\baselineskip}
 \pyregion{code/ch11/_ruler.py}{length}{The ruler: add up the straight steps}{lst:ch11-length}
 
 \noindent
@@ -86,8 +88,10 @@ plus up squared, square-rooted. The next listing starts with three points on
 the half circle and, round after round, adds a point on the circle halfway
 between every pair of neighbours, which halves the ruler:
 
+\needspace{9\baselineskip}
 \pyregion{code/ch11/semicircle.py}{table}{Half a circle, measured with shorter and shorter rulers}{lst:ch11-semicircle}
 
+\needspace{10\baselineskip}
 \transcript{ch11-semicircle}
 
 \noindent
@@ -111,6 +115,7 @@ of a triangle, each as long as the piece it replaces, like a tent pitched on
 the middle third. That is round one. Round two does the same to each of the
 four pieces, and so on, for ever.
 
+\needspace{8\baselineskip}
 \begin{think}
 Each round replaces every straight piece with four pieces, each a third as
 long. By what number does the total length get multiplied each round?
@@ -128,8 +133,10 @@ made of four smaller copies again. That is \emph{self-similarity}, the rule
 showing through at every scale. The listing builds rounds $0$ to $6$ and
 measures each with the ruler of Listing~\ref{lst:ch11-length}:
 
+\needspace{11\baselineskip}
 \pyregion{code/ch11/koch_length.py}{table}{The Koch curve, measured round by round}{lst:ch11-koch}
 
+\needspace{9\baselineskip}
 \transcript{ch11-koch-length}
 
 \noindent
@@ -151,6 +158,7 @@ the tent's tip: half a piece along the middle third, then sideways by
 \needspace{18\baselineskip}
 \pyregion{code/src/chaoslab/fractals.py}{koch}{The Koch rule, in chaoslab}{lst:ch11-kochrule}
 
+\needspace{8\baselineskip}
 \begin{think}
 Suppose you could draw every round, for ever, and measure the finished curve
 with a ruler as short as you like. What length would you get?
@@ -160,6 +168,7 @@ measurement grows by $\tfrac{4}{3}$, and it never settles. The finished
 curve is longer than any number you care to name, and it still fits in the
 dashed box.}
 
+\needspace{7\baselineskip}
 \begin{trapbox}
 \textbf{\enquote{A coastline has a length; it is only hard to measure.}} A
 length is what your measurements settle on as the ruler shrinks, and the
@@ -178,6 +187,7 @@ Georg Cantor described a second shape in 1883, and it goes the other way.
 Take the line from $0$ to $1$, cut it into thirds and throw away the middle
 third, keeping its ends. Do the same to each piece that is left, for ever.
 
+\needspace{8\baselineskip}
 \begin{think}
 Throw away middle thirds for ever. How much of the line's length is left at
 the end? And is anything left at all?
@@ -204,6 +214,7 @@ dimension. So a shape made of copies of itself, each shrunk by the same
 factor, has the dimension $D$ with
 \[ \text{shrink}^{D} = \text{copies}. \]
 
+\needspace{8\baselineskip}
 \begin{think}
 The Koch curve is four copies of itself, each shrunk by three. If $3^{D} = 4$,
 is $D$ equal to $1$, to $2$, or somewhere between?
@@ -219,6 +230,7 @@ of itself, each shrunk by three, so its dimension is $\ln 2 / \ln 3$, about
 \val{ch11.cantor.dim}: more than separate points, of dimension $0$, and less
 than a line.
 
+\needspace{7\baselineskip}
 \begin{trapbox}
 \textbf{\enquote{A dimension must be a whole number.}} It is a whole number
 for the shapes you met at school because they are smooth: zoom in on a
@@ -271,6 +283,7 @@ For a line, halving the box doubles the count; for a filled square it
 multiplies the count by four. In general, halving the box multiplies $N$ by
 $2^{D}$, and that is how $D$ is read off.
 
+\needspace{8\baselineskip}
 \begin{think}
 If the Koch curve's dimension really is \val{ch11.koch.dim}, about how many
 times as many boxes should it need each time the box size is halved?
@@ -282,8 +295,10 @@ curve with boxes from $\tfrac{1}{2}$ down to $\tfrac{1}{1024}$, in halves on
 purpose: the curve is built in thirds, and a measurement that knew that
 would be less of a test.
 
+\needspace{12\baselineskip}
 \pyregion{code/ch11/koch_boxes.py}{count}{Box counting on the Koch curve}{lst:ch11-kochboxes}
 
+\needspace{13\baselineskip}
 \transcript{ch11-koch-boxes}
 
 \noindent
@@ -321,6 +336,7 @@ settle onto an attractor with no area at all, whose stretching gives it no
 finite length either. Nobody built that shape copy by copy. It is exactly
 the kind of object box counting is for.
 
+\needspace{8\baselineskip}
 \begin{think}
 No area and no finite length. Before any box is counted: would you expect the
 Hénon attractor's dimension to be $1$, $2$, or something between?
@@ -329,8 +345,10 @@ Hénon attractor's dimension to be $1$, $2$, or something between?
 curve, and no area makes it less than a surface. The listing measures about
 \val{ch11.henon.dim}.}
 
+\needspace{12\baselineskip}
 \pyregion{code/ch11/henon_boxes.py}{count}{Box counting on the Hénon attractor}{lst:ch11-henonboxes}
 
+\needspace{10\baselineskip}
 \transcript{ch11-henon-boxes}
 
 \noindent
@@ -370,6 +388,7 @@ smaller fronds. A river gathers streams that gather smaller streams. A
 romanesco broccoli is a spiral of cones, each a spiral of smaller cones.
 Blood vessels branch, and branch again.
 
+\needspace{8\baselineskip}
 \begin{think}
 Your lungs must pass oxygen into the blood across a thin surface, and all of
 that surface must fit inside your chest. Why might a lung be built like a
@@ -379,6 +398,7 @@ fractal, branching and branching again?
 the Koch curve packs an unlimited length into its dashed box. Every round of
 branching multiplies the surface while the chest stays the same size.}
 
+\needspace{7\baselineskip}
 \begin{trapbox}
 \textbf{\enquote{Fractals are decoration: pretty pictures, no use.}} Branching
 in lungs, blood vessels and river networks does work: it reaches every point
@@ -387,6 +407,7 @@ bounded space. The shape is the solution to a problem, and its dimension is a
 number you can measure and compare.
 \end{trapbox}
 
+\needspace{9\baselineskip}
 \begin{worldbox}
 In your lungs the airways divide in two about twenty-three times between the
 windpipe and the tiny air sacs where gas crosses into the blood, folding a
@@ -432,8 +453,10 @@ Chapter~\ref{ch:mandelbrot}.
 \end{itemize}
 \end{summarybox}
 
+\needspace{16\baselineskip}
 \canyou
 
+\needspace{9\baselineskip}
 \begin{checkpoint}
 \item Two atlases give the same coastline as $800$ and $1100$ kilometres long.
   Can both be right, and what should each have told you?

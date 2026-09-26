@@ -40,7 +40,7 @@ def main() -> None:
         height = max(y for x, y in pts)
         print(f"{n:5d}  {pieces:6d}  {ruler:7.5f}  {length(pts):7.3f}"
               f"  {height:7.4f}  {area(pts):7.4f}")
-    # --8<-- [end:table]
+# --8<-- [end:table]
 
 
 if __name__ == "__main__":
