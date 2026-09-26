@@ -27,17 +27,17 @@
 \noindent
 The forecast on your phone says there is a $70$ per cent chance of rain
 tomorrow afternoon. Seventy per cent of what? Not of the sky, and not of the
-afternoon: nobody expects it to rain on seven tenths of your town for seven
-tenths of the time. The number is a count, and by the end of this chapter you
-will have made one yourself, on a small model of an atmosphere, and checked
+afternoon: nobody expects rain on seven tenths of your town for seven tenths
+of the time. The number is a count, and by the end of this chapter you will
+have made one yourself, on a small model of an atmosphere, and checked
 whether it can be trusted.
 
-This is where Part~II's bad news turns into a method. The atmosphere is
-chaotic: Chapter~\ref{ch:butterfly} showed you two nearby starts parting
-company, and Chapter~\ref{ch:lyapunov} that better measurements buy only a
-little more time. Forecasters could change neither fact. What they changed
-was the question they answered, and that change \dash{} from one forecast to
-many \dash{} is the most successful practical use chaos theory has had.
+This is where Part~II's bad news becomes a method. The atmosphere is
+chaotic, so a single forecast has a horizon, and Chapter~\ref{ch:lyapunov}
+showed that better measurements move it only a little. Forecasters could
+change neither fact. What they changed was the question they answered
+\dash{} from one forecast to many \dash{} and it is the most successful
+practical use chaos theory has had.
 
 \begin{outcomes}
 \outcome{run an ensemble forecast on a toy atmosphere and read its spread as
@@ -55,24 +55,24 @@ many \dash{} is the most successful practical use chaos theory has had.
 \index{Lorenz-96 model}
 
 \noindent
-A weather model divides the air into boxes, gives each box a handful of
-numbers \dash{} temperature, pressure, wind, moisture \dash{} and applies the
-physics of fluids to say how each number changes. The first forecast made
-this way on an electronic computer ran on ENIAC in 1950. Today's global
-models carry many millions of numbers.
+A weather model divides the air into boxes, gives each box a few numbers
+\dash{} temperature, pressure, wind, moisture \dash{} and uses the physics of
+fluids to say how each changes. The first forecast made this way on an
+electronic computer ran on ENIAC in 1950; today's global models carry many
+millions of numbers.
 
 In 1996 Edward Lorenz, whose three equations you met in
 Chapter~\ref{ch:lorenz}, proposed a model small enough to think about and
 big enough to behave like weather. Space $40$ numbers, $x_1$ to $x_{40}$,
 round a circle of latitude, so that each stands for the weather at one place
-and the last one's neighbour is the first. Read the left-hand side below as
+and the last one's neighbour is the first. Read the left-hand side as
 Chapter~\ref{ch:motion} taught you, as how fast $x_i$ is changing:
 \[ \frac{\dd x_i}{\dd t} = (x_{i+1} - x_{i-2})\, x_{i-1} - x_i + F . \]
-In words: each number is carried along by its neighbours (the product,
-which moves weather round the circle as wind does), leaks away (the $-x_i$,
-which plays friction), and is pushed by a steady drive $F$, the
-\emph{forcing}, which plays the sun. Lorenz's standard forcing is
-$F = \val{ch14.forcing}$, and in \pkg{chaoslab} the whole rule is one line:
+In words: each number is carried along by its neighbours (the product, which
+moves weather round the circle as wind does), leaks away (the $-x_i$, which
+plays friction), and is pushed by a steady drive $F$, the \emph{forcing},
+which plays the sun. Lorenz's standard forcing is $F = \val{ch14.forcing}$,
+and in \pkg{chaoslab} the whole rule is one line:
 
 \pyregion{code/src/chaoslab/systems.py}{lorenz96}{Lorenz's forty-number toy atmosphere}{lst:ch14-lorenz96}
 
@@ -86,10 +86,10 @@ each of them does next?
 \end{think}
 \reveal{Nothing. The neighbours cancel, $(8 - 8) \times 8 = 0$, and the leak
 of $8$ cancels the push of $8$, so every rate of change is zero.}
-A perfectly calm atmosphere stays calm. Calm is a fixed point, and as
-Chapter~\ref{ch:feedback} taught you, the question is whether it is stable.
-It is not: the listings below nudge one number by a hundredth and wait, and
-the calm breaks into waves that travel round the circle and never settle.
+A perfectly calm atmosphere stays calm. Calm is a fixed point, and as in
+Chapter~\ref{ch:feedback} the question is whether it is stable. It is not:
+the listings below nudge one number by a hundredth and wait, and the calm
+breaks into waves that travel round the circle and never settle.
 
 Lorenz chose his units so that one time unit is roughly five days of real
 weather, which makes the listings' step of \val{ch14.dt} about six hours.
@@ -108,18 +108,17 @@ analysis is right to within \val{ch14.error} on every one of the forty
 numbers. You know from Chapter~\ref{ch:butterfly} what a single forecast from
 it will do: follow the real weather for a while, and then not.
 
-A weather service cannot know tomorrow's truth while it is forecasting. We
-can, because we play nature ourselves. Run the model once and call that run
-the \emph{truth}; make an analysis by adding an error to it; forecast from
-the analysis; score the forecast against the truth. The model and the truth
-obey the same rule, so every error below comes from the start and none from
-the model. The toy is given every advantage a real forecast lacks.
+A weather service cannot know tomorrow's truth while it forecasts. We can,
+because we play nature ourselves. Run the model once and call that run the
+\emph{truth}; make an analysis by adding an error to it; forecast from the
+analysis; score the forecast against the truth. Model and truth obey the
+same rule, so every error below comes from the start and none from the
+model: the toy has every advantage a real forecast lacks.
 
-Now the new idea. Instead of one forecast from the analysis, make
-\val{ch14.members}. Each \emph{member} starts from the analysis nudged by
-another error of the same size, so the members differ from one another about
-as much as the analysis could differ from the truth. Together they are an
-\emph{ensemble}.
+Now the new idea. Instead of one forecast, make \val{ch14.members}. Each
+\emph{member} starts from the analysis nudged by another error of the same
+size, so the members differ from one another about as much as the analysis
+could differ from the truth. Together they are an \emph{ensemble}.
 
 \pyregion{code/ch14/ensemble.py}{setup}{The toy atmosphere, a calm start, and an error of a given size}{lst:ch14-setup}
 
@@ -129,19 +128,17 @@ as much as the analysis could differ from the truth. Together they are an
 small error to each number. Three scores do the rest. The \emph{ensemble
 mean} averages each number over the members. The \emph{spread} is how far
 the members typically sit from that mean: square each difference, average
-the squares, and take the square root. The \emph{error} is the same recipe
-applied to the difference between a forecast and the truth. Spread and error
-are therefore the same kind of number; the only difference is whether the
-members are compared with each other or with the truth.
+the squares, take the square root. The \emph{error} is the same recipe
+applied to a forecast and the truth. So spread and error are the same kind
+of number, measured against each other or against the truth.
 
 \begin{think}
 The members start within a few hundredths of one another. As the forecast
 runs on, does their spread keep growing for ever?
 \end{think}
-\reveal{No. It grows quickly and then levels off. The members cannot end up
-further apart than two unrelated days of weather, and how far apart those
-are is set by how widely the weather swings, which the attractor keeps
-bounded.}
+\reveal{No. It grows quickly and then levels off: the members cannot end up
+further apart than two unrelated days of weather, and the attractor bounds
+how far apart those can be.}
 
 \pyregion{code/ch14/ensemble.py}{forecast}{An ensemble forecast, scored at each lead time}{lst:ch14-forecast}
 
@@ -151,42 +148,41 @@ bounded.}
 The \emph{lead} is how far ahead the forecast looks, in time units. For the
 first unit or two the spread is small and the ensemble mean is close to the
 truth; by six the spread has stopped growing, because the members have
-forgotten where they started. The single run from the analysis, in the last
-column, is as good as the mean at first and much worse later. Here is the
-number at site 0 for every member, drawn against the truth:
+forgotten their start. The single run from the analysis, in the last column,
+is as good as the mean at first and much worse later. Here is site 0 for
+every member, drawn against the truth:
 
 \plotfig{ch14-plume}{The twenty members of the forecast above at site 0,
 with the truth in amber. They move almost as one for nearly three time
 units, then fan out; by five they are scattered across the weather's whole
-range.}{an
-ensemble plume fanning out}
+range.}{an ensemble plume fanning out}
 
 \begin{think}
-When you make a real forecast you cannot see the truth, so you cannot
-compute the two error columns. Look at the table: could the spread, which
-you can compute, tell you how large the error of the mean is?
+In a real forecast you cannot see the truth, so you cannot compute the two
+error columns. Look at the table: could the spread, which you can compute,
+tell you how large the error of the mean is?
 \end{think}
 \reveal{Yes, roughly. Averaged over \val{ch14.cases} forecasts from different
 days, the spread and the error of the mean are \val{ch14.sp.one} and
 \val{ch14.err.one} at a lead of one time unit, and \val{ch14.sp.three} and
 \val{ch14.err.three} at three.}
-The reason is that the truth is, as far as anyone can tell, one more member:
-it too started within the analysis error of the analysis. So it sits about as
-far from the ensemble mean as the members do, and the width of the plume
-measures the size of the mistake without anybody seeing the truth.
+The truth is, as far as anyone can tell, one more member: the analysis
+differs from it by an error of the same size as the members' nudges. So it
+sits about as far from the ensemble mean as they do, and the width of the
+plume measures the size of the mistake without anyone seeing the truth.
 
 \begin{trapbox}
 \textbf{\enquote{A forecast is a single number.}} A single number is the
 least a forecast can tell you. The ensemble gives a number and a warning
 with it: on a day the members agree, trust the mean; on a day they scatter,
 the same number deserves a shrug. The width of the plume changes from day to
-day with the weather itself, and it is the width that says how far ahead the
-forecast is worth reading.
+day with the weather itself, and it says how far ahead the forecast is worth
+reading.
 \end{trapbox}
 
 \noindent
-A weather centre repeats this every day, and it closes the loop: today's
-analysis is made by blending the new measurements with yesterday's forecast.
+A weather centre does this every day and closes the loop: today's analysis
+is made by blending new measurements with yesterday's forecast.
 
 \mermaidfig{ch14-forecast-cycle}{The forecast cycle. An inexact analysis
 becomes many nudged copies; their spread and their counts become the
@@ -198,12 +194,11 @@ analysis.}{analysis, ensemble, forecast}
 \index{probability forecast}\index{reliability}
 
 \noindent
-Now the seventy per cent. Call site 0 your town, and say that it rains there
+Now the seventy per cent. Call site 0 your town, and say it rains there
 whenever its number is above \val{ch14.rain}. Lorenz's numbers are not rain;
 this is a rule for turning a number into weather, and nothing below depends
-on the choice. In a long run of the model it rains on \val{ch14.clim.rain} per
-cent of occasions, which is the climate of your town; the last section
-measures it.
+on the choice. In a long run it rains on \val{ch14.clim.rain} per cent of
+occasions: that is the climate of your town, measured in the last section.
 
 \begin{think}
 At some lead time, $15$ of the \val{ch14.members} members show rain at your
@@ -218,18 +213,17 @@ which it rains. Here it is for the forecast you have been following.
 \transcript{ch14-rain}
 
 \noindent
-For the first few time units every member agrees that it stays dry, and it
-does. Then they split. At one lead three members in four say rain, and it
-rains; later only one in four says rain, and it rains then too. By the end
-the chances hover near the climate of your town, because the forecast has
-forgotten its start and can only quote how often it rains in general.
+For the first few time units every member says dry, and it stays dry. Then
+they split. At one lead three members in four say rain, and it rains; later
+only one in four does, and it rains then too. By the end the chances hover
+near the climate of your town: the forecast has forgotten its start.
 
 \begin{lab}{l14_01_chance}{A chance of rain, and keeping score}
 Write \api{chance}, which turns a list of members into a probability, and
-\api{hit\_rate}, which scores many forecasts at once: of the forecasts that
-gave a chance within a range, what fraction were followed by rain? One of
-the tests runs the chapter's own forecast and expects your \api{chance} to
-agree with the table above.
+\api{hit\_rate}, which scores many forecasts at once: of those that gave a
+chance within a range, what fraction were followed by rain? One test runs
+the chapter's own forecast and expects your \api{chance} to agree with the
+table above.
 \end{lab}
 
 \begin{think}
@@ -241,7 +235,7 @@ about a quarter of such days it rains, and this may be one of them.}
 
 \begin{trapbox}
 \textbf{\enquote{A 30 per cent chance of rain, followed by rain, was a wrong
-forecast.}} If the forecast was good, it will come true about three times in
+forecast.}} A good forecast of that kind comes true about three times in
 ten, and this was one of them. What would make it wrong is a record: if,
 over hundreds of forecasts of $30$ per cent, it rained on $10$ per cent of
 them, or $60$. Forecasters call the check \emph{reliability}, and it can only
@@ -254,8 +248,8 @@ forecasts, at every site on many different days, each two time units ahead.
 Of the \val{ch14.rel.low.n} occasions on which the ensemble gave rain a chance
 between $25$ and $35$ per cent, it rained on \val{ch14.rel.low} per cent. Of
 the \val{ch14.rel.high.n} on which it gave between $65$ and $75$ per cent, it
-rained on \val{ch14.rel.high} per cent. The ensemble's percentages mean what
-they say, which is the most a probability can promise.
+rained on \val{ch14.rel.high} per cent. The percentages mean what they say,
+which is the most a probability can promise.
 
 \begin{worldbox}
 Every day the European Centre for Medium-Range Weather Forecasts, based in
@@ -263,8 +257,8 @@ Reading, runs an ensemble of about fifty members of its global model, each
 from a slightly different analysis, out to fifteen days ahead. Weather
 services around the world turn ensembles like it, often after a statistical
 correction, into the percentages on your phone and into warnings of storms
-and floods. Ensembles have been run operationally since the early 1990s,
-and a chance of rain on your phone is, behind the scenes, a count much like
+and floods. Ensembles have been run operationally since the early 1990s, and
+the chance of rain on your phone is, behind the scenes, a count much like
 the one in the listing above.
 \end{worldbox}
 
@@ -273,12 +267,12 @@ the one in the listing above.
 \index{forecast skill}\index{climatology}
 
 \noindent
-There is a forecast that needs no model at all: always quote the climate.
-Tomorrow, at any site, the number will be about \val{ch14.clim.average},
-give or take \val{ch14.clim.swing} \dash{} the long-run average and typical
-swing that the last section measures. That forecast is never good, but its
-typical error is never worse than the swing itself. A forecast has
-\emph{skill} only while it beats it.
+One forecast needs no model at all: always quote the climate. Tomorrow, at
+any site, the number will be about \val{ch14.clim.average}, give or take
+\val{ch14.clim.swing} \dash{} the long-run average and typical swing that the
+last section measures. That forecast is never good, but its typical error is
+never worse than the swing. A forecast has \emph{skill} only while it beats
+it.
 
 \begin{think}
 Long after the horizon, the single run from the analysis is one more day of
@@ -306,9 +300,9 @@ shade above the swing because twenty members are not infinitely many.
 \begin{lab}{l14_02_saturation}{When does the ensemble stop spreading?}
 Write \api{spread} for a whole ensemble, then \api{saturation\_lead}: the
 first lead at which the spread reaches nine tenths of the level where it
-finally settles. The test runs the chapter's forecast through your code. One
+settles. The test runs the chapter's forecast through your code. One
 forecast is one roll of the dice, so expect your answer to differ from the
-average over forty forecasts, which is \val{ch14.saturate} time units.
+average over forty forecasts, \val{ch14.saturate} time units.
 \end{lab}
 
 \begin{think}
@@ -326,24 +320,21 @@ tenfold improvement buys the same extra stretch, never ten times as much.
 
 The real atmosphere is less generous than the toy, and Lorenz explained why
 in 1969. It has motions on many scales, from the width of an ocean down to a
-gust, and the small ones go wrong fastest; their errors then spread upwards
-into the large ones. Improve the measurements and the small scales spoil the
-large ones a little later, but they still spoil them. His conclusion, and
-the figure still commonly quoted, is that detailed weather cannot be
-predicted more than about two weeks ahead, however good the data. Forecasts
-have nevertheless improved steadily, through better observations from
-satellites and elsewhere, better models and bigger computers, but the gain
-is usually put at about one day of useful lead time per decade: the
+gust; the small ones go wrong fastest, and their errors spread upwards into
+the large ones. Better measurements delay the damage but do not stop it. His
+conclusion, still the commonly quoted figure, is that detailed weather
+cannot be predicted more than about two weeks ahead, however good the data.
+Forecasts have improved steadily all the same \dash{} better observations,
+not least from satellites, better models, bigger computers \dash{} but the
+gain is usually put at about one day of useful lead time per decade: the
 logarithm in the rule of Chapter~\ref{ch:lyapunov}, paid for in decades.
 
 \begin{rigourbox}
-The two-week figure is not derived in this book, and the toy's horizon is not
-a measurement of it: the toy's horizon moves whenever its analysis error
-does, as you have just seen. The figure comes from estimates of how fast
-errors grow at each scale of the real atmosphere, begun by Lorenz in 1969
-and refined since by comparing the forecasts of weather centres with what
-then happened. The toy shows why there is a horizon; the number for the real
-atmosphere is borrowed.
+The two-week figure is not derived in this book, and the toy's horizon, which
+moves whenever its analysis error does, is not a measurement of it. The
+figure comes from estimates of how fast errors grow at each scale of the
+real atmosphere, begun by Lorenz in 1969 and refined since by comparing
+forecasts with what then happened. The toy shows why there is a horizon.
 \end{rigourbox}
 
 \section{Weather and climate}
@@ -372,18 +363,18 @@ different numbers.}
 \noindent
 This is Chapter~\ref{ch:lorenz}'s discovery on a bigger model: the path is
 unpredictable, the attractor is not, and how often the path visits each
-region is a property of the rule rather than of the start. Weather is the
-path. Climate is the statistics of the attractor. Forecasting the weather is
-an \emph{initial-value} problem: its answer depends on where you start, and
-chaos puts a horizon on it. The climate does not depend on the start at all.
+region belongs to the rule rather than to the start. Weather is the path.
+Climate is the statistics of the attractor. Forecasting the weather is an
+\emph{initial-value} problem, whose answer depends on where you start and
+which chaos gives a horizon. The climate does not depend on the start at all.
 
 \begin{trapbox}
 \textbf{\enquote{If the weather cannot be predicted, the climate cannot be
 predicted either.}} They answer different questions. Chaos limits questions
-about the path: will it rain on this day? Questions about the statistics \dash{}
-how often does it rain, how widely does the weather swing \dash{} have stable
-answers, and the two runs above disagree about every day while agreeing
-about the climate to the figures printed.
+about the path: will it rain on this day? Questions about the statistics
+\dash{} how often does it rain, how widely does the weather swing \dash{} have
+stable answers, and the two runs above disagree about every day while
+agreeing about the climate.
 \end{trapbox}
 
 \noindent
@@ -403,15 +394,13 @@ at $5$.}{climate statistics under two forcings}
 That is the shape of a climate projection. A climate model is run not from
 today's weather but under a changed forcing \dash{} in the real case, a
 changed composition of the atmosphere \dash{} and asked how the statistics
-move: the average, the swing, how often a threshold is crossed. Scientists
-call the answer a \emph{projection} rather than a prediction, because it is
-conditional on the forcing assumed. The forcing is a \emph{boundary
-condition}: it belongs to the rule, not to today's state, so the horizon of
-the weather does not rule the projection out. Whether a particular climate
-model gets the shift right is a different question, answered by testing it
-against the climates of the past, and this toy cannot settle it. What the
-toy shows is the logic: an initial condition decides the weather, and a
-boundary condition decides the climate.
+move. It is called a \emph{projection} rather than a prediction because it
+is conditional on the forcing assumed. The forcing is a \emph{boundary
+condition}: it belongs to the rule, not to today's state, so the weather's
+horizon does not rule the projection out. Whether a particular climate model
+gets the shift right is a different question, answered by testing it against
+past climates, which this toy cannot settle. What it shows is the logic: an
+initial condition decides the weather, a boundary condition the climate.
 
 \begin{summarybox}
 \begin{itemize}
@@ -428,7 +417,7 @@ boundary condition decides the climate.
 \item A forecast has \textbf{skill} while it beats the climate average. A
   single run loses to it at the \textbf{horizon} and ends about $\sqrt{2}$
   times worse; each tenfold better analysis moves the horizon by the same
-  amount, and the real atmosphere's commonly quoted limit is about two weeks.
+  amount, and the commonly quoted limit for real weather is about two weeks.
 \item \textbf{Weather} is the path and depends on the start; \textbf{climate}
   is the statistics of the attractor and does not. A change of forcing, a
   \textbf{boundary condition}, moves the statistics, which is what a
@@ -442,10 +431,10 @@ boundary condition decides the climate.
 \item What is an analysis, and why does a forecast from it go wrong even when
   the model is perfect?
   \answerto{It is the best estimate of the present state, built from
-  measurements that are never exact. The error in it grows, as in any chaotic
+  measurements that are never exact. Its error grows, as in any chaotic
   system, until the forecast has forgotten the start.}
-\item An ensemble of $50$ members has $12$ members showing rain. What is the
-  chance of rain?
+\item An ensemble of $50$ members has $12$ showing rain. What is the chance
+  of rain?
   \answerto{$24$ per cent: $12$ out of $50$.}
 \item Over a year a forecaster said \enquote{$80$ per cent chance of rain}
   $100$ times, and it rained $55$ times. Were those forecasts reliable?

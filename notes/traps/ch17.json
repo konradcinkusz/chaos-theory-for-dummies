@@ -1,0 +1,38 @@
+[
+  {
+    "n": 171,
+    "label": "sec:ch17-nudge",
+    "en": {
+      "habit": "Chaos cannot be controlled.",
+      "truth": "Chaos forbids prediction far ahead, and a controller only needs to predict one step: wait until the orbit passes near an unstable orbit, then cancel each coming miss with a nudge to a parameter. The logistic map at $r = \\num{3.9}$ is held at its unstable fixed point with nudges under one per cent."
+    },
+    "pl": {
+      "habit": "Chaosem nie da się sterować.",
+      "truth": "Chaos zabrania przewidywania na daleką metę, a sterownik musi przewidzieć tylko jeden krok: czeka, aż orbita przejdzie blisko niestabilnej orbity, a potem znosi każde nadchodzące chybienie pchnięciem parametru. Odwzorowanie logistyczne przy $r = \\num{3.9}$ daje się utrzymać w niestabilnym punkcie stałym pchnięciami mniejszymi niż jeden procent."
+    }
+  },
+  {
+    "n": 172,
+    "label": "sec:ch17-small",
+    "en": {
+      "habit": "Controlling a system means overpowering it.",
+      "truth": "The controller supplies none of the motion: it keeps one of the system's own unstable behaviours by cancelling small misses, and once the orbit is caught the nudges shrink to almost nothing. Force, a large permanent change of the parameter, cannot even give the same state."
+    },
+    "pl": {
+      "habit": "Sterować układem to go przemóc.",
+      "truth": "Sterownik nie dostarcza żadnego ruchu: utrzymuje jedno z własnych niestabilnych zachowań układu, znosząc małe chybienia, a gdy orbita zostanie złapana, pchnięcia maleją prawie do zera. Siła, czyli duża i trwała zmiana parametru, nie daje nawet tego samego stanu."
+    }
+  },
+  {
+    "n": 173,
+    "label": "sec:ch17-sync",
+    "en": {
+      "habit": "Two chaotic systems can never agree.",
+      "truth": "Left to themselves they never stay together. Coupled so that one listens to the other, they can agree exactly: a copy of the Lorenz system handed the original's $x$ falls into step with it. The agreement is with the present, not a prediction of the future."
+    },
+    "pl": {
+      "habit": "Dwa układy chaotyczne nigdy nie mogą się zgadzać.",
+      "truth": "Zostawione same sobie nigdy nie pozostaną razem. Sprzężone tak, że jeden słucha drugiego, mogą zgadzać się dokładnie: kopia układu Lorenza, która dostaje $x$ oryginału, zgrywa się z nim. Ta zgodność dotyczy teraźniejszości, a nie przewidywania przyszłości."
+    }
+  }
+]

@@ -89,11 +89,11 @@ shuffling:
 \pyregion{code/ch15/twins.py}{make}{Two series from one: a rule, and the same numbers shuffled}{lst:ch15-make}
 
 \noindent
-The first function iterates the rule. The second copies the list and
-shuffles the copy. \code{random.Random(seed)} is Python's random number
-generator started from a fixed \emph{seed}, so the shuffle is the same on
-every computer and your run will match the page. A series built from another
-by scrambling its order is called a \emph{surrogate}: the hardest random
+The first function iterates the rule; the second shuffles a copy of the
+list with Python's random number generator, started from a fixed
+\emph{seed} so that the shuffle is the same on every computer and your run
+matches the page. A series built from another by scrambling its order is
+called a \emph{surrogate}: the hardest random
 series to tell from the original, because it has exactly the same numbers.
 
 \begin{think}
@@ -140,9 +140,8 @@ series draws its own rule; the shuffled series fills the square. The faint
 lines cut the square into a hundred little squares.}{a curve and a cloud}
 
 \noindent
-A picture is a judgement; a count is a measurement. Cut the unit square into
-a hundred little squares, ten along each side, and count how many the return
-map lands in:
+A picture is a judgement; a count is a measurement. Cut the square into a
+hundred little squares and count how many the return map lands in:
 
 \pyregion{code/ch15/return_map.py}{pairs}{Pairs of neighbours, and the squares they land in}{lst:ch15-pairs}
 
@@ -163,22 +162,23 @@ too coarse misleads.
 \end{lab}
 
 \begin{worldbox}
-In the early 1980s Robert Shaw, a physicist at the University of California
-at Santa Cruz, timed the drops falling from a leaking tap. At some rates of
-flow the drops came at irregular intervals, and when he plotted each
-interval against the next, the points did not fill a cloud: they lay along a
-thin curved shape. A kitchen tap became one of the first laboratory
-demonstrations of chaos from a single measured quantity.
+Robert Shaw, a physicist at the University of California at Santa Cruz,
+timed the drops falling from a leaking tap. At some rates of flow the drops
+came at irregular intervals, and when he plotted each interval against the
+next, the points did not fill a cloud: they lay along a thin curved shape. A
+kitchen tap became one of the best-known demonstrations of chaos read from a
+single measured quantity.
 \end{worldbox}
 
 \noindent
 Shaw measured one thing, the gap between drops, though the water has far more
-going on than one number describes. That he saw a shape is not luck. In 1980 Norman Packard, James Crutchfield, Doyne Farmer and Shaw
-himself showed how to rebuild the shape of a system's motion from one
-measured quantity, by using delayed copies of it \dash{} the reading now, a
-moment ago, a moment before that \dash{} as stand-ins for the numbers nobody
-measured. In 1981 Floris Takens proved that this works. The return map is
-the simplest case: one quantity, one delay.
+going on than one number describes. That he saw a shape is not luck. In 1980
+Norman Packard, James Crutchfield, Doyne Farmer and Shaw himself showed how
+to rebuild the shape of a system's motion from one measured quantity, by
+using delayed copies of it \dash{} the reading now, a moment ago, a moment
+before that \dash{} as stand-ins for the numbers nobody measured. In 1981
+Floris Takens proved that this works. The return map is the simplest case:
+one quantity, one delay.
 
 \begin{rigourbox}
 Takens' theorem in words: for a smooth deterministic system whose state has
@@ -265,11 +265,15 @@ value being forecast, before the rule's doubling has even started.}
 \transcript{ch15-noisy}
 
 \noindent
-The upper table uses the whole record. As the noise grows the curve thickens
-into a band: with noise of up to \val{ch15.noise.big}, a fifth of the whole
+In the upper table, the whole record, the curve thickens into a band as the
+noise grows: with noise of up to \val{ch15.noise.big}, a fifth of the whole
 range, it touches \val{ch15.noise.big.sq} squares. Even so, with
 \val{ch15.n} values the forecast still beats a blind guess,
 \val{ch15.noise.big.err} against \val{ch15.fc.shuf}.
+
+\plotfig{ch15-noisy}{Return maps of the rule's series seen through
+measurement noise of three sizes. The curve thickens into a band, and at the
+largest size the band nearly fills the square.}{a curve thickening in noise}
 
 The lower table is the cruel part. It cuts the record into short pieces and
 counts, out of a hundred, how often each test says the rule's piece is less
@@ -280,10 +284,6 @@ right \val{ch15.short.fc.forty} times. With ten it is right
 chance, and chance look like order.
 And this is the easiest chaos there is, with one number per step; a system
 with many numbers in its state needs a far longer record.
-
-\plotfig{ch15-noisy}{Return maps of the rule's series seen through
-measurement noise of three sizes. The curve thickens into a band, and at the
-largest size the band nearly fills the square.}{a curve thickening in noise}
 
 \begin{lab}{l15_02_forecast}{Ask several analogues}
 With noise in the record, the closest analogue may be close by accident.
@@ -354,8 +354,8 @@ road into chaos of Chapter~\ref{ch:bifurcations}, walked by an epidemic.
 It is also where honesty is needed. In the chaotic setting the model's
 epidemics burn out so completely that at the lowest point fewer than one
 person in $10^{\val{ch15.sir.trough}}$ is infectious. No city has a
-millionth of a person: a real disease would die out. Whether measles was ever chaotic is still argued over. In
-1990 George Sugihara and Robert May applied a forecast by analogues to
+millionth of a person: a real disease would die out. Whether measles was ever
+chaotic is still argued over. In 1990 George Sugihara and Robert May applied a forecast by analogues to
 monthly measles counts from New York City and found this chapter's
 signature, a good forecast that worsened steadily with the horizon, while
 chickenpox in the same city looked like a yearly cycle with noise on top.
@@ -363,17 +363,17 @@ chickenpox in the same city looked like a yearly cycle with noise on top.
 Hearts are harder still. In laboratory experiments reported in 1981, clusters
 of heart cells driven by regular electrical pulses went through period
 doubling into irregular beating. A healthy heart does not beat like a
-metronome either, but the claim that its variability is chaos, popular in the
-1990s, rests on this chapter's tests applied to short noisy records, and
-remains contested. Variability is not the same thing as chaos.
+metronome either, but the once popular claim that its variability is chaos
+rests on this chapter's tests applied to short noisy records, and remains
+contested. Variability is not the same thing as chaos.
 
 \section{Markets, and what a claim of chaos needs}
 \label{sec:ch15-evidence}
 \index{markets}
 
 \noindent
-Prices are the most watched wiggly lines in the world, and in the late 1980s
-many hoped chaos was the pattern beneath them.
+Prices are the most watched wiggly lines in the world, and for a while many
+hoped that chaos was the pattern beneath them.
 
 \begin{think}
 Suppose someone proved that a share price is made by a chaotic rule with only
@@ -398,7 +398,7 @@ Put the chapter together, and a claim of chaos in real data needs:
 
 \begin{itemize}
 \item \textbf{a long record}, long compared with the number of quantities
-  that matter, since close analogues must exist before they can be used;
+  that matter;
 \item \textbf{little noise}, or tests that allow for it;
 \item \textbf{a fair comparison}: the series must beat its surrogates,
   including surrogates that keep its slow ups and downs, because a series

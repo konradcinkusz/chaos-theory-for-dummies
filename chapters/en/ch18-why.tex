@@ -128,7 +128,6 @@ over \val{ch18.apart.starts} different starts:
 
 \transcript{ch18-thousandfold}
 
-\noindent
 \plotfig{ch18-digits}{How far ahead a forecast lasts, against how many
 decimal places of the start are right. Lines are the formula, dots the
 median of many measured pairs of runs. Each extra digit buys the same few
@@ -136,7 +135,8 @@ steps.}{horizon against correct digits}
 
 \noindent
 The formula said \val{ch18.hor.six} and \val{ch18.hor.nine}; the map says
-\val{ch18.apart.six} and \val{ch18.apart.nine}. Every extra correct digit
+\val{ch18.apart.six} and \val{ch18.apart.nine}, a gain of
+\val{ch18.apart.gain}. Every extra correct digit
 buys the same number of steps, $\ln 10 / \lambda = \val{ch18.ln.ten} /
 \val{ch18.lam.logistic}$, about \val{ch18.per.digit} here. The horizon
 grows like the logarithm of your precision, so better instruments and
@@ -148,7 +148,8 @@ of the book's systems side by side:
 \transcript{ch18-horizon}
 
 \noindent
-The Hénon map's errors grow more slowly, so each digit buys it
+The Hénon map's errors grow more slowly, at \val{ch18.lam.henon} per step,
+so each digit buys it
 \val{ch18.per.digit.henon} steps; Lorenz's system, at
 \val{ch18.lam.lorenz} per unit of time, gains \val{ch18.per.digit.lorenz}
 units of time per digit. Plotted against the number of correct digits,

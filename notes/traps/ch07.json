@@ -1,0 +1,38 @@
+[
+  {
+    "n": 71,
+    "label": "sec:ch07-stretch",
+    "en": {
+      "habit": "To find the typical stretch per step, average the stretches.",
+      "truth": "Growth compounds, so the typical factor is the one that, used at every step, gives the same product. Average the logarithms of the stretches, not the stretches: a step of $\\times 4$ and a step of $\\times \\tfrac14$ leave a gap where it was."
+    },
+    "pl": {
+      "habit": "Żeby poznać typowe rozciągnięcie na krok, uśrednij rozciągnięcia.",
+      "truth": "Wzrost się składa, więc typowy czynnik to ten, który użyty w każdym kroku daje ten sam iloczyn. Uśredniaj logarytmy rozciągnięć, nie same rozciągnięcia: krok $\\times 4$ i krok $\\times \\tfrac14$ zostawiają odstęp tam, gdzie był."
+    }
+  },
+  {
+    "n": 72,
+    "label": "sec:ch07-horizon",
+    "en": {
+      "habit": "Ten times better data gives ten times longer forecasts.",
+      "truth": "The horizon is about $\\ln(T/\\delta)/\\lambda$, so a tenfold better start buys a fixed $\\ln 10/\\lambda$ extra steps. For the logistic map at $r = 4$ a thousandfold improvement buys about ten steps, whatever the error was before."
+    },
+    "pl": {
+      "habit": "Dziesięć razy lepsze dane dają dziesięć razy dłuższe prognozy.",
+      "truth": "Horyzont to mniej więcej $\\ln(T/\\delta)/\\lambda$, więc dziesięciokrotnie lepszy stan początkowy daje stałe $\\ln 10/\\lambda$ dodatkowych kroków. Dla odwzorowania logistycznego przy $r = 4$ tysiąckrotna poprawa daje mniej więcej dziesięć kroków, bez względu na wcześniejszy błąd."
+    }
+  },
+  {
+    "n": 73,
+    "label": "sec:ch07-horizon",
+    "en": {
+      "habit": "A bigger computer will eventually make any system predictable.",
+      "truth": "A faster computer does not measure the start any better, and the horizon depends on the error in the start only through its logarithm. Doubling the horizon needs twice as many correct digits; a thousand steps of the logistic map at $r = 4$ would need the start to about three hundred decimal places."
+    },
+    "pl": {
+      "habit": "Większy komputer w końcu uczyni każdy układ przewidywalnym.",
+      "truth": "Szybszy komputer nie mierzy stanu początkowego ani trochę lepiej, a horyzont zależy od błędu stanu początkowego tylko przez jego logarytm. Podwojenie horyzontu wymaga dwa razy więcej poprawnych cyfr; tysiąc kroków odwzorowania logistycznego przy $r = 4$ wymagałoby stanu początkowego z dokładnością do mniej więcej trzystu miejsc po przecinku."
+    }
+  }
+]

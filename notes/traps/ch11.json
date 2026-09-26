@@ -16,11 +16,11 @@
     "label": "sec:ch11-dimension",
     "en": {
       "habit": "A dimension must be a whole number.",
-      "truth": "Counted from copies or from boxes, a dimension is a measurement: the Koch curve's is $\\ln 4 / \\ln 3$, about \\val{ch11.koch.dim}, and the Cantor set's about \\val{ch11.cantor.dim}. Whole numbers belong to smooth shapes."
+      "truth": "Counted from copies or from boxes, a dimension is a measurement, and it need not be whole: the Koch curve's is $\\ln 4 / \\ln 3$, between one and two, and the Cantor set's $\\ln 2 / \\ln 3$, between nothing and one. Whole numbers belong to smooth shapes."
     },
     "pl": {
       "habit": "Wymiar musi być liczbą całkowitą.",
-      "truth": "Liczony z kopii albo z pudełek wymiar jest pomiarem: dla krzywej Kocha wynosi $\\ln 4 / \\ln 3$, około \\val{ch11.koch.dim}, a dla zbioru Cantora około \\val{ch11.cantor.dim}. Liczby całkowite należą do kształtów gładkich."
+      "truth": "Liczony z kopii albo z pudełek wymiar jest pomiarem i nie musi być całkowity: dla krzywej Kocha wynosi $\\ln 4 / \\ln 3$, między jeden a dwa, a dla zbioru Cantora $\\ln 2 / \\ln 3$, między zero a jeden. Liczby całkowite należą do kształtów gładkich."
     }
   },
   {

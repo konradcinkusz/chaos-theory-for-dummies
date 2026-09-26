@@ -288,16 +288,17 @@ pudełka o połowę?
 \end{think}
 \reveal{Około $2^{\val{ch11.koch.dim}}$, czyli \val{ch11.koch.halve}: więcej
 niż $2$ dla odcinka i mniej niż $4$ dla kwadratu.}
+Następny listing pokrywa \val{ch11.koch.corners} wierzchołków krzywej z
+rundy $8$ pudełkami od $\tfrac{1}{2}$ do $\tfrac{1}{1024}$, celowo
+połówkami: krzywa jest zbudowana z trzecich, a pomiar, który by to wiedział,
+byłby słabszym sprawdzianem.
 
 \pyregion{code/ch11/koch_boxes.py}{count}{Zliczanie pudełek na krzywej Kocha}{lst:ch11-kochboxes}
 
 \transcript{ch11-koch-boxes}
 
 \noindent
-Listing pokrywa \val{ch11.koch.corners} wierzchołków krzywej z rundy $8$
-pudełkami od $\tfrac{1}{2}$ do $\tfrac{1}{1024}$, celowo połówkami: krzywa
-jest zbudowana z trzecich, a pomiar, który by to wiedział, byłby słabszym
-sprawdzianem. Ostatnia kolumna waha się wokół \val{ch11.koch.halve}, bo
+Ostatnia kolumna waha się wokół \val{ch11.koch.halve}, bo
 trzecie i połówki do siebie nie pasują. Żeby uśrednić to wahanie, narysuj
 logarytm każdej liczby pudełek względem logarytmu każdego $1/s$. Jeśli $N$
 rośnie jak $(1/s)^{D}$, logarytm zamienia tę potęgę w prostą o nachyleniu

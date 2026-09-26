@@ -94,10 +94,6 @@ każdą liczbę o jeden krok w tempie, jakie ma teraz:
 Potem zapytaj regułę znowu w nowym stanie i powtarzaj. Reguła zmiany stała
 się regułą następnego kroku i dalej działa iteracja.
 
-\mermaidfig{ch04-step-loop}{Metoda Eulera. Reguła podaje tempa w tej chwili;
-mały krok przesuwa tak, jakby się nie zmieniały; w nowym stanie znowu pyta
-się regułę.}{reguła zmiany śledzona krokami}
-
 \pyregion{code/ch04/spring.py}{euler}{Sprężyna śledzona metodą Eulera}{lst:ch04-euler}
 
 \noindent
@@ -105,6 +101,10 @@ się regułę.}{reguła zmiany śledzona krokami}
 \code{energy} dodaje energię ruchu, połowę $v \times v$, do energii
 zmagazynowanej w sprężynie, połowy $k \times x \times x$. Ciężarek startuje z
 $x = 1$, w spoczynku, a kroki trwają \val{ch04.euler.dt} sekundy.
+
+\mermaidfig{ch04-step-loop}{Metoda Eulera. Reguła podaje tempa w tej chwili;
+mały krok przesuwa tak, jakby się nie zmieniały; w nowym stanie znowu pyta
+się regułę.}{reguła zmiany śledzona krokami}
 
 \begin{think}
 Prawdziwa sprężyna bez tarcia drga w nieskończoność, za każdym razem
@@ -217,7 +217,8 @@ nich.}{Euler uciekający spiralą i RK4}
 Napisz energię sprężyny i funkcję, która śledzi sprężynę daną metodą przez
 dany czas i podaje, o ile zmieniła się jej energia. Potem odpowiedz na
 pytanie, które rozdział zostawia otwarte: zmniejsz krok o połowę \dash{} ile
-razy mniejszy stanie się dryf każdej z metod? Przewiduj, zanim uruchomisz.
+razy mniejszy stanie się dryf energii w każdej z metod? (Komentarz w listingu
+RK4 dotyczy błędu położenia, a to inna miara.) Przewiduj, zanim uruchomisz.
 \end{lab}
 
 \section{Mapa wszystkich stanów}
@@ -236,6 +237,26 @@ szybko ten kąt się zmienia. Jego reguła to reguła sprężyny z jedną różn
 siła ciągnąca z powrotem jest największa, gdy wahadło sterczy w bok, a znika,
 gdy wskazuje prosto w dół albo prosto w górę. (To sinus, którego woła reguła
 wahadła z \code{chaoslab}.)
+
+\begin{think}
+Wahadło puszczone dalej ma dłuższą drogę, ale też porusza się szybciej. Czy
+wahadło puszczone z $90$ stopni wychyla się tam i z powrotem dłużej niż
+puszczone z $10$?
+\end{think}
+\reveal{Dłużej: \val{ch04.pend.ninety} sekundy wobec \val{ch04.pend.ten},
+o około \val{ch04.pend.ninety.pct} procent więcej. Puszczone ze $170$
+stopni potrzebuje \val{ch04.pend.big} sekundy, \val{ch04.pend.ratio} razy
+więcej.}
+
+\pyregion{code/ch04/pendulum.py}{period}{Mierzenie czasu wahnięcia wahadła}{lst:ch04-period}
+
+\transcript{ch04-pendulum}
+
+\noindent
+Szkolna reguła, że czas wahnięcia nie zależy od wychylenia, jest prawdziwa
+dla małych wychyleń: czasy zbliżają się do \val{ch04.pend.small} sekundy, gdy
+wychylenie maleje. Dlatego precyzyjny zegar wahadłowy wychyla się ledwie o
+kilka stopni.
 
 Teraz narysuj regułę jako mapę. W każdym punkcie płaszczyzny reguła podaje
 tempa, a więc kierunek, w którym stan zaraz się ruszy. Postaw tam małą
@@ -264,26 +285,6 @@ powrotem, w nieskończoność po tej samej pętli. Droga, która zamyka się sam
 sobie, to \emph{cykl}, a cykl jest doskonale przewidywalny: jedno okrążenie i
 znasz wszystkie następne. Daleko u góry i u dołu drogi biegną przez całą
 szerokość: wahadło przechodzi przez górę i obraca się dalej.
-
-\begin{think}
-Większa pętla jest dłuższa, ale stan porusza się po niej szybciej. Czy
-wahadło puszczone z $90$ stopni wychyla się tam i z powrotem dłużej niż
-puszczone z $10$?
-\end{think}
-\reveal{Dłużej: \val{ch04.pend.ninety} sekundy wobec \val{ch04.pend.ten},
-o około \val{ch04.pend.ninety.pct} procent więcej. Puszczone ze $170$
-stopni potrzebuje \val{ch04.pend.big} sekundy, \val{ch04.pend.ratio} razy
-więcej.}
-
-\pyregion{code/ch04/pendulum.py}{period}{Mierzenie czasu wahnięcia wahadła}{lst:ch04-period}
-
-\transcript{ch04-pendulum}
-
-\noindent
-Szkolna reguła, że czas wahnięcia nie zależy od wychylenia, jest prawdziwa
-dla małych wychyleń: czasy zbliżają się do \val{ch04.pend.small} sekundy, gdy
-wychylenie maleje. Dlatego precyzyjny zegar wahadłowy wychyla się ledwie o
-kilka stopni.
 
 \section{Zatrzymać się, krążyć albo uciec}
 \label{sec:ch04-settle}

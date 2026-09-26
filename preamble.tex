@@ -257,8 +257,13 @@
 
 % The path is printed above every file listing, in the form the reader opens
 % in the editor. \nobreak keeps it on the page of the listing it names.
+% The path must not be stranded at the foot of a page with its listing
+% overleaf: \nobreak alone does not hold, because listings opens with its own
+% vertical material. \needspace asks for room for the path and the first few
+% lines of code, and turns the page first when there is not.
+\IfFileExists{needspace.sty}{\usepackage{needspace}}{\providecommand{\needspace}[1]{}}
 \newcommand{\listingpath}[1]{%
-  \par\medskip\noindent
+  \par\medskip\needspace{6\baselineskip}\noindent
   {\ttfamily\footnotesize\color{mgrey}\detokenize{#1}}%
   \par\nobreak}
 

@@ -213,18 +213,17 @@ Finding that power is the job of the logarithm, which answered \enquote{how
 many steps until} in Chapter~\ref{ch:iteration} and here answers \enquote{how
 many factors of three make four}:
 \[ D = \frac{\ln 4}{\ln 3} \approx \val{ch11.koch.dim}, \]
-where $\ln$ is the natural logarithm on any calculator. The Cantor set is two
-copies of itself, each shrunk by three, so its dimension is $\ln 2 / \ln 3$,
-about \val{ch11.cantor.dim}: more than separate points, which have dimension
-$0$, and less than a line.
+where $\ln$ is a calculator's natural logarithm. The Cantor set is two copies
+of itself, each shrunk by three, so its dimension is $\ln 2 / \ln 3$, about
+\val{ch11.cantor.dim}: more than separate points, of dimension $0$, and less
+than a line.
 
 \begin{trapbox}
 \textbf{\enquote{A dimension must be a whole number.}} It is a whole number
 for the shapes you met at school because they are smooth: zoom in on a
 smooth curve and it looks like a line. Count copies instead of directions
-and dimension becomes a measurement that can come out anywhere. The Koch
-curve's \val{ch11.koch.dim} says something precise: too long to have a
-length, too thin to have an area. A shape whose dimension is not a whole
+and dimension becomes a measurement. The Koch curve's \val{ch11.koch.dim}
+says something precise: too long for a length, too thin for an area. A shape whose dimension is not a whole
 number is what Mandelbrot, in 1975, named a \emph{fractal}, from the Latin
 \emph{fractus}, broken.
 \end{trapbox}
@@ -233,10 +232,10 @@ number is what Mandelbrot, in 1975, named a \emph{fractal}, from the Latin
 Dimension also explains Richardson's rulers. Shrink the ruler by three and
 the measured length is multiplied by $3^{D - 1}$: by $\tfrac{4}{3}$ for the
 Koch curve, by $1$ for anything smooth, by $\tfrac{2}{3}$ for the Cantor set.
-On axes where every step is a factor of ten each is a straight line, and
-Figure~\ref{fig:ch11-three-fates} draws all three. Richardson's coasts gave
-lines of exactly this kind, and Mandelbrot read dimensions off their slopes:
-about \num{1.25} for the west coast of Britain.
+On axes where every step is a factor of ten each is a straight line
+(Figure~\ref{fig:ch11-three-fates}). Richardson's coasts gave such lines,
+and Mandelbrot read dimensions off their slopes: about \num{1.25} for the
+west coast of Britain.
 
 \plotfig{ch11-three-fates}{What happens to a measured length as the ruler
 shrinks (rightwards). A smooth curve settles; the Koch curve climbs for ever
@@ -247,9 +246,8 @@ is its dimension minus one.}{three fates of a length}
 Write \code{cantor}, which returns the pieces left after a number of rounds,
 and \code{length\_left}, which adds them up. Then write
 \code{similarity\_dimension}, which turns \enquote{this many copies, each
-shrunk by this factor} into a dimension with \code{math.log}. The test checks
-the line, the square, the Koch curve and the Cantor set, and that
-$\tfrac{1}{4}$ survives every round.
+shrunk by this factor} into a dimension with \code{math.log}. The test also
+checks that $\tfrac{1}{4}$ survives every round.
 \end{lab}
 
 \section{Counting boxes}
@@ -277,16 +275,17 @@ times as many boxes should it need each time the box size is halved?
 \end{think}
 \reveal{About $2^{\val{ch11.koch.dim}}$, which is \val{ch11.koch.halve}:
 more than a line's $2$ and fewer than a square's $4$.}
+The next listing covers the \val{ch11.koch.corners} corners of the round-$8$
+curve with boxes from $\tfrac{1}{2}$ down to $\tfrac{1}{1024}$, in halves on
+purpose: the curve is built in thirds, and a measurement that knew that
+would be less of a test.
 
 \pyregion{code/ch11/koch_boxes.py}{count}{Box counting on the Koch curve}{lst:ch11-kochboxes}
 
 \transcript{ch11-koch-boxes}
 
 \noindent
-The listing covers the \val{ch11.koch.corners} corners of the round-$8$ curve
-with boxes from $\tfrac{1}{2}$ down to $\tfrac{1}{1024}$, in halves on
-purpose: the curve is built in thirds, and a measurement that knew that
-would be less of a test. The last column wobbles around
+The last column wobbles around
 \val{ch11.koch.halve}, because thirds and halves do not line up. To average
 the wobble away, plot the logarithm of each count against the logarithm of
 each $1/s$. If $N$ grows like $(1/s)^{D}$, the logarithm turns that power

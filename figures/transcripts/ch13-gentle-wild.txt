@@ -1,0 +1,9 @@
+  10 deg   together; largest gap 1e-06 rad
+  30 deg   together; largest gap 2e-06 rad
+  50 deg   together; largest gap 4e-06 rad
+  70 deg   together; largest gap 8e-06 rad
+  90 deg   apart after 16.9 s
+ 110 deg   apart after 12.1 s
+ 130 deg   apart after  8.2 s
+ 150 deg   apart after 10.1 s
+ 170 deg   apart after  5.4 s

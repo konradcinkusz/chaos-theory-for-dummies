@@ -51,6 +51,8 @@ sq_rule, sq_shuf = squares_touched(rule), squares_touched(shuf)
 v.num("sq.rule", sq_rule)
 v.num("sq.shuf", sq_shuf)
 assert sq_rule < 35 and sq_shuf > 95
+# "A longer record would not raise the count": ten times as long, the same.
+assert squares_touched(rule_series(10 * N)) == sq_rule
 # Every pair of the rule's series lies exactly on its graph.
 on_curve = sum(1 for a, b in zip(rule[:-1], rule[1:], strict=True)
                if b == 4.0 * a * (1.0 - a))

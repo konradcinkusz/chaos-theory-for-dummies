@@ -10,6 +10,7 @@ from decimal import Decimal
 
 
 def main() -> None:
+    # --8<-- [start:store]
     print(0.1 + 0.2)
     print(0.1 + 0.2 == 0.3)
     print(Decimal(0.1))              # the exact value stored for 0.1
@@ -18,6 +19,7 @@ def main() -> None:
     print((0.1 + 0.2) + 0.3, 0.1 + (0.2 + 0.3))
     big = float(2**53)
     print(big + 1.0 == big)          # 2**53 + 1 has no room to be stored
+    # --8<-- [end:store]
 
 
 if __name__ == "__main__":

@@ -83,7 +83,7 @@ $\num{0.3}$?
 \reveal{No. The sum prints as a number a whisker above $\num{0.3}$, and the
 comparison answers \code{False}.}
 
-\pyfile{code/ch16/floats.py}{What the computer stores, and what it does with it}{lst:ch16-floats}
+\pyregion{code/ch16/floats.py}{store}{What the computer stores, and what it does with it}{lst:ch16-floats}
 
 \transcript{ch16-floats}
 
@@ -408,7 +408,7 @@ tests; they do not come free with chaos.
 
 \noindent
 A random-number generator is a deterministic rule on a finite set of values,
-built to have one enormous loop. The oldest kind, the \emph{linear
+built to have one enormous loop. The simplest kind, the \emph{linear
 congruential generator}, is one line: multiply by $a$, add $c$, and keep the
 remainder after dividing by $m$. With $a = 5$, $c = 3$ and $m = 16$, from
 $0$ you get $3$, then $5 \times 3 + 3 = 18$, remainder $2$, then $13$, $4$,

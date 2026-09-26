@@ -65,13 +65,15 @@ def sync(lang: str):
         free.append(gap(s[0:3], alone))
         s = rk4_step(drive_and_copy, s, DT)
         alone = rk4_step(ORIGINAL, alone, DT)
+    bound = [e0 * math.exp(-t) for t in ts]
     ax.semilogy(ts, free, color=GREY, lw=0.8,
                 label=T(lang, "copy left alone", "kopia zostawiona sama"))
     ax.semilogy(ts, driven, color=BLUE, lw=1.1,
-                label=T(lang, "copy driven by $x$", "kopia napędzana przez $x$"))
-    ax.semilogy(ts, [e0 * math.exp(-t) for t in ts], color=AMBER, lw=0.8,
-                ls="--", label=T(lang, "guaranteed: $e$ times smaller per unit",
-                                 "gwarancja: $e$ razy mniej na jednostkę"))
+                label=T(lang, "copy driven by $x$",
+                        "kopia napędzana przez $x$"))
+    ax.semilogy(ts, bound, color=AMBER, lw=0.8, ls="--",
+                label=T(lang, "guaranteed: $e$ times smaller per unit",
+                        "gwarancja: $e$ razy mniej na jednostkę"))
     last = max(t for t, e in zip(ts, driven, strict=True) if e == e)
     ax.axvline(last, color=BLUE, lw=0.5, ls=":")
     ax.text(last + 0.5, 1e-6, T(lang, "identical in every\ndigit from here",

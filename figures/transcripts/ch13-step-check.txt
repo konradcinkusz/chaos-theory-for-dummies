@@ -1,0 +1,4 @@
+step 0.0040 s   apart after 10.21 s   energy moved 2.5e-05 J
+step 0.0020 s   apart after 10.21 s   energy moved 1.7e-06 J
+step 0.0010 s   apart after 10.21 s   energy moved 1.1e-07 J
+step 0.0005 s   apart after 10.21 s   energy moved 6.8e-09 J

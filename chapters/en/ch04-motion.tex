@@ -98,10 +98,6 @@ who described it in the eighteenth century. Pick a short length of time, the
 Then ask the rule again at the new state, and repeat. A rule of change has
 become a rule of the next step, and iteration takes over.
 
-\mermaidfig{ch04-step-loop}{Euler's method. The rule gives the rates at this
-instant; a small step moves as if they stayed the same; at the new state the
-rule is asked again.}{a rule of change, followed in steps}
-
 \pyregion{code/ch04/spring.py}{euler}{A spring, followed with Euler's method}{lst:ch04-euler}
 
 \noindent
@@ -109,6 +105,10 @@ rule is asked again.}{a rule of change, followed in steps}
 \code{energy} adds the energy of motion, half of $v \times v$, to the energy
 stored in the spring, half of $k \times x \times x$. The weight starts at
 $x = 1$, at rest, and the steps are \val{ch04.euler.dt} seconds long.
+
+\mermaidfig{ch04-step-loop}{Euler's method. The rule gives the rates at this
+instant; a small step moves as if they stayed the same; at the new state the
+rule is asked again.}{a rule of change, followed in steps}
 
 \begin{think}
 A real spring with no friction swings for ever, reaching the same distance
@@ -219,7 +219,9 @@ energy each one reports.}{Euler spiralling out against RK4}
 Write the spring's energy, and a function that follows the spring with a
 given stepper for a given time and reports how much its energy has changed.
 Then answer a question the chapter leaves open: halve the step, and how many
-times smaller does each method's drift become? Predict before you run.
+times smaller does each method's drift in energy become? (The comment in the
+RK4 listing is about the error in position, a different measure.) Predict
+before you run.
 \end{lab}
 
 \section{The map of every state}
@@ -238,6 +240,25 @@ straight down and how fast that angle is changing. Its rule is the spring's
 with one difference: the pull back is largest when the pendulum sticks out
 sideways and falls to nothing when it points straight down or straight up.
 (That is the sine, which \code{chaoslab}'s pendulum rule calls.)
+
+\begin{think}
+Released further out, a pendulum has further to go, but it also moves
+faster. Does a pendulum released at $90$ degrees take longer to swing out and
+back than one released at $10$?
+\end{think}
+\reveal{Longer: \val{ch04.pend.ninety} seconds against \val{ch04.pend.ten},
+about \val{ch04.pend.ninety.pct} per cent more. Released at $170$ degrees it
+takes \val{ch04.pend.big} seconds, \val{ch04.pend.ratio} times as long.}
+
+\pyregion{code/ch04/pendulum.py}{period}{Timing a pendulum's swing}{lst:ch04-period}
+
+\transcript{ch04-pendulum}
+
+\noindent
+The school rule that the swing time does not depend on the swing is right for
+small swings: the times settle on \val{ch04.pend.small} seconds as the swing
+shrinks. That is why a precision pendulum clock swings through only a few
+degrees.
 
 Now draw the rule as a map. At every point of the plane the rule gives the
 rates, and so the direction the state is about to move in. Put a small arrow
@@ -265,25 +286,6 @@ round the same loop for ever. A path that closes on itself is a
 \emph{cycle}, and a cycle is perfectly predictable: once round, and you know
 every later lap. Far above and below, the paths run the whole width: the
 pendulum goes over the top and keeps turning.
-
-\begin{think}
-A bigger loop is longer, but the state moves faster round it. Does a
-pendulum released at $90$ degrees take longer to swing out and back than one
-released at $10$?
-\end{think}
-\reveal{Longer: \val{ch04.pend.ninety} seconds against \val{ch04.pend.ten},
-about \val{ch04.pend.ninety.pct} per cent more. Released at $170$ degrees it
-takes \val{ch04.pend.big} seconds, \val{ch04.pend.ratio} times as long.}
-
-\pyregion{code/ch04/pendulum.py}{period}{Timing a pendulum's swing}{lst:ch04-period}
-
-\transcript{ch04-pendulum}
-
-\noindent
-The school rule that the swing time does not depend on the swing is right for
-small swings: the times settle on \val{ch04.pend.small} seconds as the swing
-shrinks. That is why a precision pendulum clock swings through only a few
-degrees.
 
 \section{Settle, cycle or run off}
 \label{sec:ch04-settle}

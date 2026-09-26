@@ -1,0 +1,8 @@
+season  cases per thousand people, eight years running
+   0.0    19   19   19   19   19   19   19   19
+   0.1    24   13   24   13   24   13   24   13
+   0.3    33    7   32    4   33    7   32    4
+   0.4     0   38   44    0    0    0   75    9
+the same, starting one part in a billion more susceptible:
+   0.1    24   13   24   13   24   13   24   13
+   0.4     0   39   29    0    0   56   25    0
