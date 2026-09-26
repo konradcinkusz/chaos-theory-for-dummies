@@ -1,0 +1,38 @@
+[
+  {
+    "n": 111,
+    "label": "sec:ch11-koch",
+    "en": {
+      "habit": "A coastline has a length; it is only hard to measure.",
+      "truth": "A length is what measurements settle on as the ruler shrinks, and a coast's measurements do not settle: the Koch curve's grow by $\\tfrac{4}{3}$ every time the ruler shrinks by three. A coastline's length is a fact about the coast and the ruler together."
+    },
+    "pl": {
+      "habit": "Wybrzeże ma długość, tylko trudno ją zmierzyć.",
+      "truth": "Długość to wartość, na której ustalają się pomiary, gdy linijka się skraca, a pomiary wybrzeża się nie ustalają: pomiary krzywej Kocha rosną $\\tfrac{4}{3}$ razy przy każdym trzykrotnym skróceniu linijki. Długość wybrzeża to fakt o wybrzeżu i o linijce naraz."
+    }
+  },
+  {
+    "n": 112,
+    "label": "sec:ch11-dimension",
+    "en": {
+      "habit": "A dimension must be a whole number.",
+      "truth": "Counted from copies or from boxes, a dimension is a measurement: the Koch curve's is $\\ln 4 / \\ln 3$, about \\val{ch11.koch.dim}, and the Cantor set's about \\val{ch11.cantor.dim}. Whole numbers belong to smooth shapes."
+    },
+    "pl": {
+      "habit": "Wymiar musi być liczbą całkowitą.",
+      "truth": "Liczony z kopii albo z pudełek wymiar jest pomiarem: dla krzywej Kocha wynosi $\\ln 4 / \\ln 3$, około \\val{ch11.koch.dim}, a dla zbioru Cantora około \\val{ch11.cantor.dim}. Liczby całkowite należą do kształtów gładkich."
+    }
+  },
+  {
+    "n": 113,
+    "label": "sec:ch11-world",
+    "en": {
+      "habit": "Fractals are decoration: pretty pictures, no use.",
+      "truth": "Fractal branching in lungs, blood vessels and rivers does work: it packs a large surface or a long edge into a bounded space. Real objects are fractal only over a range of sizes, and a claimed dimension should say which."
+    },
+    "pl": {
+      "habit": "Fraktale to ozdoba: ładne obrazki, żadnego pożytku.",
+      "truth": "Fraktalne rozgałęzienia w płucach, naczyniach krwionośnych i rzekach wykonują pracę: mieszczą dużą powierzchnię albo długi brzeg w ograniczonej przestrzeni. Prawdziwe obiekty są fraktalami tylko w pewnym zakresie rozmiarów, a podany wymiar powinien mówić w jakim."
+    }
+  }
+]
