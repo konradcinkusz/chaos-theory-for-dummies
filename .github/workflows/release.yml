@@ -1,0 +1,103 @@
+name: Release
+
+# Builds both editions and attaches the PDFs to a GitHub Release, on a tag:
+#
+#   git tag -a v0.1.0 -m "First complete draft"
+#   git push origin v0.1.0
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to build a release for'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build both editions and release
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      # A tag is not checked by build.yml before it publishes, so the release
+      # runs the same gates.
+      - name: The source gates
+        run: |
+          python3 tools/gen_stubs.py --check
+          python3 tools/gen_traps.py --check
+          python3 tools/parity.py
+          python3 tools/check_structure.py --all
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.13"
+      - name: Run every listing and lab, refuse to release on drift, draw plots
+        run: |
+          cd code
+          uv sync --locked
+          uv run ruff check .
+          CHAOS_SOLUTIONS=1 uv run pytest
+          CHAOS_STARTERS=fail uv run pytest labs
+          for f in measure/*.py; do
+            case "$(basename "$f")" in _*) continue;; esac
+            uv run python "$f"
+          done
+          for f in plots/ch*.py; do uv run python "$f"; done
+          cd ..
+          if [ -n "$(git diff --name-only -- figures/values figures/transcripts)" ]; then
+            echo "::error::A computed value has drifted from its script."; exit 1
+          fi
+          { echo '% Generated in CI --- do not edit.';
+            for v in figures/values/*.tex; do
+              case "$v" in */all.tex) continue;; esac
+              echo "\\input{${v%.tex}}"
+            done; } > figures/values/all.tex
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Render diagrams
+        run: |
+          shopt -s nullglob
+          SRC=(figures/mermaid/*/*.mmd)
+          [ ${#SRC[@]} -eq 0 ] && exit 0
+          printf '{"args":["--no-sandbox","--disable-dev-shm-usage"]}\n' > .puppeteer.json
+          npm install -g @mermaid-js/mermaid-cli@11
+          for f in "${SRC[@]}"; do
+            lang=$(basename "$(dirname "$f")"); key=$(basename "$f" .mmd)
+            mkdir -p "figures/diagrams/$lang"
+            timeout 180 mmdc -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
+              -p .puppeteer.json -c figures/mermaid/config.json \
+              -b transparent --pdfFit -w 1600
+          done
+      - name: Compile the English edition
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main-en.tex
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+      - name: Compile the Polish edition
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main-pl.tex
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+      - name: Check both logs properly
+        run: python3 tools/checklog.py main-en.log main-pl.log
+      - name: Attach the PDFs to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          cp main-en.pdf Chaos-from-Zero.pdf
+          cp main-pl.pdf Chaos-od-zera.pdf
+          gh release view "$TAG" >/dev/null 2>&1 || \
+            gh release create "$TAG" --title "Chaos from Zero $TAG" --notes "Both editions, built from $TAG."
+          gh release upload "$TAG" Chaos-from-Zero.pdf Chaos-od-zera.pdf --clobber

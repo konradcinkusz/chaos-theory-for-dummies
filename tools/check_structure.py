@@ -453,6 +453,8 @@ def main() -> int:
     ap.add_argument("--all", action="store_true",
                     help="every check except --stubs, which is a ledger")
     ap.add_argument("--soft", action="store_true", help="report and exit 0")
+    ap.add_argument("--only", metavar="chNN",
+                    help="keep only the failures that mention this chapter")
     a = ap.parse_args()
     chosen = [n for n in CHECKS if getattr(a, n)]
     if a.all:
@@ -462,7 +464,13 @@ def main() -> int:
         return 2
     ok = True
     for n in chosen:
-        ok &= CHECKS[n]().show()
+        res = CHECKS[n]()
+        if a.only:
+            k = a.only
+            res.fails = [f for f in res.fails
+                         if k in f or ("l" + k[2:] + "_") in f]
+            res.notes = [x for x in res.notes if k in x]
+        ok &= res.show()
     return 0 if ok or a.soft else 1
 
 

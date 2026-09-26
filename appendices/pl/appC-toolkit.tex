@@ -1,19 +1,148 @@
-%% appC --- Matematyka, której potrzebujesz, na czterech stronach
+%% appC --- The mathematics you need, on four pages
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
-%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
-%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
-%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
-%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
-%% już generowany.
+%% A reference, not a lesson: each tool is introduced properly in the chapter
+%% named beside it, and this appendix is where you look it up again. The few
+%% constants it quotes come from code/measure/appc.py.
+%%
+%% Twin: appendices/en/appC-toolkit.tex.
 
 \chapter{Matematyka, której potrzebujesz, na czterech stronach}
 \label{app:toolkit}
 
-\chapterstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\noindent
+Każde narzędzie, którego używa książka, w jednym miejscu, z rozdziałem, który
+je wprowadza. Jeśli w środku rozdziału zatrzyma cię jakiś symbol, znajdziesz
+go tutaj.
 
-Notation and the handful of tools the book uses \dash{} powers, logarithms,
-the slope of a curve measured numerically, sums and averages, complex
-numbers \dash{} each with the chapter that introduces it.
-}
+\section{Bardzo duże i bardzo małe liczby}
+\label{sec:appc-numbers}
+
+\noindent
+Liczbę taką jak $\num{0.00000000015}$ trudno odczytać, więc zapisuje się ją
+jako $\num{1.5} \times 10^{-10}$: cyfry, które mają znaczenie, i o ile miejsc
+przesunąć przecinek. $10^{3}$ to tysiąc, $10^{6}$ milion, a potęga ujemna
+przesuwa w drugą stronę, więc $10^{-3}$ to jedna tysięczna. Kiedy książka
+mówi, że dwie liczby różnią się \enquote{na dziesiątym miejscu po
+przecinku}, ma na myśli różnicę rzędu $10^{-10}$. Książka zaokrągla to, co
+drukuje, i mówi, ile cyfr zostawia: wynik jest wart tylko tylu cyfr, ile może
+potwierdzić stojący za nim pomiar (rozdział~\ref{ch:models}).
+
+\section{Reguły, kroki i orbity}
+\label{sec:appc-steps}
+
+\noindent
+Regułę, która zamienia teraźniejszość w następną chwilę, zapisuje się tak:
+\[ x_{n+1} = f(x_{n}), \]
+co czytamy \enquote{następne $x$ to $f$ od tego $x$}. Małe $n$ pod linią
+liczy kroki: $x_{0}$ to początek, $x_{1}$ stan po jednym kroku i tak dalej.
+Całą listę $x_{0}, x_{1}, x_{2}, \ldots$ nazywamy \emph{orbitą}.
+\emph{Punkt stały} to stan, który reguła zostawia na miejscu, czyli
+rozwiązanie równania $x = f(x)$ (rozdział~\ref{ch:iteration}).
+
+\section{Potęgi, wzrost i połowienie}
+\label{sec:appc-powers}
+
+\noindent
+Wielokrotne mnożenie przez ten sam czynnik $a$ daje potęgi:
+$a \times a \times a = a^{3}$, a $n$ kroków mnożenia przez $a$ mnoży przez
+$a^{n}$. Jeśli $a$ jest większe od $1$, wynik rośnie coraz szybciej; jeśli
+leży między $0$ a $1$, maleje do zera. Dziesięć podwojeń mnoży przez
+$2^{10} = 1024$, niewiele ponad tysiąc, co warto zapamiętać: dziesięć
+podwojeń to tysiąc, dwadzieścia to milion, a trzydzieści miliard
+(rozdziały~\ref{ch:iteration}, \ref{ch:feedback} i~\ref{ch:butterfly}).
+
+\section{Logarytmy}
+\label{sec:appc-logs}
+
+\noindent
+Logarytm odpowiada na pytanie \enquote{ile razy?}. Logarytm naturalny,
+zapisywany $\ln$, zamienia mnożenie w dodawanie:
+\[ \ln(a \times b) = \ln a + \ln b . \]
+Jeśli więc błąd w każdym kroku mnoży się przez $2$, to $\ln$ błędu rośnie w
+każdym kroku o $\ln 2 \approx \val{appc.ln2}$, czyli o stałą wielkość, a stałą
+wielkość można uśrednić i porównać. Liczbę, której $\ln$ wynosi $1$,
+nazywamy $e \approx \val{appc.e}$, a $\ln 10 \approx \val{appc.ln10}$.
+
+Na pytanie \enquote{ile podwojeń mnoży przez $N$?} odpowiedź brzmi
+$\ln N / \ln 2$. Pomnożenie przez tysiąc wymaga około
+\val{appc.doublings.thousand} podwojeń, a jedna dodatkowa cyfra dziesiętna
+dokładności jest warta około \val{appc.doublings.per.digit} podwojenia. Ten
+jeden fakt stoi za horyzontem prognozy z rozdziału~\ref{ch:lyapunov} i za
+całym wywodem książki o przewidywaniu: za dokładność płaci się cyframi, a
+każda cyfra kupuje tylko stałą liczbę kroków.
+
+\section{Nachylenie krzywej}
+\label{sec:appc-slope}
+
+\noindent
+Jak stroma jest krzywa w danym punkcie? Przesuń wejście o malutkie $h$ w
+obie strony, zobacz, o ile zmienia się wyjście, i podziel:
+\[ \text{nachylenie } f \text{ w } x \approx \frac{f(x+h) - f(x-h)}{2h} . \]
+Dla $f(x) = x^{3}$ w punkcie $x = 2$ dokładne nachylenie wynosi $12$, a przy
+$h = \val{appc.slope.h}$ przepis daje \val{appc.slope.approx}. Nachylenie
+mówi, jak bardzo błąd wejścia zostaje powiększony na wyjściu: nachylenie $3$
+go potraja, nachylenie $-\tfrac{1}{2}$ go połowi i odwraca znak. Wielkość
+liczby bez jej znaku zapisuje się między kreskami, $\abs{-3} = 3$
+(rozdział~\ref{ch:iteration}).
+
+\section{Tempo zmian}
+\label{sec:appc-rates}
+
+\noindent
+Kiedy czas płynie gładko, a nie krokami, reguła mówi, jak szybko każda
+wielkość zmienia się w tej chwili. Zapisuje się to tak:
+\[ \frac{\dd x}{\dd t} = \text{(jakiś wzór)}, \]
+co czytamy \enquote{tempo zmiany $x$ w czasie}. W tej książce nigdy nie
+trzeba rozwiązywać takiej reguły algebrą: komputer podąża za nią w wielu
+małych krokach czasu, a rozdział~\ref{ch:motion} pokazuje, jak robić to
+dobrze.
+
+\section{Sumy i średnie}
+\label{sec:appc-sums}
+
+\noindent
+Długą sumę zapisuje się wielką grecką literą sigma:
+\[ \sum_{n=1}^{N} a_{n} = a_{1} + a_{2} + \cdots + a_{N} , \]
+a średnia $N$ liczb to ta suma podzielona przez $N$. Wykładnik Lapunowa z
+rozdziału~\ref{ch:lyapunov} jest właśnie taką średnią: średnią z $\ln$ tego,
+jak bardzo każdy krok rozciąga mały błąd.
+
+\section{Reszty}
+\label{sec:appc-mod}
+
+\noindent
+\enquote{$x \bmod 1$} znaczy \enquote{odrzuć część całkowitą i zostaw to, co
+po przecinku}, więc $\num{2.75} \bmod 1 = \num{0.75}$.
+Rozdział~\ref{ch:butterfly} używa tego, żeby trzymać liczbę między $0$ a $1$.
+
+\section{Liczby zespolone}
+\label{sec:appc-complex}
+
+\noindent
+Liczba zespolona to punkt na płaszczyźnie, zapisywany $a + b\iu$: $a$ kroków
+w bok i $b$ kroków w górę. Dodawanie dwóch takich liczb dodaje kroki.
+Mnożenie korzysta ze zwykłej algebry i jednej nowej reguły,
+$\iu \times \iu = -1$, więc
+\[ (1 + 2\iu)(3 + 4\iu) = 3 + 4\iu + 6\iu + 8\iu^{2} = -5 + 10\iu . \]
+Odległość $a + b\iu$ od środka płaszczyzny wynosi $\sqrt{a^{2} + b^{2}}$
+(rozdział~\ref{ch:mandelbrot}).
+
+\section{Litery greckie}
+\label{sec:appc-greek}
+
+\noindent
+Książka używa kilku, zawsze do tego samego:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Litera & Nazwa & Co oznacza w tej książce \\
+\midrule
+$\lambda$ & lambda & wykładnik Lapunowa (rozdział~\ref{ch:lyapunov}) \\
+$\delta$ & delta & stała Feigenbauma (rozdział~\ref{ch:bifurcations}) \\
+$\sigma, \rho, \beta$ & sigma, rho, beta & trzy ustawienia Lorenza (rozdział~\ref{ch:lorenz}) \\
+$\varepsilon$ & epsilon & mały błąd albo małe pchnięcie \\
+$\Sigma$ & wielka sigma & suma \\
+\bottomrule
+\end{tabular}
+\end{center}

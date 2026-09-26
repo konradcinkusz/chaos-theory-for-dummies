@@ -1,0 +1,26 @@
+[
+  {
+    "n": 11,
+    "label": "sec:ch01-parts",
+    "en": {
+      "habit": "A model is a copy of reality.",
+      "truth": "A model is a machine for answering questions: numbers in, numbers out, and the only fair test is whether its answers agree with what you then measure."
+    },
+    "pl": {
+      "habit": "Model to kopia rzeczywistości.",
+      "truth": "Model to maszyna do odpowiadania na pytania: liczby na wejściu, liczby na wyjściu, a jedyny uczciwy test to zgodność jego odpowiedzi z tym, co potem zmierzysz."
+    }
+  },
+  {
+    "n": 12,
+    "label": "sec:ch01-wrong",
+    "en": {
+      "habit": "A model that is wrong is useless.",
+      "truth": "Every model is wrong, because it leaves something out. The useful question is whether it is good enough, for this question, over this range."
+    },
+    "pl": {
+      "habit": "Model, który jest błędny, jest bezużyteczny.",
+      "truth": "Każdy model jest błędny, bo coś pomija. Użyteczne pytanie brzmi: czy jest wystarczająco dobry do tego pytania, w tym zakresie."
+    }
+  }
+]

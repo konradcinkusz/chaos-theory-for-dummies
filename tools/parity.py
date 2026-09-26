@@ -501,7 +501,11 @@ def check_notation(rep: Report, path: Path) -> None:
     prose = LISTING_SPAN.sub(lambda m: " " * len(m.group(0)), prose)
     for _ in range(2):
         prose = skip.sub(lambda m: " " * len(m.group(0)), prose)
-    for d in re.finditer(r"(?<![\w.\\/-])\d+\.\d+(?![\w.])", prose):
+    # A length like 0.9\\linewidth is a layout decision, not a number the
+    # reader reads, and the same in both editions.
+    lengths = r"\s*\\(?:linewidth|textwidth|textheight|columnwidth|baselineskip)"
+    for d in re.finditer(r"(?<![\w.\\/-])\d+\.\d+(?![\w.]|" + lengths + ")",
+                         prose):
         rep.bad("C10-notation",
                 f"{rel}:{prose.count(chr(10), 0, d.start())+1} bare decimal "
                 f"{d.group(0)!r} in prose -- write \\num{{{d.group(0)}}} so the "
@@ -687,8 +691,24 @@ def check_main_files(rep: Report) -> None:
 
 # --------------------------------------------------------------------------
 
+def only_filter() -> str | None:
+    """--only chNN keeps only the failures and warnings that mention that
+    chapter (its file, its value keys, its lab keys), so a pass writing one
+    chapter is not distracted by another chapter still being written."""
+    if "--only" in sys.argv:
+        i = sys.argv.index("--only")
+        if i + 1 < len(sys.argv):
+            return sys.argv[i + 1]
+    return None
+
+
+def mentions(line: str, key: str) -> bool:
+    return key in line or ("l" + key[2:] + "_") in line
+
+
 def main() -> int:
     rep = Report()
+    only = only_filter()
     pairs = check_filesets(rep)
     check_lang_catalogue(rep)
     check_main_files(rep)
@@ -709,6 +729,10 @@ def main() -> int:
     check_value_defs(rep, docs)
     check_diagram_sources(rep, docs)
 
+    if only:
+        rep.fail = [x for x in rep.fail if mentions(x, only)]
+        rep.warn = [x for x in rep.warn if mentions(x, only)]
+        rep.ok = [f"(filtered to {only})"]
     allows = sum(d.allows for d in docs)
     print("=" * 68)
     print("EDITION PARITY")

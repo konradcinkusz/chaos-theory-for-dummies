@@ -1,5 +1,5 @@
 .PHONY: all en pl check source numbers plots diagrams verify code starters \
-        debt clean chapter site
+        debt clean chapter site traps
 
 # One paper format, two languages: main-en.tex and main-pl.tex differ in two
 # lines and share everything else.
@@ -29,6 +29,7 @@ all: source numbers plots diagrams en pl check
 # ---------------------------------------------------------------------------
 source:
 	@python3 tools/gen_stubs.py --check
+	@python3 tools/gen_traps.py --check
 	@out=$$(python3 tools/parity.py) || { echo "$$out"; exit 1; }; \
 	 echo "$$out" | tail -n 1
 	@python3 tools/check_structure.py --all
@@ -45,6 +46,10 @@ en: numbers
 pl: numbers
 	latexmk -pdf -interaction=nonstopmode -file-line-error main-pl.tex
 	@python3 tools/checklog.py main-pl.log
+
+# Appendix B and notes/02-traps.md, from each chapter's notes/traps/chNN.json.
+traps:
+	@python3 tools/gen_traps.py
 
 # One chapter on its own, in its own build directory, for writing it:
 #     make chapter CH=ch05          (both languages)

@@ -1,18 +1,42 @@
 %% appE --- Manifest
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/chapters.json.
-%% Poniższy opis jest kontraktem tego rozdziału: co ma uzasadnić, co ma dać
-%% czytelnikowi i czego NIE ma zabierać sąsiednim rozdziałom. Napisanie
-%% rozdziału oznacza usunięcie zalążkowego bloku (tego, który zaczyna się po
-%% linii \chapter) i zastąpienie go rozdziałem -- po czym ten plik nie jest
-%% już generowany.
+%% Generated. The three lists are collected by the build at the point where
+%% each lab, plot and diagram is placed, and every figure in the ledger comes
+%% from code/measure/ledgers.py, so this appendix cannot describe a book that
+%% no longer exists.
+%%
+%% Twin: appendices/en/appE-manifest.tex.
 
 \chapter{Manifest}
 \label{app:manifest}
 
-\chapterstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\noindent
+Co zawiera książka, policzone, a nie zadeklarowane. Każdą liczbę poniżej
+proces budowania oblicza z repozytorium i odmawia dokończenia pracy, jeśli
+książka się zmieniła, a ta strona nie.
 
-Generated. Every listing, lab, plot and diagram, and the ledgers, computed
-from the tree.
-}
+\section*{Rejestr}
+
+\begin{center}
+\begin{tabularx}{0.9\linewidth}{Xr}
+\toprule
+Napisane rozdziały, z \val{ledgers.chapters} & \val{ledgers.written} \\
+Listingi, każdy uruchamiany przy budowaniu & \val{ledgers.listings} \\
+Laboratoria, każde z szablonem, który nie przechodzi, i rozwiązaniem, które przechodzi & \val{ledgers.labs} \\
+Testy sprawdzające laboratoria & \val{ledgers.tests} \\
+Pytania \enquote{zatrzymaj się i pomyśl} & \val{ledgers.thinks} \\
+Pytania sprawdzianów, każde z odpowiedzią w dodatku~\ref{app:answers} & \val{ledgers.answers} \\
+Błędne odczytania w dodatku~\ref{app:misreadings} & \val{ledgers.traps} \\
+Wykresy & \val{ledgers.plots} \\
+Diagramy & \val{ledgers.diagrams} \\
+Wydruki wyników listingów & \val{ledgers.transcripts} \\
+Obliczone liczby w tekście & \val{ledgers.values} \\
+Linie biblioteki \code{chaoslab} & \val{ledgers.library} \\
+Fragmenty kodu wydrukowane bez uruchomienia & \val{ledgers.verify} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\listoflabs
+\listofplots
+\listofdiagrams
