@@ -16,7 +16,7 @@ from chaoslab import logistic
 
 def main() -> None:
     print("     r   period")
-    for r in (3.82, 3.8284, 3.8285, 3.83, 3.84, 3.845, 3.848, 3.85, 3.86):
+    for r in (3.82, 3.8284, 3.8285, 3.83, 3.84, 3.845, 3.848, 3.85):
         p = settled_period(r)
         print(f"{r:6}   {p if p else '-':>6}")
     print(f"the window opens at 1 + sqrt(8) = {1 + math.sqrt(8):.5f}")

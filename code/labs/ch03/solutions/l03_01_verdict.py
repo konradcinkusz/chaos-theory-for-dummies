@@ -1,11 +1,6 @@
 """Reference solution for Lab 3.1."""
 
-from chaoslab import slope
-
-
-def next_gen(r: float):
-    """The crowding rule with growth rate r, as a rule of one number."""
-    return lambda x: r * x * (1 - x)
+from chaoslab import logistic, slope
 
 
 def fixed_points(r: float) -> list[float]:
@@ -15,7 +10,7 @@ def fixed_points(r: float) -> list[float]:
 
 def level_slope(r: float) -> float:
     """The slope of the crowding rule at its settled level 1 - 1/r."""
-    return slope(next_gen(r), 1 - 1 / r)
+    return slope(logistic(r), 1 - 1 / r)
 
 
 def verdict(r: float) -> str:

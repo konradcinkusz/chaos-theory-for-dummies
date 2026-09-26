@@ -1,9 +1,10 @@
 """Lab 3.1 -- read a fixed point's fate off its slope.
 
 Chapter 2 measured slopes by nudging, and chaoslab's `slope` does it for
-any rule you hand it. Here you use it on the crowding rule
-x |-> r * x * (1 - x), at its settled level 1 - 1/r, and turn the number
-into a verdict about a population that starts a little off that level:
+any rule you hand it. chaoslab's `logistic(r)` is the crowding rule
+x |-> r * x * (1 - x). Measure its slope at the settled level 1 - 1/r and
+turn the number into a verdict about a population that starts a little off
+that level:
 
     "creeps in"    the nudge shrinks and keeps its side  (0 <= s < 1)
     "swings in"    it shrinks and changes side each time (-1 < s < 0)
@@ -13,13 +14,7 @@ The tests then run the rule for two thousand generations and check that
 your verdict is what actually happens.
 """
 
-from chaoslab import slope  # noqa: F401 -- you will need it
-
-
-def next_gen(r: float):
-    """The crowding rule with growth rate r, as a rule of one number (given:
-    hand it to `slope`)."""
-    return lambda x: r * x * (1 - x)
+from chaoslab import logistic, slope  # noqa: F401 -- you will need them
 
 
 def fixed_points(r: float) -> list[float]:
@@ -30,7 +25,7 @@ def fixed_points(r: float) -> list[float]:
 
 def level_slope(r: float) -> float:
     """The slope of the crowding rule at its settled level 1 - 1/r,
-    measured with chaoslab's slope."""
+    measured with chaoslab's slope on chaoslab's logistic(r)."""
     raise NotImplementedError("your turn: replace this line")
 
 

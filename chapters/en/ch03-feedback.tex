@@ -10,8 +10,11 @@
 %% first two-cycle, and shows only that the settling STOPS. Where exactly the
 %% fixed point loses its grip, the cobweb on a parabola, the four-cycle and
 %% the irregular behaviour beyond are Chapter 5's; the bifurcation diagram is
-%% Chapter 8's; r = 4 is never mentioned. The slope is MEASURED, never given as
-%% a formula (Chapter 5 and Chapter 7 use one).
+%% Chapter 8's; r = 4 is never mentioned. The slope is Chapter 2's, measured
+%% by nudging with chaoslab's slope; this chapter APPLIES it to a curve and
+%% never gives it as a formula (Chapter 5 and Chapter 7 use one). Exponential
+%% growth and the logarithm are Chapter 2's too, so the doubling section is
+%% short and points back.
 %%
 %% The brief's "continuous logistic growth stepped finely" is the same law of
 %% change paid in ten instalments a generation (code/ch03/overshoot.py): that
@@ -45,8 +48,8 @@ population that runs out of room does not always come to a gentle stop.
 \outcome{turn \enquote{growth slows as room runs out} into a rule, and run
   it}
 \outcome{test whether the effects of two pushes on a rule add up}
-\outcome{find the fixed points of a curved rule and measure the slope at
-  each by computing}
+\outcome{find the fixed points of a curved rule and judge each by its
+  measured slope}
 \outcome{predict from that slope what a population near its settled level
   will do next}
 \end{outcomes}
@@ -56,28 +59,27 @@ population that runs out of room does not always come to a gentle stop.
 \index{doubling}\index{bacteria}
 
 \noindent
-Doubling is the simplest growth there is: at every step, each one of
-whatever you have becomes two. Chapter~\ref{ch:iteration} called growth like
-this, in proportion to what is already there, exponential.
+Chapter~\ref{ch:iteration} called growth that multiplies by the same number
+at every step exponential, and counted with a logarithm the steps it takes
+to double. The bacterium is that kind of growth, with a multiplier of two
+every twenty minutes.
 
 \begin{think}
-Back to the bacterium, doubling every twenty minutes. Roughly how long until
-the colony weighs more than the Earth: a century, a year, a month, or two
-days?
+Roughly how long until its colony weighs more than the Earth: a century, a
+year, a month, or two days?
 \end{think}
 \reveal{Under two days: \val{ch03.earth.doublings} doublings, which is
 \val{ch03.earth.hours} hours. One cell weighs about a million-millionth of a
 gram.}
-Most people guess a year or more. The listing counts in whole numbers, so
-nothing is rounded along the way:
+Most people guess a year or more. The logarithm of
+Chapter~\ref{ch:iteration} would give the count; the listing counts in whole
+numbers instead, and the line \code{cells = 2 * cells} is the whole of the
+growth rule.
 
 \pyregion{code/ch03/doubling.py}{grow}{Counting doublings until the colony outweighs the Earth}{lst:ch03-grow}
 
 \noindent
-The line \code{cells = 2 * cells} is the whole of the growth rule. The rest
-of the program prints the colony every eight hours:
-
-\pyregion{code/ch03/doubling.py}{table}{The colony, every eight hours}{lst:ch03-table}
+The rest of the program prints the colony every eight hours:
 
 \transcript{ch03-doubling}
 
@@ -86,13 +88,10 @@ In Python's shorthand for very large and very small numbers,
 \code{4.7e+09} is \num{4.7} with the decimal point moved nine places to the
 right, and \code{1.0e-12} is the point moved twelve places to the left. After
 one day the colony would weigh about \val{ch03.day.tonnes} tonnes; less than
-a day later, more than the planet.
-
-Doubling fools the eye because each step adds more than all the steps before
-it together. Put one grain of rice on the first square of a chessboard, two
-on the second, four on the third, and so on: the first four squares hold
-$1 + 2 + 4 + 8 = 15$ grains and the fifth holds $16$ on its own, and at the
-end the last square holds more than the other sixty-three together.
+a day later, more than the planet. Doubling fools the eye because each
+step adds more than all the steps before it together: put one grain of rice
+on the first square of a chessboard, two on the second and four on the
+third, and the last square holds more than the other sixty-three together.
 
 Nothing grows like that for long. A flask of broth stops its bacteria at a
 few billion cells in every millilitre, when the food is gone and the waste
@@ -148,10 +147,10 @@ every scrap of food and space is taken. Then $1 - x$ is the share of the
 room still free.
 
 With room to spare, suppose each animal leaves $r$ young that live to breed,
-so the next generation is $r$ times this one: $x \to r x$. With $r = 2$ that
+so the next generation is $r$ times this one: $x \mapsto r x$. With $r = 2$ that
 is the doubling rule. Now let the crowding slow it down, by multiplying by
 the share of the room that is still free:
-\[ x \;\to\; r\,x\,(1 - x). \]
+\[ x \;\mapsto\; r\,x\,(1 - x). \]
 In words: the next generation is what this one would breed with room to
 spare, scaled down by the room that is left. While $x$ is tiny, $1 - x$ is
 nearly $1$ and the rule is nearly the doubling rule. As $x$ grows the brake
@@ -273,13 +272,13 @@ With $r = \num{1.5}$, where does the population settle?
 \reveal{At one third: $1/\num{1.5}$ is two thirds, and $1 - \tfrac{2}{3} =
 \tfrac{1}{3}$.}
 A fixed point is only half the answer; the other half is whether a
-population near it is drawn in or pushed away. For a straight-line rule
-$x \to a x + b$ that was decided by the multiplier $a$: a nudge away from
-the fixed point is multiplied by $a$ at every step, so it shrinks when $a$ is
-between $-1$ and $1$ and grows otherwise. A curve has no single multiplier;
-its steepness changes from place to place. But zoom in on it, and near any
-one point it looks straight \dash{} and a straight line does have a
-multiplier. It is the line's steepness, its \emph{slope}.
+population near it is drawn in or pushed away. Chapter~\ref{ch:iteration}
+answered that for a straight line: a nudge away from the fixed point is
+multiplied at every step by the rule's \emph{slope}, and the fixed point
+holds when the size of the slope is below one. It also found that a curve's
+slope changes from place to place. That does not spoil the test, because a
+small enough nudge feels only the curve where it is: zoom in, and near any
+one point a curve looks straight.
 
 \plotfig{ch03-zoom}{The crowding rule with $r = \num{1.5}$, zoomed in on its
 fixed point at one third. Close enough, the curve is indistinguishable from
@@ -287,12 +286,10 @@ a straight line, and the steepness of that line decides what happens to a
 small nudge.}{zooming in until a curve looks straight}
 
 \noindent
-So measure the slope: nudge the population a millionth up and a millionth
-down, and see how far apart the next generations land.
+So measure the slope at each fixed point by nudging, with \pkg{chaoslab}'s
+\api{slope}, as Chapter~\ref{ch:iteration} did:
 
-\pyregion{code/ch03/settle.py}{slope}{How much one generation multiplies a tiny nudge}{lst:ch03-slope}
-
-\pyregion{code/ch03/settle.py}{table}{The slope at both fixed points, for two growth rates}{lst:ch03-slopes}
+\pyregion{code/ch03/settle.py}{measure}{The slope of the crowding rule at both fixed points, for two growth rates}{lst:ch03-slope}
 
 \transcript{ch03-settle}
 
@@ -306,9 +303,9 @@ one half is \val{ch03.slope.half}. That fixed point sits on the flat top of
 the hump, where a nudge is all but wiped out in a single generation, which is
 why the crowded column snapped onto \num{0.5} so fast.
 
-This is the idea the rest of the book leans on: \textbf{on a curve, the
-slope at a point is the multiplier of a tiny nudge there}, found by nudging
-and looking.
+This is the idea the rest of the book leans on: \textbf{at a fixed point
+of a curve, the slope does the job the multiplier did for a line}, and
+decides whether a small nudge dies away or grows.
 
 \begin{rigourbox}
 Taken on trust here: that the slope decides for a curve what the
@@ -318,18 +315,20 @@ in any first course on dynamical systems. The measurement estimates what
 calculus calls the \emph{derivative}, exactly here to every digit printed.
 \end{rigourbox}
 
-\begin{lab}{l03_01_slope}{Measure a slope, and judge a fixed point}
-Write \code{slope}, which measures the slope of any rule you hand it;
-\code{fixed\_points}, which gives both fixed points of the crowding rule;
-and \code{is\_stable}, which uses the slope to say whether a fixed point
-holds. The tests include the cosine button of a calculator, pressed over and
-over.
-\end{lab}
-
 \begin{projectbox}
-The book's shared library, \pkg{chaoslab}, has this measurement for any
-rule as \api{slope}, and later chapters call it.
+\pkg{chaoslab} has the crowding rule as \api{logistic}: hand it $r$ and it
+hands back the rule, ready for \api{slope} and \api{orbit}. The name is
+Chapter~\ref{ch:logistic}'s, where the rule's stranger habits begin.
 \end{projectbox}
+
+\begin{lab}{l03_01_verdict}{Read a fixed point's fate off its slope}
+Write \code{fixed\_points}, which gives both fixed points of the crowding
+rule; \code{level\_slope}, which measures the slope at the settled level;
+and \code{verdict}, which reads from that slope whether a population nudged
+off the level creeps back, swings back or is pushed away. The tests run the
+rule for two thousand generations and check your verdict against what
+happens.
+\end{lab}
 
 \section{Overshoot}
 \label{sec:ch03-overshoot}
@@ -359,18 +358,19 @@ swings, and turned up further the swings need not die away at all.
 \noindent
 The slope says why. At the settled level with $r = \num{2.8}$ it is
 \val{ch03.slope.over}. Its size is below one, so a nudge shrinks and the
-level is stable. But it is negative: a population a little above the level
-is sent a little below it, then a little above again. A negative slope is
-overshoot built into the rule, and settling with swings that shrink is
-called a \emph{damped oscillation}.
+level is stable. But it is negative, and Chapter~\ref{ch:iteration} showed
+on a straight line what a negative multiplier does: a population a little
+above the level is sent a little below it, then a little above again.
+Settling with swings that shrink is called a \emph{damped oscillation}.
 
 What puts the overshoot there is delay. The rule works out a whole
 generation's change from how crowded the place is now, and looks again only a
 generation later. At \val{ch03.over.before}, below its level, the population
 sees plenty of room and breeds a big next generation; by the time those
-young arrive the room has gone, and the population is past the level. You
-have met this in an unfamiliar shower: turn the tap towards hot, nothing
-happens, so you turn it further \dash{} and then it scalds you.
+young arrive the room has gone, and the population is past the level. The
+hotel shower of Chapter~\ref{ch:iteration} overshot for the same reason: the
+water you feel left the tap a few seconds ago, so you turn the tap further
+than you need \dash{} and then it scalds you.
 
 To test that explanation, take the delay away. Keep the same law of change,
 but let the population look at its crowding ten times a generation: split
@@ -446,13 +446,13 @@ surprising you.
 
 \begin{summarybox}
 \begin{itemize}
-\item \textbf{Exponential growth}, in proportion to what is already there,
-  adds more at each step than at all the steps before, and nothing real grows
-  that way for long.
+\item \textbf{Exponential growth}, met in Chapter~\ref{ch:iteration}, adds
+  more at each doubling than at all the doublings before, and nothing real
+  grows that way for long.
 \item \textbf{Feedback} is a quantity changing its own rate of change.
   \textbf{Positive feedback} pushes on (a howl, a bank run) until it meets a
   limit; \textbf{negative feedback} pushes back (a thermostat, crowding).
-\item Crowding written into doubling gives $x \to r x (1 - x)$, with $x$ the
+\item Crowding written into doubling gives $x \mapsto r x (1 - x)$, with $x$ the
   fraction of the room in use: an \textbf{S-curve}, growing fastest at half
   its settled level.
 \item For a straight-line rule the effects of pushes add up
@@ -460,7 +460,8 @@ surprising you.
   not, and a push can help or hurt depending on where the system stands.
 \item The rule settles where each animal is exactly replaced, at the
   \textbf{fixed point} $1 - 1/r$. The \textbf{slope} there, measured by
-  nudging, multiplies a small nudge; a size below one makes it stable.
+  nudging as in Chapter~\ref{ch:iteration}, multiplies a small nudge; a size
+  below one makes it stable.
 \item A negative slope means \textbf{overshoot} and a \textbf{damped
   oscillation}. The cause is delay: the same law in small instalments does
   not overshoot.

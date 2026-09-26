@@ -7,6 +7,5 @@
  3.845        6
  3.848       12
   3.85        -
-  3.86        -
 the window opens at 1 + sqrt(8) = 3.82843
 periods 3, 6, 12, ...: last ratio 4.669
