@@ -272,7 +272,7 @@ $r = \num{3.2}$.
 \index{prediction horizon}\index{Lyapunov time}
 
 \noindent
-Now put the number to work. After $n$ steps a small error of size $\delta$
+After $n$ steps a small error of size $\delta$
 (the Greek letter delta) has grown to about $\delta\, e^{\lambda n}$. You
 stop trusting a prediction once its error reaches a tolerance $T$, the
 largest error you can live with. So the horizon is the number of steps at
@@ -284,7 +284,7 @@ leaves $\ln\delta + \lambda n = \ln T$, and so
 In words: the horizon is the logarithm of how many times the error is
 allowed to grow, divided by the rate at which it grows.
 
-The number $1/\lambda$ has a name of its own. It is the \emph{Lyapunov time},
+The number $1/\lambda$ is called the \emph{Lyapunov time}:
 the number of steps over which errors grow by the factor $e$. At $r = 4$ it
 is $1/\ln 2$, about \val{ch07.lyap.time} steps, and the formula says that a
 horizon is the Lyapunov time multiplied by $\ln(T/\delta)$.
@@ -397,8 +397,8 @@ number of steps whatever error you started from.
 \index{Lyapunov exponent!across r}
 
 \noindent
-One number for each setting of the knob means you can turn the knob and
-watch the number. Chapter~\ref{ch:logistic} found a fixed point at
+With one number per setting of the knob, you can turn the knob and watch
+it. Chapter~\ref{ch:logistic} found a fixed point at
 $r = \num{2.8}$ and a two-cycle at $r = \num{3.2}$; between them, at $r = 3$,
 the fixed point gives way.
 
@@ -409,9 +409,9 @@ that make $\lambda$?
 \reveal{$2 - 3 = -1$, and $\ln 1 = 0$, so $\lambda = 0$: a nudge is neither
 stretched nor shrunk, only flipped. Run at $r = 3$, the program finds a value
 within $\num{0.001}$ of zero.}
-Zero is the borderline, and it marks the places where one kind of behaviour
-hands over to another. To see where those are, take the exponent at many
-settings of $r$. The listing uses the library's \api{lyapunov}, which is the
+Zero is the borderline, and it marks where one kind of behaviour hands over
+to another. To find such places, take the exponent at many settings of $r$.
+The listing uses the library's \api{lyapunov}, which is the
 loop of \code{exponent} with the rule and its stretch passed in, so that it
 works for any map:
 

@@ -146,7 +146,7 @@ v.num("centre.8", centres[3], ".4f")
 v.num("rc.2", c_to_r(centres[1]), ".4f")
 v.num("rc.4", c_to_r(centres[2]), ".4f")
 v.num("rc.8", c_to_r(centres[3]), ".4f")
-v.num("feig.ratio", ratios[-1], ".2f")
+v.num("feig.ratio", ratios[-1], ".3f")
 v.num("feig.c", limit_c, ".3f")
 v.num("feig.r", c_to_r(limit_c), ".4f")
 
