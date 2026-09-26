@@ -13,20 +13,18 @@ from superstable import LOGISTIC, landmarks, ratios
 
 from chaoslab import sine_map
 
-# --8<-- [start:sine]
-SINE = (sine_map, (0.4, 0.6), (0.72, 0.84))
-# --8<-- [end:sine]
+# --8<-- [start:compare]
+SINE = (sine_map, (0.4, 0.6), (0.72, 0.84))   # brackets read off its diagram
 
 
 def main() -> None:
-    # --8<-- [start:table]
     a = landmarks(*LOGISTIC, count=11)
     b = landmarks(*SINE, count=11)
     print(" n   logistic   sine map")
     for n, (x, y) in enumerate(zip(ratios(a), ratios(b), strict=True), 2):
         print(f"{n:2d}  {x:9.2f}  {y:9.2f}")
     print(f"last{a[-1]:9.4f}  {b[-1]:9.4f}")
-    # --8<-- [end:table]
+# --8<-- [end:compare]
 
 
 if __name__ == "__main__":

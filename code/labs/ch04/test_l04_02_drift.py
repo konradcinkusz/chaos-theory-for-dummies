@@ -28,3 +28,10 @@ def test_rk4_holds_the_energy() -> None:
     lab = load("ch04", "l04_02_drift")
     d = lab.drift(rk4_step, 0.1, 10)
     assert -1e-5 < d < 0.0             # a very slight loss
+
+
+def test_halving_the_step() -> None:
+    # Euler's drift only about halves; RK4's shrinks about thirty-two-fold.
+    lab = load("ch04", "l04_02_drift")
+    assert 1.9 < lab.halving(euler_step, 0.01, 10) < 2.2
+    assert 30 < lab.halving(rk4_step, 0.1, 10) < 34

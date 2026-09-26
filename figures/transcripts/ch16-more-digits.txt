@@ -1,0 +1,11 @@
+step  0:     2 digits
+step  2:     3 digits
+step  4:    12 digits
+step  6:    45 digits
+step  8:   179 digits
+step 10:   716 digits
+step 12:  2863 digits
+  16 digits kept: right for 54 steps
+  32 digits kept: right for 108 steps
+  64 digits kept: right for 217 steps
+ 128 digits kept: right for 430 steps

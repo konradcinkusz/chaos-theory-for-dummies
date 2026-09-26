@@ -71,6 +71,8 @@ assert 1 < KOCH_D < 2 and 0 < CANTOR_D < 1
 v.num("koch.dim", KOCH_D, ".2f")
 v.num("cantor.dim", CANTOR_D, ".2f")
 v.num("koch.halve", 2**KOCH_D, ".1f")
+# A checkpoint question: cut into five, keep three (the 1st, 3rd and 5th).
+v.num("five.dim", math.log(3) / math.log(5), ".2f")
 
 # --- Box counting on the Koch curve: all ten sizes, and any five in a row.
 ns = counts(KOCH_POINTS, KOCH_SIZES)

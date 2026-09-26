@@ -22,7 +22,6 @@ def long_run(r: float, burn: int = BURN, keep: int = KEEP) -> list[float]:
 
 
 def main() -> None:
-    # --8<-- [start:table]
     print("    r  period  where the orbit lives")
     for r in (2.8, 3.2, 3.5, 3.56, 3.567, 3.9):
         xs = long_run(r)
@@ -34,7 +33,6 @@ def main() -> None:
         else:
             where = f"{p} values from {min(xs):.2f} to {max(xs):.2f}"
         print(f"{r:5}  {p if p else '-':>6}  {where}")
-    # --8<-- [end:table]
 
 
 if __name__ == "__main__":

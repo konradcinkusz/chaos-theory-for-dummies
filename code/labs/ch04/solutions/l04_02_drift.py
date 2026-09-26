@@ -18,3 +18,8 @@ def drift(stepper, dt: float, seconds: float) -> float:
     for _ in range(round(seconds / dt)):
         state = stepper(FIELD, state, dt)
     return spring_energy(state) / spring_energy(START) - 1.0
+
+
+def halving(stepper, dt: float, seconds: float) -> float:
+    """Drift with step dt divided by drift with step dt / 2."""
+    return drift(stepper, dt, seconds) / drift(stepper, dt / 2, seconds)

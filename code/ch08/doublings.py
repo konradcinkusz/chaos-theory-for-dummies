@@ -9,12 +9,10 @@ the orbit settles into, and keep the half where the change still lies.
 from chaoslab import logistic, orbit, period
 
 
-# --8<-- [start:settle]
 def settled_period(r: float, burn: int = 20_000) -> int | None:
     """The period the orbit at r has settled into, after `burn` steps."""
     xs = orbit(logistic(r), 0.5, burn + 256)
     return period(xs[burn:], tol=1e-6)
-# --8<-- [end:settle]
 
 
 # --8<-- [start:fork]
@@ -42,7 +40,6 @@ def forks() -> list[float]:
 
 
 def main() -> None:
-    # --8<-- [start:table]
     rs = forks()
     print("   fork       r     gap   ratio")
     for i, (p, _, _) in enumerate(BRACKETS):
@@ -53,7 +50,6 @@ def main() -> None:
             ratio = (rs[i - 1] - rs[i - 2]) / (rs[i] - rs[i - 1])
             line += f"  {ratio:6.2f}"
         print(line)
-    # --8<-- [end:table]
 
 
 if __name__ == "__main__":

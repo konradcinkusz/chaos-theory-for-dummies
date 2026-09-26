@@ -97,6 +97,8 @@ v.num("hz.gained", sum(diffs) / len(diffs), ".1f")
 v.num("hz.sixteen", horizon(LN2, 1e-16, tol), ".0f")
 v.num("digits.hundred", math.ceil(1 + 100 * LN2 / math.log(10)))
 v.num("digits.thousand", math.ceil(1 + 1000 * LN2 / math.log(10)))
+# A horizon in Lyapunov times: ln of how many times the error may grow.
+v.num("ln.tenbillion", math.log(1e10), ".0f")
 
 # --- 5. The exponent across r ---------------------------------------------
 sweep = {(340 + 4 * k) / 100:

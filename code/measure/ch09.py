@@ -17,12 +17,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ch09"))
 
 from _values import Values
-from chaoslab import horizon, integrate, lorenz, lyapunov_flow, rk4_step
+from averages import STARTS, fraction_right, mean_height
 from cloud import corners, room
 from exponent import STARTS as LAMBDA_STARTS
 from lorenz_run import DT, loops, path
-from averages import STARTS, fraction_right, mean_height
 from two_runs import a, b, first_apart
+
+from chaoslab import horizon, integrate, lorenz, lyapunov_flow, rk4_step
 
 v = Values("ch09")
 SIGMA, RHO, BETA = 10.0, 28.0, 8.0 / 3.0

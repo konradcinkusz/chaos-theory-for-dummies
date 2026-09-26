@@ -46,7 +46,6 @@ def gap(a: tuple[float, ...], b: tuple[float, ...]) -> float:
 
 
 def main() -> None:
-    # --8<-- [start:run]
     s = start()
     alone = (s[0], s[3], s[4])       # a copy that runs on its own
     print("  time    driven copy    copy left alone")
@@ -57,7 +56,6 @@ def main() -> None:
             print(f"{n * DT:6.1f}    {driven:10.2e}    {free:10.2e}")
         s = rk4_step(drive_and_copy, s, DT)
         alone = rk4_step(ORIGINAL, alone, DT)
-    # --8<-- [end:run]
 
 
 if __name__ == "__main__":

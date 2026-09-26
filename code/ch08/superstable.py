@@ -16,17 +16,15 @@ Rule = Callable[[float], float]
 Family = Callable[[float], Rule]
 
 
-# --8<-- [start:top]
+# --8<-- [start:search]
 def from_top(f: Rule, steps: int) -> float:
     """Start at the top of the hump; how far from it are you after steps?"""
     x = 0.5
     for _ in range(steps):
         x = f(x)
     return x - 0.5
-# --8<-- [end:top]
 
 
-# --8<-- [start:bisect]
 def bisect(g: Callable[[float], float], lo: float, hi: float,
            rounds: int = 60) -> float:
     """A root of g between lo and hi, where g changes sign: halve and keep
@@ -41,15 +39,15 @@ def bisect(g: Callable[[float], float], lo: float, hi: float,
         else:
             hi = mid
     return (lo + hi) / 2
-# --8<-- [end:bisect]
+# --8<-- [end:search]
 
 
+# --8<-- [start:landmarks]
 def returns(family: Family, steps: int) -> Callable[[float], float]:
     """The function of r whose root is the landmark with this period."""
     return lambda r: from_top(family(r), steps)
 
 
-# --8<-- [start:landmarks]
 def landmarks(family: Family, first: tuple[float, float],
               second: tuple[float, float], count: int,
               base: int = 1) -> list[float]:
@@ -66,6 +64,9 @@ def landmarks(family: Family, first: tuple[float, float],
         found.append(bisect(returns(family, base * 2 ** n),
                             found[-1] + gap / 10, found[-1] + gap / 2))
     return found
+
+
+LOGISTIC = (logistic, (1.5, 2.5), (3.0, 3.4))
 # --8<-- [end:landmarks]
 
 
@@ -75,11 +76,7 @@ def ratios(found: list[float]) -> list[float]:
                                                    found[2:], strict=False)]
 
 
-LOGISTIC = (logistic, (1.5, 2.5), (3.0, 3.4))
-
-
 def main() -> None:
-    # --8<-- [start:table]
     found = landmarks(*LOGISTIC, count=11)
     print(" n  period    landmark R_n           gap   ratio")
     for n, r in enumerate(found):
@@ -89,7 +86,6 @@ def main() -> None:
         if n >= 2:
             line += f"  {ratios(found)[n - 2]:.4f}"
         print(line)
-    # --8<-- [end:table]
 
 
 if __name__ == "__main__":

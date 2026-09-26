@@ -36,7 +36,8 @@ v.num("n", N)
 for k in range(4):
     v.num(f"a.{k + 1}", shuf[k], ".4f")
     v.num(f"b.{k + 1}", rule[k], ".4f")
-assert abs(rule[1] - 0.64) < 1e-12, "4 x 0.2 x 0.8, which the reader checks by hand"
+# 4 x 0.2 x 0.8, which the reader checks by hand
+assert abs(rule[1] - 0.64) < 1e-12
 hist = histogram(rule)
 v.num("hist.low", hist[0])
 v.num("hist.mid", hist[2])
@@ -102,10 +103,17 @@ v.num("sir.two", epidemic.SEASONS[1], ".1f")
 v.num("sir.four", epidemic.SEASONS[2], ".1f")
 v.num("sir.wild", epidemic.SEASONS[3], ".1f")
 v.num("sir.steady", flat[0], ".0f")
-assert max(flat) - min(flat) < 1e-6, "no school year: the same every year"
-assert two[0] != two[1] and two[:2] == two[2:4], "every other year"
-assert four[:4] == four[4:8] and four[0] != four[2], "every fourth year"
-assert wild[:4] != wild[4:8], "no repeat"
+
+
+def repeats(xs: list[float], p: int) -> bool:
+    """Does the list repeat every p years, to a millionth of a case?"""
+    return all(abs(xs[k] - xs[k + p]) < 1e-6 for k in range(len(xs) - p))
+
+
+assert repeats(flat, 1), "no school year: the same every year"
+assert repeats(two, 2) and not repeats(two, 1), "every other year"
+assert repeats(four, 4) and not repeats(four, 2), "every fourth year"
+assert not any(repeats(wild, p) for p in (1, 2, 3, 4)), "no repeat"
 
 
 def deepest(season: float) -> float:

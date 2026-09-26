@@ -1,0 +1,13 @@
+step  0:  computer 0.100000   truth 0.100000
+step  1:  computer 0.200000   truth 0.200000
+step  2:  computer 0.400000   truth 0.400000
+step  3:  computer 0.800000   truth 0.800000
+step  4:  computer 0.600000   truth 0.600000
+step  5:  computer 0.200000   truth 0.200000
+step 40:  computer 0.600006   truth 0.600000
+step 45:  computer 0.200195   truth 0.200000
+step 50:  computer 0.406250   truth 0.400000
+step 53:  computer 0.250000   truth 0.200000
+step 54:  computer 0.500000   truth 0.400000
+step 55:  computer 0.000000   truth 0.800000
+step 60:  computer 0.000000   truth 0.600000

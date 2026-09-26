@@ -56,7 +56,10 @@ v.num("hor.gain", nine - six, ".1f")
 assert 9.5 < nine - six < 10.5
 assert format(printed(math.log(1000), ".3f") / printed(lam, ".3f"),
               ".1f") == format(nine - six, ".1f")
+v.num("ln.ten", math.log(10), ".3f")
 v.num("per.digit", math.log(10) / lam, ".1f")
+assert format(printed(math.log(10), ".3f") / printed(lam, ".3f"),
+              ".1f") == format(math.log(10) / lam, ".1f")
 v.num("per.digit.henon", math.log(10) / lam_henon, ".1f")
 assert lam_henon < lam, "the Henon map's errors grow more slowly"
 

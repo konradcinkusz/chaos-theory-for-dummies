@@ -23,14 +23,12 @@ def wait(x: float, largest: float) -> int:
 
 
 def main() -> None:
-    # --8<-- [start:table]
     starts = [k / 1001 for k in range(1, 1001)]
     print("largest nudge    average wait    longest wait")
     for percent in (10.0, 1.0, 0.1):
         waits = [wait(x, percent / 100 * R0) for x in starts]
         print(f"{percent:5.1f} per cent   {sum(waits) / len(waits):8.0f}"
               f"      {max(waits):10d}")
-    # --8<-- [end:table]
 
 
 if __name__ == "__main__":

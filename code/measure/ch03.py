@@ -96,6 +96,8 @@ assert abs(s28 + 0.8) < 1e-6
 v.num("over.level", level28, ".3f")
 v.num("over.peak", once[peak], ".3f")
 v.num("over.peakgen", peak)
+v.num("over.before", once[peak - 1], ".2f")   # below the level, and then
+assert once[peak - 1] < level28 - 0.1
 v.num("over.fall", once[peak + 1], ".3f")
 v.num("slope.over", s28, ".3f")
 
