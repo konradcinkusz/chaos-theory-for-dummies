@@ -54,6 +54,33 @@ mystery. It turns up in dripping taps, swinging pendulums, animal
 populations, heart rhythms, the orbits of planets and, most famously, the
 weather.
 
+\section*{See it before you believe it}
+
+Here is the whole claim in one small experiment, with nothing hidden. Take a
+number $x$ between $0$ and $1$ and apply one rule, over and over: the new $x$
+is $4 \times x \times (1 - x)$. From $x = \num{0.2}$ the first step gives
+$4 \times \num{0.2} \times \num{0.8} = \num{0.64}$, and you could do the
+second on paper. No chance enters anywhere.
+
+Now run the rule twice: once from \num{0.2}, and once from
+\num{0.2000000001}, a start that differs by one part in ten billion, far
+below anything a ruler, a thermometer or a satellite can measure. Here are
+both runs, every fifth step:
+
+\transcript{ch06-twins}
+
+\noindent
+Read down the two columns. For the first \val{ch06.twins.million} steps the
+runs agree to within a millionth. By step~\val{ch06.twins.apart} they do not
+agree even in the first decimal place, and from there on they are two
+unrelated lists of numbers. The rule is exact, the two starts are the same to
+ten digits, and the futures have nothing in common.
+
+That is chaos in miniature. Chapter~\ref{ch:butterfly} runs this program with
+you and measures how fast the gap grows; most of what comes before it is the
+preparation, and everything after it is an explanation of this table, a
+measurement of it, or a use for it.
+
 \section*{Why it is worth your time}
 
 You might reasonably ask why anyone who is not a scientist should learn

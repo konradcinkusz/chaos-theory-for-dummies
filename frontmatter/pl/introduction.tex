@@ -54,6 +54,34 @@ losowości, tłumu ani tajemnicy. Pojawia się w kapiących kranach, wahadłach,
 populacjach zwierząt, rytmie serca, orbitach planet i, najsłynniej, w
 pogodzie.
 
+\section*{Zobacz to, zanim uwierzysz}
+
+Oto cała teza w jednym małym eksperymencie, w którym nic nie jest ukryte.
+Weź liczbę $x$ z przedziału od $0$ do $1$ i stosuj w kółko jedną regułę:
+nowe $x$ to $4 \times x \times (1 - x)$. Dla $x = \num{0.2}$ pierwszy krok
+daje $4 \times \num{0.2} \times \num{0.8} = \num{0.64}$, a drugi możesz
+policzyć na kartce. Przypadek nie występuje tu nigdzie.
+
+Teraz policz to dwa razy: raz od \num{0.2}, a raz od \num{0.2000000001}, czyli
+od startu, który różni się o jedną dziesięciomiliardową część, daleko poniżej
+tego, co zmierzy linijka, termometr czy satelita. Oto oba przebiegi, co piąty
+krok:
+
+\transcript{ch06-twins}
+
+\noindent
+Przeczytaj obie kolumny od góry do dołu. Przez pierwsze
+\val{ch06.twins.million} kroków przebiegi zgadzają się co do milionowej
+części. W kroku~\val{ch06.twins.apart} nie zgadzają się nawet na pierwszym
+miejscu po przecinku i od tej pory to dwa niepowiązane ze sobą ciągi liczb.
+Reguła jest dokładna, oba starty są takie same do dziesięciu cyfr, a ich
+przyszłości nie mają ze sobą nic wspólnego.
+
+To chaos w miniaturze. Rozdział~\ref{ch:butterfly} uruchamia ten program razem
+z tobą i mierzy, jak szybko rośnie różnica; wszystko, co go poprzedza, to
+przygotowanie, a wszystko, co po nim, to wyjaśnienie tej tabelki, jej pomiar
+albo jej zastosowanie.
+
 \section*{Dlaczego warto poświęcić na to czas}
 
 Możesz rozsądnie zapytać, po co ktoś, kto nie jest naukowcem, miałby się

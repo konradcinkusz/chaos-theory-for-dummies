@@ -8,7 +8,7 @@
     },
     "pl": {
       "habit": "Skutek dwóch pchnięć to suma ich skutków.",
-      "truth": "Tylko dla reguły prostoliniowej. Na krzywej, a taką robi z reguły sprzężenie zwrotne, skutek pchnięcia zależy od tego, gdzie układ już się znajduje: dwa pchnięcia mogą razem zrobić znacznie więcej, znacznie mniej albo coś przeciwnego niż ich suma."
+      "truth": "Tylko dla reguły liniowej. Na krzywej, a taką robi z reguły sprzężenie zwrotne, skutek pchnięcia zależy od tego, gdzie układ już się znajduje: dwa pchnięcia mogą razem zrobić znacznie więcej, znacznie mniej albo coś przeciwnego niż ich suma."
     }
   },
   {

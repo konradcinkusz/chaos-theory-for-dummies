@@ -309,7 +309,7 @@
       "file": "appB-misreadings",
       "label": "app:misreadings",
       "en": "Misreadings of chaos",
-      "pl": "Błędne odczytania chaosu",
+      "pl": "Częste nieporozumienia o chaosie",
       "brief": "The catalogue of misconceptions from notes/02-traps.md, each in the reader's own voice, with what is true instead and the chapter that elicits it. Gated by check_structure.py --traps."
     },
     {

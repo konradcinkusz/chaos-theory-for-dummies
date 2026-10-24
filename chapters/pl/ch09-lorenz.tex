@@ -27,7 +27,7 @@ zaczyna się toczyć: w górę z jednej strony, w dół z drugiej, jak powolne
 koło. Powietrze robi to samo nad nasłonecznionym polem, a w większej skali to
 toczenie się jest jednym z silników pogody.
 
-Opisz ten wir trzema liczbami i trzema krótkimi regułami, dokładnymi, bez
+Opisz ten walec trzema liczbami i trzema krótkimi regułami, dokładnymi, bez
 żadnej przypadkowości. Czy będzie się kręcił równo, jak koło? Czy też trzy
 liczby mogą być tak nieregularne jak niebo? Część~II znalazła chaos w
 regułach, które robią jeden krok na raz. Ten rozdział znajduje go w czymś,
@@ -36,7 +36,7 @@ spodziewał: kształt.
 
 \begin{outcomes}
 \outcome{przeczytać trzy reguły zmiany Lorenza wyraz po wyrazie i powiedzieć,
-  co każdy wyraz robi z wirem}
+  co każdy wyraz robi z walcem}
 \outcome{prowadzić reguły metodą RK4 i odczytać wynik z dwóch widoków: jedna
   liczba względem drugiej oraz jedna liczba względem czasu}
 \outcome{zmierzyć, jak szybko rozchodzą się dwa prawie identyczne przebiegi,
@@ -63,12 +63,12 @@ rozdziale~\ref{ch:motion}. Model Lorenza to drastycznie okrojony opis płynu
 podgrzewanego od dołu i zachowuje trzy liczby:
 
 \begin{itemize}
-\item $x$: jak szybko kręci się wir i w którą stronę (dodatnie w jedną,
+\item $x$: jak szybko kręci się walec i w którą stronę (dodatnie w jedną,
   ujemne w drugą);
 \item $y$: o ile cieplejsza jest strona, którą woda się wznosi, od strony,
   którą opada;
 \item $z$: o ile temperatura, od dołu do góry, została odgięta od
-  równomiernego spadku przez mieszanie, które robi wir.
+  równomiernego spadku przez mieszanie, które robi walec.
 \end{itemize}
 
 \noindent
@@ -84,18 +84,18 @@ z trzema stałymi liczbami nazwanymi greckimi literami: $\sigma$ (sigma) to
 $10$, $\rho$ (ro) to $28$, a $\beta$ (beta) to $\tfrac{8}{3}$. Słowami:
 
 \begin{itemize}
-\item \textbf{Wir goni różnicę temperatur.} Gdy $y$ jest większe od $x$, wir
+\item \textbf{Walec goni różnicę temperatur.} Gdy $y$ jest większe od $x$, walec
   przyspiesza, a gdy mniejsze, zwalnia; $\sigma$ mówi, jak żwawo.
-\item \textbf{Wir buduje różnicę, a różnica ucieka.} Po wymnożeniu druga
-  reguła to $\rho x - xz - y$. Kręcący się wir wynosi ciepłą wodę w górę z
+\item \textbf{Walec buduje różnicę, a różnica ucieka.} Po wymnożeniu druga
+  reguła to $\rho x - xz - y$. Kręcący się walec wynosi ciepłą wodę w górę z
   jednej strony i sprowadza chłodną w dół z drugiej, budując $y$ w tempie
   $\rho x$, gdzie $\rho$ mówi, jak mocno grzejemy garnek ($\rho = 1$ to
-  najsłabsze grzanie, przy którym wir w ogóle rusza). Wyraz $-y$ to różnica
+  najsłabsze podgrzewanie, przy którym walec w ogóle rusza). Wyraz $-y$ to różnica
   uciekająca na boki; wyraz $-xz$ to mieszanie, które się odgryza.
-\item \textbf{Wir miesza warstwę, a warstwa się uspokaja.} Wir wynoszący
+\item \textbf{Walec miesza warstwę, a warstwa się uspokaja.} Walec wynoszący
   ciepłą wodę w górę ($x$ i $y$ tego samego znaku) wygina profil temperatury w
   tempie $xy$; pozostawiony sam sobie profil wraca w tempie $\beta z$, gdzie
-  $\beta$ wynika z kształtu wirów.
+  $\beta$ wynika z kształtu walców.
 \end{itemize}
 
 \noindent
@@ -104,8 +104,8 @@ inny wyraz to stała liczba razy jedna z nich. Te dwa iloczyny to cała
 nieliniowość modelu w sensie z rozdziału~\ref{ch:feedback} i okaże się, że
 wystarczą.
 
-\mermaidfig{ch09-feedback}{Trzy liczby popychają się nawzajem w kółko. Wir
-buduje różnicę temperatur, różnica napędza wir, a razem mieszają warstwę,
+\mermaidfig{ch09-feedback}{Trzy liczby popychają się nawzajem w kółko. Walec
+buduje różnicę temperatur, różnica napędza walec, a razem mieszają warstwę,
 która osłabia różnicę.}{trzy liczby w pętli}
 
 \begin{think}
@@ -114,7 +114,7 @@ mówią trzy reguły?
 \end{think}
 \reveal{Każde tempo jest zerem: $10 \times (0 - 0) = 0$, potem $0 - 0 = 0$,
 potem $0 - 0 = 0$. Nic się nie zmienia.}
-To garnek, który po cichu przekazuje ciepło w górę, bez żadnego wiru. Stan, w
+To garnek, który po cichu przekazuje ciepło w górę, bez żadnego walca. Stan, w
 którym każde tempo jest zerem, to \emph{punkt stały} przepływu, w języku
 rozdziału~\ref{ch:iteration}: zacznij w nim, a w nim zostaniesz. Nie jest
 jedyny.
@@ -127,10 +127,10 @@ $\tfrac{8}{3} \times 27 = 72$.
 \reveal{Tak. Pierwsze tempo to $10 \times 0 = 0$. Drugie to
 $x \times (28 - 27) - y = x - y = 0$. Trzecie to $x \times x - 72 = 72 -
 72 = 0$.}
-To \emph{ustalony wir}: kręci się ze stałą prędkością przy stałej różnicy
-temperatur. Z minusami, $x = y = -\sqrt{72}$ i $z = 27$, to ten sam wir
-kręcący się w drugą stronę. Dla każdego grzania $\rho$ większego od $1$ oba
-ustalone wiry leżą w $x = y = \pm\sqrt{\beta(\rho - 1)}$ i $z = \rho - 1$,
+To \emph{stały walec}: obraca się ze stałą prędkością przy stałej różnicy
+temperatur. Z minusami, $x = y = -\sqrt{72}$ i $z = 27$, to ten sam walec
+obracający się w drugą stronę. Dla każdego podgrzewania $\rho$ większego od $1$ oba
+stałe walce leżą w $x = y = \pm\sqrt{\beta(\rho - 1)}$ i $z = \rho - 1$,
 gdzie $\pm$ znaczy \enquote{plus albo minus}.
 
 \begin{lab}{l09_01_rates}{Reguły Lorenza własną ręką}
@@ -165,13 +165,13 @@ trzy punkty stałe. Czy przebieg rozpoczęty w $(1, 1, 1)$, blisko
 nieruchomej wody, osiądzie w jednym z nich?
 \end{think}
 \reveal{Nie. Zostaje odepchnięty od nieruchomej wody, krąży wokół jednego
-ustalonego wiru coraz szerszymi pętlami, zostaje przerzucony, by krążyć
+stałego walca coraz szerszymi pętlami, zostaje przerzucony, by krążyć
 wokół drugiego, i nigdy się nie uspokaja.}
-Przy tym grzaniu żaden ustalony wir nie potrafi zatrzymać stanu; potrafią
-tylko wtedy, gdy $\rho$ jest mniejsze od $\tfrac{470}{19}$, czyli około
+Przy takim podgrzewaniu żaden ze stałych walców nie utrzyma stanu;
+utrzymują go tylko wtedy, gdy $\rho$ jest mniejsze od $\tfrac{470}{19}$, czyli około
 \val{ch09.rho.hopf} \dash{} tę liczbę daje z reguł algebra, której ta
-książka nie przeprowadza. Zmniejsz grzanie do $20$, a ten sam start
-rzeczywiście się uspokoi: ostatni wiersz wydruku to ustalony wir w
+książka nie przeprowadza. Zmniejsz podgrzewanie do $20$, a ten sam start
+rzeczywiście się uspokoi: ostatni wiersz wydruku to stały walec w
 $x = y = -\val{ch09.steady.x}$, $z = 19$.
 
 \transcript{ch09-butterfly}
@@ -184,15 +184,15 @@ a potem litery idą seriami od jednej do pięciu, bez żadnego wzoru. Nie ma go
 czego szukać: to jest \emph{nieokresowość} z tytułu Lorenza.
 
 \plotfig{ch09-butterfly}{Przebieg od $(1, 1, 1)$. Z lewej: $x$ względem $z$
-od chwili 5 do chwili 60 \dash{} pętle wokół dwóch ustalonych wirów
+od chwili 5 do chwili 60 \dash{} pętle wokół dwóch stałych walców
 (krzyżyki) rysują dwa skrzydła. Z prawej: $x$ względem czasu przez
-pierwsze czterdzieści jednostek czasu; linie przerywane to ustalone
-wiry.}{motyl z dwóch stron}
+pierwsze czterdzieści jednostek czasu; linie przerywane to stałe
+walce.}{motyl z dwóch stron}
 
 \noindent
 Lewa połowa rysunku~\ref{fig:ch09-butterfly} zasłużyła na nazwę
-\emph{motyla Lorenza}. Każde skrzydło to wir kręcący się w jedną stronę;
-przejście między nimi to wir zmieniający kierunek.
+\emph{motyla Lorenza}. Każde skrzydło to walec obracający się w jedną stronę;
+przejście między nimi to walec zmieniający kierunek.
 
 \begin{think}
 Służby pogodowe liczą dziś modele niosące wiele milionów liczb. Model
@@ -210,8 +210,8 @@ droga może przechodzić nad sobą i pod sobą, i to wystarcza.
 \textbf{\enquote{Chaos potrzebuje wielu zmiennych.}} Potrzebuje trzech liczb
 i dwóch mnożeń. Pogodę trudno przewidzieć nie tylko dlatego, że atmosfera
 jest wielka: garnek wody okrojony do trzech liczb jest już
-nieprzewidywalny. Czego chaos naprawdę potrzebuje, to temat
-rozdziału~\ref{ch:strange}.
+nieprzewidywalny. Czego chaos naprawdę potrzebuje, wyjaśnia
+rozdział~\ref{ch:strange}.
 \end{trapbox}
 
 \begin{worldbox}
@@ -283,7 +283,7 @@ $\ln(10^{8})$, czyli około \val{ch09.ln.eight}.
 \reveal{Około $\val{ch09.ln.eight} / \val{ch09.lambda}$, czyli mniej więcej
 \val{ch09.horizon} jednostek czasu. Para powyżej potrzebowała
 \val{ch09.apart.first}.}
-Jedna para to jedna próbka. Rozdziel przebieg w \val{ch09.apart.pairs}
+Jedna para to jedna próbka. Rozdwój przebieg w \val{ch09.apart.pairs}
 różnych miejscach wzdłuż motyla, a pierwsze przekroczenie $1$ wypada
 gdziekolwiek od chwili \val{ch09.apart.min} do chwili \val{ch09.apart.max},
 średnio w \val{ch09.apart.mean}. Wzór przewiduje średnią; rozrzut bierze się
@@ -326,13 +326,13 @@ rysunkach powyżej:
 
 \noindent
 Program prowadzi każdy przez pięćdziesiąt jednostek czasu, pomija pierwsze
-pięć i wypisuje pokój, w którym żył każdy przebieg:
+pięć i wypisuje obszar, w którym mieścił się każdy przebieg:
 
 \transcript{ch09-cloud}
 
 \noindent
-Każdy przebieg zostaje ściągnięty ze swojego narożnika i potem mieszka w tym
-samym pokoju co długi przebieg. Zauważ też, że wiersze idą w identycznych
+Każdy przebieg zostaje ściągnięty ze swojego narożnika i potem przebywa w tym
+samym obszarze co długi przebieg. Zauważ też, że wiersze idą w identycznych
 parach: $(-40, -40, -40)$ i $(40, 40, -40)$ dają te same liczby. Następny
 podrozdział mówi dlaczego.
 
@@ -370,7 +370,7 @@ komputer liczył tak, że każdy błąd zaokrąglenia był wzięty pod uwagę.
 \index{atraktor!statystyki}
 
 \noindent
-Motyl mówi, gdzie przebieg mieszka. Następne pytanie brzmi: jak spędza tam
+Motyl mówi, gdzie przebieg przebywa. Następne pytanie brzmi: jak spędza tam
 czas.
 
 \begin{think}
@@ -381,7 +381,7 @@ dodatnie?
 \reveal{Tak: połowę. Zmień jednocześnie znaki $x$ i $y$: pierwsze dwa tempa
 zmieniają znak razem z nimi, a trzecie, $xy - \beta z$, wcale się nie
 zmienia, bo $(-x)(-y) = xy$.}
-Reguły nie dbają więc o to, w którą stronę kręci się wir. Każdy przebieg na
+Reguły nie dbają więc o to, w którą stronę obraca się walec. Każdy przebieg na
 jednym skrzydle ma lustrzane odbicie na drugim \dash{} dlatego wiersze
 chmury szły parami \dash{} i długi przebieg dzieli swój czas między skrzydła
 po równo.
@@ -389,7 +389,7 @@ po równo.
 \begin{trapbox}
 \textbf{\enquote{Jeśli droga jest nieprzewidywalna, nic w niej nie da się
 przewidzieć.}} Droga jest nieprzewidywalna dalej niż na mniej więcej
-dwadzieścia jednostek czasu. Kształt, na którym mieszka, już nie, podobnie
+dwadzieścia jednostek czasu. Kształt, na którym leży, już nie, podobnie
 jak to, ile czasu spędza w każdej jego części. To są \emph{statystyki
 atraktora} i z każdego startu wychodzą takie same.
 \end{trapbox}
@@ -416,13 +416,13 @@ prawym skrzydle i jaka jest jego średnia wysokość:
 
 \noindent
 Środkowa kolumna to część nieprzewidywalna: lewe, lewe, prawe, lewe, prawe, i
-nic, co mógłbyś wiedzieć zawczasu, tego nie wybiera. Ostatnie dwie kolumny to
+nic, co mógłbyś wiedzieć z góry, nie podpowiada, które wypadnie. Ostatnie dwie kolumny to
 część przewidywalna. Udział prawego skrzydła wynosi od \val{ch09.frac.lo} do
 \val{ch09.frac.hi} z każdego startu, tak jak zapowiadało lustro. Średnia
 wysokość wynosi od \val{ch09.height.lo} do \val{ch09.height.hi}, a tej liczby
-nie podpowiedziała żadna symetria: po prostu jest taka sama z każdego startu.
+nie podpowiedziała żadna symetria, a mimo to jest taka sama z każdego startu.
 
-Statystyka skończonego przebiegu trochę się chwieje. Potnij jeden przebieg
+Statystyka policzona z przebiegu o skończonej długości trochę się waha. Potnij jeden przebieg
 długości \val{ch09.long.time} jednostek czasu na kawałki: w kawałkach po 100
 jednostek czasu udział prawego skrzydła odbiega zwykle od połowy o około
 \val{ch09.wobble.short}; w kawałkach po 2000 \dash{} o około
@@ -439,10 +439,10 @@ wystartował.}{histogramy obojętne na start}
 Cały histogram tego, gdzie przebieg spędza czas, wychodzi taki sam z trzech
 startów. To oś tego rozdziału i druga wielka myśl tej książki:
 \textbf{indywidualna przyszłość układu chaotycznego jest nieprzewidywalna,
-ale to, gdzie układ mieszka i jak często odwiedza każdą część, da się
+ale to, gdzie układ przebywa i jak często odwiedza każdą część, da się
 przewidzieć}. Nawet $\lambda$ jest liczbą tego rodzaju.
 
-Rozdział~\ref{ch:weather} buduje właśnie na tym rozróżnienie między pytaniem
+Na tym rozróżnieniu rozdział~\ref{ch:weather} opiera różnicę między pytaniem
 o pogodę na przyszły tydzień a pytaniem o klimat i pokazuje, jak synoptycy
 liczą wiele kopii naraz. Rozdział~\ref{ch:computers} pyta, dlaczego można
 ufać statystyce, choć własne zaokrąglenia komputera szybko czynią jego drogę
@@ -451,12 +451,12 @@ inną niż prawdziwa.
 \begin{summarybox}
 \begin{itemize}
 \item Model Lorenza z 1963 roku, opisujący podgrzewany garnek, zachowuje trzy
-  liczby: prędkość wiru $x$, różnicę temperatur $y$ i wymieszanie $z$. Tylko
+  liczby: prędkość walca $x$, różnicę temperatur $y$ i wymieszanie $z$. Tylko
   dwa wyrazy jego trzech \textbf{reguł zmiany}, $xy$ i $xz$, są
   \textbf{nieliniowe}. Jego \textbf{punkty stałe} to nieruchomy garnek i dwa
-  \textbf{ustalone wiry}.
+  \textbf{stałe walce}.
 \item Przy $\rho = 28$ przebieg nie osiada w żadnym punkcie stałym: krąży
-  wokół jednego ustalonego wiru, potem wokół drugiego, przeskakując
+  wokół jednego stałego walca, potem wokół drugiego, przeskakując
   nieregularnie i nigdy się nie powtarzając. Trzy liczby to najmniej, ile
   \textbf{przepływ} potrzebuje do chaosu, i wystarczą.
 \item Dwa przebiegi o jedną stumilionową od siebie rozchodzą się w mniej
@@ -468,19 +468,19 @@ inną niż prawdziwa.
   zechce.
 \item \textbf{Statystyki atraktora}, takie jak część czasu na każdym
   skrzydle i średnia wysokość, są takie same z każdego startu. Droga jest
-  nieprzewidywalna; to, gdzie układ mieszka, nie.
+  nieprzewidywalna; to, gdzie układ przebywa, nie.
 \end{itemize}
 \end{summarybox}
 
 \canyou
 
 \begin{checkpoint}
-\item Co słowami robi z wirem reguła na tempo $x$, $\sigma(y - x)$, gdy $y$
+\item Co słowami robi z walcem reguła na tempo $x$, $\sigma(y - x)$, gdy $y$
   jest większe od $x$?
-  \answerto{Sprawia, że $x$ rośnie: wir przyspiesza w stronę różnicy
+  \answerto{Sprawia, że $x$ rośnie: walec przyspiesza w stronę różnicy
   temperatur.}
 \item Gdzie przy $\rho = 28$ leżą trzy punkty stałe reguł Lorenza?
-  \answerto{Nieruchomy garnek, $(0, 0, 0)$, oraz dwa ustalone wiry,
+  \answerto{Nieruchomy garnek, $(0, 0, 0)$, oraz dwa stałe walce,
   $x = y = \pm\sqrt{72}$ (około \val{ch09.fixed.xy}) z $z = 27$.}
 \item Dlaczego przepływ z dwiema liczbami nie może być chaotyczny i ile liczb
   używa model Lorenza?

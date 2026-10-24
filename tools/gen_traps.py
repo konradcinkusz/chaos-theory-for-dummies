@@ -38,15 +38,15 @@ HEAD = {
             "it."),
     },
     "pl": {
-        "title": "Błędne odczytania chaosu",
+        "title": "Częste nieporozumienia o chaosie",
         "chapter": "Rozdział",
         "intro": (
-            "Każde błędne odczytanie, które książka stara się poprawić, w "
-            "kolejności, w jakiej wywołują je rozdziały. Każde jest zapisane "
-            "głosem kogoś, kto w nie wierzy, a po nim następuje to, co jest "
-            "prawdą, i podrozdział, w którym książka pozwala ci najpierw w nie "
-            "wpaść. Jeśli trafiłeś tu przed przeczytaniem tego podrozdziału, "
-            "wpis nabierze sensu później: każda pułapka miała na ciebie "
+            "Każde nieporozumienie, które książka stara się rozwiać, w kolejności, "
+            "w jakiej wywołują je rozdziały. Każde jest zapisane głosem kogoś, "
+            "kto w nie wierzy, a po nim następuje to, co jest prawdą, i "
+            "podrozdział, w którym książka pozwala ci najpierw w nie wpaść. "
+            "Jeśli trafiłeś tu przed przeczytaniem tego podrozdziału, wpis "
+            "nabierze sensu później: każda pułapka miała na ciebie "
             "zadziałać."),
     },
 }
