@@ -34,7 +34,7 @@ def two_releases(lang: str):
             gaps.append(gap(a, b))
         a, b = rk4_step(RULE, a, DT), rk4_step(RULE, b, DT)
     top.plot(ts, la, color=BLUE, label=T(lang, "first release",
-                                            "pierwsze puszczenie"))
+                                            "pierwszy start"))
     top.plot(ts, lb, color=AMBER, ls="--",
              label=T(lang, "a millionth of a radian further round",
                      "o milionową część radiana dalej"))
@@ -126,7 +126,7 @@ def gentle_wild(lang: str):
                 label=T(lang, "parted", "rozeszły się"))
     ax.axhline(APART, color=GREY, lw=0.6, ls="--")
     ax.set_xlabel(T(lang, "release angle of both arms (degrees)",
-                    "kąt puszczenia obu ramion (stopnie)"))
+                    "kąt startowy obu ramion (stopnie)"))
     ax.set_ylabel(T(lang, f"largest gap in {round(SECONDS)} s (rad)",
                     f"największa różnica w {round(SECONDS)} s (rad)"))
     ax.set_xticks(range(0, 181, 30))

@@ -328,3 +328,36 @@ pass could not verify or that was not true as stated:
 pass was unsure of a date (Shishikura's result, in Chapter 12) it left the
 date out rather than guessing.
 
+
+### The editorial pass, October 2026 --- reviewer feedback
+
+A reviewer who read the contents, the introduction, Chapter 9 and the
+appendices made four points; three were actionable.
+
+- **Chaos arrived late.** The introduction now has a section, *See it before
+  you believe it* / *Zobacz to, zanim uwierzysz*, that prints Chapter 6's
+  `ch06-twins` transcript (two starts one part in ten billion apart) and its
+  `ch06.twins.*` values. It adds no listing, value or transcript of its own,
+  so nothing new is gated; if Chapter 6's twins change, the introduction
+  follows them.
+- **The promise outran the level.** *How to use this book* has a section,
+  *The pace changes*, that says which chapters are harder than school
+  mathematics (4, 7, 10, 11, 13) and tells the reader to read for the idea and
+  skip the rigour boxes and labs rather than stop. Keep that list in step with
+  the chapters if a brief moves.
+- **The Polish read as translation.** Fixed, with the reasoning, so the choice
+  is not undone: *steady roll* is **stały walec** (a convection roll, not a
+  *wir*), *heating* is **podgrzewanie**, a double-pendulum *release* is a
+  **start**, *misreadings* is **nieporozumienia** (Appendix B is *Częste
+  nieporozumienia o chaosie*), *the lab* as a verb is **przejdź do
+  laboratorium** (the box stays *Laboratorium*), *the room a run lived in* is
+  an **obszar**, and *linear* is **liniowa** throughout (Chapter 3 had
+  *prostoliniowa*). *po prostu* is out, as *simply* is. The English text
+  decides what a sentence says; the Polish rebuilds it, but digits, maths and
+  macros keep the English order or `parity.py` fails (a reordered pair of
+  numbers in Chapter 1 did exactly that during this pass).
+- **Not done here**: this sandbox has no TeX and no Python 3.14, so the
+  editions were not recompiled, the page counts above were not re-measured
+  and `ruff` was not run. The source gates (`parity`, `check_structure`,
+  `gen_traps --check`, `gen_stubs --check`) pass. A Polish editor should still
+  read the whole book.

@@ -158,7 +158,7 @@ $(-\num{0.4}, \num{0.3})$.}
 \noindent
 Listing ciągnie dalej tam, gdzie zatrzymała się twoja ręka. Punkt skacze, nie
 uspokajając się, nie powtarzając i nie uciekając: jakkolwiek długo go
-puścisz, $x$ pozostaje między \val{ch10.attractor.left} a
+będziesz prowadzić, $x$ pozostaje między \val{ch10.attractor.left} a
 \val{ch10.attractor.right}.
 
 \section{Jeden kształt dla każdego startu}
@@ -178,7 +178,7 @@ jednym punkcie, czy gdzie indziej?
 \end{think}
 \reveal{Gdzie indziej. Kilka punktów ucieka na zawsze, a wszystkie pozostałe
 leżą na jednym cienkim, wygiętym zbiorze \dash{} tym samym, który rysuje
-pojedynczy start, jeśli puścić go dość długo. Nie zbierają się w punkcie, bo
+pojedynczy start, jeśli prowadzić go dość długo. Nie zbierają się w punkcie, bo
 rozciąganie trzyma je z dala od siebie wzdłuż tego zbioru.}
 
 \pyregion{code/ch10/cloud.py}{cloud}{Chmura startów i to, czy każdy ląduje na atraktorze}{lst:ch10-cloud}
@@ -187,8 +187,8 @@ rozciąganie trzyma je z dala od siebie wzdłuż tego zbioru.}
 \transcript{ch10-cloud}
 
 \noindent
-Żeby rozstrzygnąć, czy punkt leży na tym zbiorze, program najpierw puszcza
-jeden start na \val{ch10.cloud.reference} kroków i zaznacza każdy kwadracik o
+Żeby rozstrzygnąć, czy punkt leży na tym zbiorze, program najpierw prowadzi
+jeden start przez \val{ch10.cloud.reference} kroków i zaznacza każdy kwadracik o
 boku \val{ch10.cloud.cell}, który ten start odwiedzi. Na początku tylko
 \val{ch10.cloud.zero} z \val{ch10.cloud.n} punktów leży w zaznaczonym
 kwadraciku. Od kroku \val{ch10.cloud.settled} leżą w nich wszystkie
@@ -351,8 +351,8 @@ struktura nie ma najmniejszej skali.
 Atraktor o takiej warstwowej budowie, na którym ruch jest chaotyczny, nazywa
 się \emph{atraktorem dziwnym}; tę nazwę nadali mu David Ruelle i Floris
 Takens w 1971 roku. Motyl Lorenza jest takim atraktorem, a atraktor Hénona
-też. Taki zbiór jest czymś więcej niż linia, która miałaby skończoną długość,
-i czymś mniej niż pole, bo żadnego pola nie ma: jego wymiar leży między jeden
+też. Taki zbiór to coś więcej niż linia o skończonej długości i coś
+mniej niż pole, bo żadnego pola nie ma: jego wymiar leży między jeden
 a dwa, a rozdział~\ref{ch:fractals} mierzy, gdzie dokładnie.
 
 \begin{worldbox}

@@ -27,7 +27,7 @@ def butterfly(lang: str):
     run = np.array(integrate(FIELD, (1.0, 1.0, 1.0), DT, 6000))
     left.plot(run[500:, 0], run[500:, 2], color=BLUE, lw=0.35)
     left.plot([STILL, -STILL], [27, 27], "x", color=AMBER, ms=5, mew=1.2)
-    left.set_xlabel(T(lang, "x (the roll)", "x (wir)"))
+    left.set_xlabel(T(lang, "x (the roll)", "x (walec)"))
     left.set_ylabel(T(lang, "z (the layer)", "z (warstwa)"))
     left.set_title(T(lang, "Seen from the side: x against z",
                      "Z boku: x względem z"))

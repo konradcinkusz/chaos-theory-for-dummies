@@ -150,7 +150,7 @@ wydaje się zachowanie układu, bardzo mało mówi o tym, jak skomplikowana jest
 jego reguła.
 \end{trapbox}
 
-\section{Stan ustalony i chwila, w której puszcza}
+\section{Stan ustalony i chwila, w której przestaje się utrzymywać}
 \label{sec:ch05-fixed}
 \index{punkt stały}\index{punkt stały!stabilność}
 
@@ -201,14 +201,14 @@ Gdy podkręcasz $r$ od $\num{2.8}$ w górę, przy jakiej wartości nachylenie
 $2 - r$ osiąga $-1$, tak że punkt stały przestaje się utrzymywać?
 \end{think}
 \reveal{Przy $r = 3$, bo $2 - 3 = -1$. Poniżej $3$ stan ustalony się
-utrzymuje; powyżej $3$ puszcza.}
+utrzymuje; powyżej $3$ przestaje się utrzymywać.}
 
 \noindent
 To pierwsze miejsce, w którym pokrętło zmienia rodzaj zachowania, i
 znalazłeś je ręcznie. Przejście od dwóch wartości do czterech następuje
 wyżej; rozdział~\ref{ch:bifurcations} znajduje, gdzie, i wzór w tym, gdzie.
 
-\begin{lab}{l05_01_stability}{Gdzie stan ustalony puszcza}
+\begin{lab}{l05_01_stability}{Gdzie stan ustalony przestaje się utrzymywać}
 Napisz \code{fixed\_point}; \code{slope\_at}, która mierzy nachylenie w
 punkcie, przesuwając go w obie strony; oraz \code{holds}, która mówi, czy
 przesunięcie w punkcie stałym maleje. Potem napisz \code{lets\_go}, która
@@ -329,7 +329,7 @@ co to znaczy dla symulacji.
 \end{rigourbox}
 
 \begin{lab}{l05_02_period}{Własny detektor cykli}
-Napisz \code{settle}, która puszcza regułę bez patrzenia, a potem zachowuje
+Napisz \code{settle}, która uruchamia regułę bez patrzenia, a potem zachowuje
 kilka następnych wartości, oraz \code{period}, która znajduje najmniejsze
 $p$, dla którego każda wartość na liście równa się tej o $p$ miejsc dalej,
 i zwraca \code{None}, gdy żadne $p$ do ustalonej granicy nie pasuje. Testy
@@ -408,7 +408,7 @@ niedokładnego liczenia; odwzorowanie logistyczne pokazuje, że jedno
 pokolenie na rok i jedna prosta reguła wzrostu mogą dać taką samą
 nieregularność bez żadnego zakłócenia. May zakończył apelem, który sięga
 poza ekologię: żeby uczniowie poznawali to równanie wcześnie, bo intuicja
-wyćwiczona wyłącznie na regułach prostoliniowych zostawia ludzi
+wyćwiczona wyłącznie na regułach liniowych zostawia ludzi
 nieprzygotowanymi na to, co robią reguły zakrzywione. Ty już je poznałeś.
 
 \begin{trapbox}
@@ -445,7 +445,7 @@ obrazie.
 \begin{summarybox}
 \begin{itemize}
 \item \textbf{Odwzorowanie logistyczne}, $x_{n+1} = r\,x_n\,(1 - x_n)$, to
-  reguła prostoliniowa z jednym dodatkowym mnożeniem, sprzężeniem zwrotnym
+  reguła liniowa z jednym dodatkowym mnożeniem, sprzężeniem zwrotnym
   $1 - x_n$. Dla $r$ nie większego niż $4$ liczba $x$ pozostaje między $0$
   a $1$.
 \item Kręcenie $r$ daje \textbf{stan ustalony} przy $\num{2.8}$,

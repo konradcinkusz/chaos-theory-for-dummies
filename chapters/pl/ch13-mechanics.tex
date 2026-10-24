@@ -7,7 +7,7 @@
 %% zapisywane z późnej części chaotycznego przebiegu: chwila rozejścia jest
 %% brana długo przed tym, zanim różnica ostatniej cyfry mogłaby mieć znaczenie,
 %% a skrypt odmawia zapisania każdej liczby, którą zmieniłaby inna długość kroku
-%% albo puszczenie przesunięte o 1e-12 rad.
+%% albo start przesunięty o 1e-12 rad.
 %%
 %% Bliźniak: chapters/en/ch13-mechanics.tex. Podrozdział za podrozdziałem,
 %% makro za makrem, liczba za liczbą; tools/parity.py je porównuje.
@@ -36,8 +36,8 @@ planet krążących wokół Słońca, gdzie zadano je po raz pierwszy.
 \outcome{sprawdzić symulację układu bez tarcia, obserwując jego energię, i
   powiedzieć, czego ten sprawdzian dowodzi, a czego nie}
 \outcome{zmierzyć, jak daleko od siebie odchodzą dwa niemal identyczne
-  puszczenia, i sprawdzić, czy wynik zależy od długości kroku}
-\outcome{odróżnić łagodne puszczenie od dzikiego i powiedzieć, co zachowanie
+  starty, i sprawdzić, czy wynik zależy od długości kroku}
+\outcome{odróżnić łagodny start od dzikiego i powiedzieć, co zachowanie
   energii przesądza o przyszłości układu, a czego nie}
 \outcome{oddzielić to, co zmierzono na temat chaosu w Układzie Słonecznym, od
   tego, co jest legendą}
@@ -74,7 +74,7 @@ używać; to \api{double\_pendulum} z biblioteki książki, \pkg{chaoslab}. RK4 
 rozdziału~\ref{ch:motion} stosuje ją krok po kroku, po tysięcznej części
 sekundy naraz:
 
-\pyregion{code/ch13/release.py}{setup}{Puszczenie: cztery liczby i długość jednego kroku}{lst:ch13-setup}
+\pyregion{code/ch13/release.py}{setup}{Start: cztery liczby i długość jednego kroku}{lst:ch13-setup}
 
 \noindent
 \code{math.radians} zamienia stopnie na radiany, jednostkę, której oczekują
@@ -114,7 +114,7 @@ od punktu zawieszenia?
 wysokości są zerowe, a oba stoją w miejscu, więc nie ma też energii ruchu.}
 Wysokości poniżej punktu zawieszenia liczą się jako ujemne, więc wahadło
 wiszące w spoczynku ma energię ujemną; znaczenie mają tylko zmiany energii.
-Dla puszczenia z wydruku odrobina geometrii umieszcza górny ciężarek pół
+Dla startu z wydruku odrobina geometrii umieszcza górny ciężarek pół
 metra nad punktem zawieszenia, a dolny cały metr, więc energia wynosi
 $\num{9.81} \times (\num{0.5} + 1)$, czyli około \val{ch13.energy.start}
 dżula \dash{} od tego zaczyna się kolumna energii. Przeczytaj ją w dół: przez
@@ -158,7 +158,7 @@ obserwator. Kilka sekund później robią już zupełnie co innego.}
 
 \pyregion{code/ch13/two_releases.py}{gap}{Jak daleko od siebie są dwa wahadła}{lst:ch13-gap}
 
-\pyregion{code/ch13/two_releases.py}{run}{Dwa puszczenia różniące się o milionową część radiana}{lst:ch13-pair}
+\pyregion{code/ch13/two_releases.py}{run}{Dwa starty różniące się o milionową część radiana}{lst:ch13-pair}
 
 \transcript{ch13-two-releases}
 
@@ -175,12 +175,12 @@ na stole warsztatowym.
 milionowej części radiana. U góry: dolne ramię każdego z nich, nie do
 odróżnienia przez około dziesięć sekund. U dołu: różnica między nimi w skali
 logarytmicznej, rosnąca nierówno, aż staje się dość duża, by ją
-zobaczyć.}{dwa puszczenia, które się rozchodzą}
+zobaczyć.}{dwa starty, które się rozchodzą}
 
 \noindent
 Oto wątpliwość, która powinna ci przyjść do głowy. Każdy krok jest odrobinę
 błędny: a co, jeśli rozejście wywołują te błędy, a nie wahadło? Wtedy
-dokładniejsze kroki by je przesunęły. Uruchom więc te same dwa puszczenia z
+dokładniejsze kroki by je przesunęły. Uruchom więc te same dwa starty z
 czterema długościami kroku, obserwując przy tym energię:
 
 \pyregion{code/ch13/step_check.py}{parting}{Ta sama para, z dowolną długością kroku}{lst:ch13-parting}
@@ -199,11 +199,11 @@ przesuwa się nawet o setną część sekundy. Przy kroku używanym w książce,
 \plotfig{ch13-energy-error}{Jak daleko energia w symulacji odchodzi od swojej
 prawdziwej, stałej wartości, dla czterech długości kroku. Każde skrócenie
 kroku o połowę obniża całą krzywą mniej więcej o ten sam czynnik, a linia
-kropkowana zaznacza chwilę, w której dwa puszczenia się rozchodzą, taką samą
+kropkowana zaznacza chwilę, w której dwa starty się rozchodzą, taką samą
 dla wszystkich czterech.}{sprawdzian energii}
 
 \begin{note}
-Ten sprawdzian ma granicę. Policz jedno puszczenie dwa razy, z krokiem
+Ten sprawdzian ma granicę. Policz jeden start dwa razy, z krokiem
 książki i z jego połową, a te dwa obliczenia też się rozejdą, po około
 \val{ch13.stepper.apart} sekundach. Drobny błąd każdego kroku jest
 pchnięciem, a chaos powiększa je jak każde inne. Zaczyna się jednak od czegoś
@@ -223,11 +223,11 @@ wystarczą do chaosu. Sprawdzian energii dowodzi, że symulacja jest uczciwa.
 Nie sprawia, że ruch staje się przewidywalny.
 \end{trapbox}
 
-\begin{lab}{l13_02_apart}{Kiedy dwa puszczenia się rozchodzą?}
+\begin{lab}{l13_02_apart}{Kiedy dwa starty się rozchodzą?}
 Zamień listing w funkcję. \code{seconds\_until\_apart} prowadzi krok po kroku
 dwa wahadła obok siebie i zwraca pierwszą chwilę, w której różnią się o
 więcej niż zadana tolerancja, albo \code{None}, jeśli wciąż są razem, gdy
-skończy się czas. Potem jej użyj: o ile dłużej rozchodzą się puszczenia
+skończy się czas. Potem jej użyj: o ile dłużej rozchodzą się starty
 różniące się o miliardową część radiana niż takie, które różnią się o
 milionową? Porównaj odpowiedź z arytmetyką horyzontów z
 rozdziału~\ref{ch:lyapunov}.
@@ -238,7 +238,7 @@ rozdziału~\ref{ch:lyapunov}.
 \index{twierdzenie KAM}\index{wyspy ruchu regularnego}
 
 \noindent
-Wszystko dotąd było puszczeniem z wysoka, z dużą energią. Wahadło podwójne
+Wszystko dotąd było startem z wysoka, z dużą energią. Wahadło podwójne
 można też puścić łagodnie.
 
 \begin{think}
@@ -262,10 +262,10 @@ różnica wynosi \val{ch13.calm.gap} radiana: pchnięcie urosło kilka razy, a
 nie sto tysięcy razy. Od \val{ch13.wild.from}° w górę każda para się
 rozchodzi. Wykres wypełnia kąty pomiędzy.
 
-\plotfig{ch13-gentle-wild}{Każda kropka to puszczenie obu ramion pod jednym
+\plotfig{ch13-gentle-wild}{Każda kropka to start obu ramion pod jednym
 kątem, razem z kopią przesuniętą o milionową część radiana. Małe wychylenia
 pozostają razem przez dwadzieścia sekund; duże się rozchodzą, a zmiana
-następuje w przedziale kilku stopni.}{spokojne i dzikie puszczenia}
+następuje w przedziale kilku stopni.}{spokojne i dzikie starty}
 
 \noindent
 Tak właśnie żyje chaos w układzie bez tarcia. Przy małej energii wahadło
@@ -277,7 +277,7 @@ ruchu regularnego.
 
 \begin{rigourbox}
 Ta książka nie dowodzi, że wahadło podwójne jest chaotyczne; mierzy
-wrażliwość dla kilku puszczeń. Twierdzenie stojące za morzem i jego wyspami
+wrażliwość dla kilku startów. Twierdzenie stojące za morzem i jego wyspami
 nazywa się KAM, od Andrieja Kołmogorowa, który ogłosił je w 1954 roku, oraz
 Jürgena Mosera i Władimira Arnolda, którzy udowodnili jego wersje w latach
 1962 i 1963. Mówi ono, że gdy regularny układ bez tarcia zostanie lekko
@@ -397,10 +397,10 @@ chaosu opisanego w tym podrozdziale.
 \item Bez tarcia \textbf{energia} nie może się zmienić, więc energia
   symulacji mierzy błąd kroków: przy kroku książki około jednej części na
   \val{ch13.energy.parts}.
-\item Puszczenia różniące się o milionową część radiana rozchodzą się po
+\item Starty różniące się o milionową część radiana rozchodzą się po
   \val{ch13.apart.seconds} sekundy przy każdej długości kroku:
   \textbf{rozejście to fizyka}. Zachowanie energii nie zapobiega chaosowi.
-\item Łagodne puszczenia są \textbf{regularne}, a dzikie chaotyczne: morze z
+\item Łagodne starty są \textbf{regularne}, a dzikie chaotyczne: morze z
   wyspami, jak opisuje twierdzenie KAM. Bez tarcia nie ma atraktora; energia
   ogradza ruch.
 \item Dwa ciała mają wzór, a trzy nie. Poprawiona nagrodzona rozprawa
@@ -430,7 +430,7 @@ chaosu opisanego w tym podrozdziale.
   \answerto{Błąd kroków jest za duży, by ufać wynikowi. Skracaj krok, aż
   energia się utrzyma, a potem sprawdź, czy twoja odpowiedź przetrwa kolejne
   skrócenie kroku o połowę.}
-\item Dwa puszczenia rozchodzą się po dziesięciu sekundach. Skracasz krok o
+\item Dwa starty rozchodzą się po dziesięciu sekundach. Skracasz krok o
   połowę i teraz rozchodzą się po trzech. Co ci to mówi?
   \answerto{Że rozejście wywołały przynajmniej częściowo błędy kroków, więc
   żadnej z tych liczb nie można ufać. Rozejście, które jest fizyką, nie
